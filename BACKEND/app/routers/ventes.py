@@ -7,11 +7,12 @@ from app.database.dependencies import get_db
 
 from app.models.vente import Vente
 from app.models.client import Client
-from app.models.utilisateur import Utilisateur
 from app.models.detail_vente import DetailVente
 from app.models.produit import Produit
 from app.models.stock import Stock
 from app.models.mouvement_stock import MouvementStock
+from app.models.utilisateur import Utilisateur
+
 
 from app.schemas.vente import (
     VenteCreate,
@@ -20,12 +21,18 @@ from app.schemas.vente import (
     VenteCompleteResponse
 )
 
+from app.core.security import get_current_user
+
 
 router = APIRouter(
     prefix="/ventes",
     tags=["Ventes"]
 )
 
+
+# =========================================================
+# CREER UNE VENTE
+# =========================================================
 
 @router.post(
     "/",
@@ -37,6 +44,10 @@ def create_vente(
     db: Session = Depends(get_db)
 ):
 
+    # =====================================================
+    # CLIENT
+    # =====================================================
+
     client = db.query(Client).filter(
         Client.id_client == vente_data.id_client
     ).first()
@@ -47,8 +58,13 @@ def create_vente(
             detail="Client introuvable"
         )
 
+    # =====================================================
+    # UTILISATEUR
+    # =====================================================
+
     utilisateur = db.query(Utilisateur).filter(
-        Utilisateur.id_utilisateur == vente_data.id_utilisateur
+        Utilisateur.id_utilisateur ==
+        vente_data.id_utilisateur
     ).first()
 
     if utilisateur is None:
@@ -57,26 +73,145 @@ def create_vente(
             detail="Utilisateur introuvable"
         )
 
+    # =====================================================
+    # VERIFIER LES DETAILS
+    # =====================================================
+
+    if not vente_data.details:
+        raise HTTPException(
+            status_code=400,
+            detail="La vente doit contenir au moins un produit"
+        )
+
+    # =====================================================
+    # VERIFIER LES PRODUITS
+    # =====================================================
+
+    produits = []
+
+    total = Decimal("0")
+
+    for detail_data in vente_data.details:
+
+        produit = db.query(Produit).filter(
+            Produit.id_produit ==
+            detail_data.id_produit
+        ).first()
+
+        if produit is None:
+            raise HTTPException(
+                status_code=404,
+                detail=(
+                    f"Produit introuvable : "
+                    f"{detail_data.id_produit}"
+                )
+            )
+
+        if not produit.statut:
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    f"Le produit "
+                    f"'{produit.nom}' est désactivé"
+                )
+            )
+
+        # -------------------------------------------------
+        # Vérifier le stock
+        # -------------------------------------------------
+
+        stock = db.query(Stock).filter(
+            Stock.id_produit ==
+            detail_data.id_produit
+        ).first()
+
+        if stock is None:
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    f"Aucun stock disponible "
+                    f"pour '{produit.nom}'"
+                )
+            )
+
+        if detail_data.quantite > stock.quantite:
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    f"Stock insuffisant pour "
+                    f"'{produit.nom}'. "
+                    f"Disponible : {stock.quantite}, "
+                    f"demandé : {detail_data.quantite}"
+                )
+            )
+
+        # -------------------------------------------------
+        # Total
+        # -------------------------------------------------
+
+        sous_total = (
+            Decimal(str(produit.prix))
+            * detail_data.quantite
+        )
+
+        total += sous_total
+
+        produits.append(
+            (detail_data, produit)
+        )
+
+    # =====================================================
+    # CREER LA VENTE
+    # =====================================================
+
     vente = Vente(
         id_client=vente_data.id_client,
         id_utilisateur=vente_data.id_utilisateur,
-        statut=vente_data.statut,
-        total=0
+        statut="EN_COURS",
+        total=total
     )
 
     db.add(vente)
+
+    # Important : récupérer id_vente
+    db.flush()
+
+    # =====================================================
+    # CREER LES DETAILS
+    # =====================================================
+
+    for detail_data, produit in produits:
+
+        detail = DetailVente(
+            id_vente=vente.id_vente,
+            id_produit=produit.id_produit,
+            prix_unitaire=produit.prix,
+            quantite=detail_data.quantite
+        )
+
+        db.add(detail)
+
+    # =====================================================
+    # ENREGISTRER
+    # =====================================================
+
     db.commit()
+
     db.refresh(vente)
 
     return vente
 
+# =========================================================
+# LISTE DES VENTES
+# =========================================================
 
 @router.get(
     "/",
     response_model=list[VenteResponse]
 )
 def get_ventes(
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
 ):
 
     return db.query(Vente).order_by(
@@ -84,13 +219,18 @@ def get_ventes(
     ).all()
 
 
+# =========================================================
+# DETAIL D'UNE VENTE
+# =========================================================
+
 @router.get(
     "/{id_vente}",
     response_model=VenteCompleteResponse
 )
 def get_vente(
     id_vente: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
 ):
 
     vente = db.query(Vente).filter(
@@ -122,37 +262,71 @@ def get_vente(
     )
 
     details = []
+
     total_calcul = Decimal("0")
 
     for detail in details_db:
 
+        prix = Decimal(
+            str(detail.prix_unitaire)
+        )
+
         sous_total = (
-            Decimal(str(detail.prix_unitaire))
-            * detail.quantite
+            prix * detail.quantite
         )
 
         details.append({
-            "id_detail_vente": detail.id_detail_vente,
-            "id_produit": detail.id_produit,
-            "nom_produit": detail.nom_produit,
-            "prix_unitaire": float(detail.prix_unitaire),
-            "quantite": detail.quantite,
-            "sous_total": float(sous_total)
+            "id_detail_vente":
+                detail.id_detail_vente,
+
+            "id_produit":
+                detail.id_produit,
+
+            "nom_produit":
+                detail.nom_produit,
+
+            "prix_unitaire":
+                float(prix),
+
+            "quantite":
+                detail.quantite,
+
+            "sous_total":
+                float(sous_total)
         })
 
         total_calcul += sous_total
 
     return {
-        "id_vente": vente.id_vente,
-        "date_vente": vente.date_vente,
-        "total": float(vente.total),
-        "statut": vente.statut,
-        "id_client": vente.id_client,
-        "id_utilisateur": vente.id_utilisateur,
-        "details": details,
-        "total_calcul": float(total_calcul)
+        "id_vente":
+            vente.id_vente,
+
+        "date_vente":
+            vente.date_vente,
+
+        "total":
+            float(vente.total),
+
+        "statut":
+            vente.statut,
+
+        "id_client":
+            vente.id_client,
+
+        "id_utilisateur":
+            vente.id_utilisateur,
+
+        "details":
+            details,
+
+        "total_calcul":
+            float(total_calcul)
     }
 
+
+# =========================================================
+# MODIFIER LE STATUT
+# =========================================================
 
 @router.put(
     "/{id_vente}",
@@ -161,7 +335,8 @@ def get_vente(
 def update_vente(
     id_vente: int,
     vente_data: VenteUpdate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
 ):
 
     vente = db.query(Vente).filter(
@@ -177,23 +352,32 @@ def update_vente(
     ancien_statut = vente.statut
     nouveau_statut = vente_data.statut
 
-    transitions_autorisees = {
-        "EN_COURS": [
-            "PAYEE",
-            "ANNULEE"
-        ],
-        "PAYEE": [],
-        "ANNULEE": []
-    }
+    # -----------------------------------------------------
+    # Aucun changement
+    # -----------------------------------------------------
 
-    if nouveau_statut not in transitions_autorisees[ancien_statut]:
+    if ancien_statut == nouveau_statut:
         raise HTTPException(
             status_code=400,
-            detail=(
-                f"Transition impossible : "
-                f"{ancien_statut} → {nouveau_statut}"
-            )
+            detail="La vente possède déjà ce statut"
         )
+
+    # -----------------------------------------------------
+    # Vente déjà terminée
+    # -----------------------------------------------------
+
+    if ancien_statut in [
+        "PAYEE",
+        "ANNULEE"
+    ]:
+        raise HTTPException(
+            status_code=400,
+            detail="Cette vente ne peut plus être modifiée"
+        )
+
+    # =====================================================
+    # PASSAGE EN PAYEE
+    # =====================================================
 
     if (
         ancien_statut == "EN_COURS"
@@ -228,11 +412,22 @@ def update_vente(
                 )
 
             if detail.quantite > stock.quantite:
+                produit = db.query(Produit).filter(
+                    Produit.id_produit ==
+                    detail.id_produit
+                ).first()
+
+                nom_produit = (
+                    produit.nom
+                    if produit
+                    else str(detail.id_produit)
+                )
+
                 raise HTTPException(
                     status_code=400,
                     detail=(
-                        f"Stock insuffisant pour le produit "
-                        f"{detail.id_produit}. "
+                        f"Stock insuffisant pour "
+                        f"« {nom_produit} ». "
                         f"Disponible : {stock.quantite}, "
                         f"demandé : {detail.quantite}"
                     )
@@ -241,6 +436,10 @@ def update_vente(
             stocks_a_modifier.append(
                 (detail, stock)
             )
+
+        # -------------------------------------------------
+        # Diminuer le stock
+        # -------------------------------------------------
 
         for detail, stock in stocks_a_modifier:
 
@@ -251,12 +450,16 @@ def update_vente(
                 quantite=detail.quantite,
                 motif=f"Vente #{id_vente}",
                 id_produit=detail.id_produit,
-                id_utilisateur=vente.id_utilisateur
+                id_utilisateur=current_user.id_utilisateur
             )
 
             db.add(mouvement)
 
         vente.statut = "PAYEE"
+
+    # =====================================================
+    # ANNULATION
+    # =====================================================
 
     elif (
         ancien_statut == "EN_COURS"
@@ -264,6 +467,16 @@ def update_vente(
     ):
 
         vente.statut = "ANNULEE"
+
+    else:
+
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                f"Transition impossible : "
+                f"{ancien_statut} → {nouveau_statut}"
+            )
+        )
 
     db.commit()
     db.refresh(vente)

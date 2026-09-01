@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.database.dependencies import get_db
 from app.models.produit import Produit
+from app.models.stock import Stock
 from app.schemas.produit import ProduitCreate, ProduitUpdate, ProduitResponse
 from app.core.security import require_role
 
@@ -48,7 +49,8 @@ def create_produit(
         require_role("ADMIN", "GESTIONNAIRE")
     )
 ):
-    
+
+    # Créer le produit
     produit = Produit(
         nom=produit_data.nom,
         description=produit_data.description,
@@ -58,7 +60,20 @@ def create_produit(
     )
 
     db.add(produit)
+
+    # Obtenir l'id du produit avant le commit
+    db.flush()
+
+    # Créer automatiquement son stock
+    stock = Stock(
+        id_produit=produit.id_produit,
+        quantite=0
+    )
+
+    db.add(stock)
+
     db.commit()
+
     db.refresh(produit)
 
     return produit

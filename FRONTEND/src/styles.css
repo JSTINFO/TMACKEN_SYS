@@ -1,0 +1,4829 @@
+
+:root {
+
+    /* =========================
+       BRAND
+       ========================= */
+
+    --primary: #25D366;
+    --primary-dark: #128C7E;
+    --primary-deep: #075E54;
+    --primary-light: #DCF8C6;
+
+
+    /* =========================
+       BACKGROUNDS
+       ========================= */
+
+    --bg-primary: #F0F2F5;
+    --bg-secondary: #FFFFFF;
+    --bg-tertiary: #E9EDEF;
+
+
+    /* =========================
+       SIDEBAR
+       ========================= */
+
+    --sidebar-bg: #075E54;
+    --sidebar-hover: #128C7E;
+    --sidebar-active: #25D366;
+
+
+    /* =========================
+       HEADER
+       ========================= */
+
+    --header-bg: #FFFFFF;
+
+
+    /* =========================
+       TEXT
+       ========================= */
+
+    --text-primary: #111B21;
+    --text-secondary: #667781;
+    --text-muted: #8696A0;
+
+
+    /* =========================
+       BORDER
+       ========================= */
+
+    --border-color: #D1D7DB;
+
+
+    /* =========================
+       CARDS
+       ========================= */
+
+    --card-bg: #FFFFFF;
+
+    --shadow:
+        0 2px 8px rgba(17, 27, 33, 0.08);
+
+
+    /* =========================
+       STATUS
+       ========================= */
+
+    --success: #25D366;
+    --warning: #F7B731;
+    --danger: #EA4335;
+    --info: #34B7F1;
+
+
+    /* =========================
+       RADIUS
+       ========================= */
+
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+
+
+    /* =========================
+       SPACING
+       ========================= */
+
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 16px;
+    --space-lg: 24px;
+    --space-xl: 32px;
+
+
+    /* =========================
+       LAYOUT
+       ========================= */
+
+    --sidebar-width: 250px;
+    --header-height: 68px;
+
+
+    /* =========================
+       TRANSITION
+       ========================= */
+
+    --transition: 0.2s ease;
+}
+
+
+/* =========================================================
+   DARK MODE
+   ========================================================= */
+
+[data-theme="dark"] {
+
+    /* BRAND */
+
+    --primary: #25D366;
+    --primary-dark: #128C7E;
+    --primary-deep: #075E54;
+    --primary-light: #1F3B32;
+
+
+    /* BACKGROUNDS */
+
+    --bg-primary: #111B21;
+    --bg-secondary: #202C33;
+    --bg-tertiary: #2A3942;
+
+
+    /* SIDEBAR */
+
+    --sidebar-bg: #075E54;
+    --sidebar-hover: #128C7E;
+    --sidebar-active: #25D366;
+
+
+    /* HEADER */
+
+    --header-bg: #202C33;
+
+
+    /* TEXT */
+
+    --text-primary: #E9EDEF;
+    --text-secondary: #8696A0;
+    --text-muted: #667781;
+
+
+    /* BORDER */
+
+    --border-color: #374045;
+
+
+    /* CARDS */
+
+    --card-bg: #202C33;
+
+    --shadow:
+        0 3px 12px rgba(0, 0, 0, 0.25);
+
+
+    /* STATUS */
+
+    --success: #25D366;
+    --warning: #F7B731;
+    --danger: #EA4335;
+    --info: #34B7F1;
+}
+
+
+
+/* =========================================================
+   RESET
+   ========================================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+}
+
+
+body {
+
+    font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Arial,
+        sans-serif;
+
+    background: var(--bg-primary);
+
+    color: var(--text-primary);
+
+    min-height: 100vh;
+
+    transition:
+        background var(--transition),
+        color var(--transition);
+}
+
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+
+button {
+    cursor: pointer;
+}
+
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+
+ul,
+ol {
+    list-style: none;
+}
+
+
+#root {
+    min-height: 100vh;
+}
+
+
+/* =========================================================
+   LAYOUT
+   ========================================================= */
+
+.app-layout {
+
+    display: flex;
+
+    min-height: 100vh;
+}
+
+
+/* =========================================================
+   SIDEBAR
+   ========================================================= */
+
+.sidebar {
+
+    width: var(--sidebar-width);
+
+    height: 100vh;
+
+    position: fixed;
+
+    top: 0;
+    left: 0;
+
+    background: var(--sidebar-bg);
+
+    color: #D8D0C8;
+
+    display: flex;
+
+    flex-direction: column;
+
+    z-index: 1000;
+
+    transition:
+        transform var(--transition);
+
+        
+}
+
+
+/* Logo */
+
+.sidebar-logo {
+
+    height: var(--header-height);
+
+    display: flex;
+
+    align-items: center;
+
+    padding: 0 var(--space-lg);
+
+    border-bottom:
+        1px solid rgba(255,255,255,0.08);
+}
+
+
+.sidebar-logo h2 {
+
+    color: #FFFFFF;
+
+    font-size: 20px;
+
+    font-weight: 700;
+
+    letter-spacing: 0.5px;
+}
+
+
+/* Navigation */
+
+.sidebar-nav {
+
+    flex: 1;
+
+    padding: var(--space-md);
+
+    overflow-y: auto;
+}
+
+
+.sidebar-nav-title {
+
+    margin:
+        20px
+        8px
+        8px;
+
+    font-size: 10px;
+
+    text-transform: uppercase;
+
+    letter-spacing: 1px;
+
+    color: #8F857C;
+}
+
+
+.sidebar-nav a svg {
+    flex-shrink: 0;
+}
+
+.sidebar-nav a span {
+    line-height: 1;
+}
+
+.sidebar-nav a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    padding: 10px 12px;
+    margin-bottom: 3px;
+
+    border-radius: var(--radius-sm);
+
+    color: #CFC6BD;
+
+    font-size: 14px;
+    font-weight: 500;
+
+    transition:
+        background var(--transition),
+        color var(--transition);
+}
+
+.sidebar-nav a:hover {
+
+    background: var(--sidebar-hover);
+
+    color: #FFFFFF;
+}
+
+
+.sidebar-nav a.active {
+
+    background: var(--sidebar-active);
+
+    color: #FFFFFF;
+}
+
+
+/* Footer */
+
+.sidebar-footer {
+
+    padding: var(--space-md);
+
+    color: #8F857C;
+
+    font-size: 12px;
+
+    border-top:
+        1px solid rgba(255,255,255,0.08);
+}
+
+
+/* =========================================================
+   MAIN
+   ========================================================= */
+
+.main-content {
+
+    width:
+        calc(100% - var(--sidebar-width));
+
+    margin-left: var(--sidebar-width);
+
+    min-height: 100vh;
+
+    display: flex;
+
+    flex-direction: column;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.header {
+
+    height: var(--header-height);
+
+    background: var(--header-bg);
+
+    border-bottom:
+        1px solid var(--border-color);
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding:
+        0
+        var(--space-xl);
+
+    position: sticky;
+
+    top: 0;
+
+    z-index: 900;
+}
+
+
+.header-left {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: var(--space-md);
+}
+
+
+.header-title {
+
+    font-size: 19px;
+
+    font-weight: 600;
+
+    color: var(--text-primary);
+}
+
+
+.header-right {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: var(--space-md);
+}
+
+/* =========================================================
+   HEADER ACTIONS
+   ========================================================= */
+
+.header-icon-button {
+
+    position: relative;
+
+    width: 38px;
+    height: 38px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid var(--border-color);
+
+    border-radius: 50%;
+
+    background: var(--bg-secondary);
+
+    color: var(--text-secondary);
+
+    transition:
+        background var(--transition),
+        color var(--transition),
+        border-color var(--transition),
+        transform var(--transition);
+}
+
+
+.header-icon-button:hover {
+
+    background: var(--bg-tertiary);
+
+    color: var(--primary);
+
+    border-color: var(--primary);
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   NOTIFICATION
+   ========================================================= */
+
+.notification-badge {
+
+    position: absolute;
+
+    top: -3px;
+    right: -3px;
+
+    min-width: 16px;
+    height: 16px;
+
+    padding: 0 4px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    background: var(--danger);
+
+    color: #FFFFFF;
+
+    border-radius: 20px;
+
+    font-size: 9px;
+
+    font-weight: 700;
+
+    border: 2px solid var(--header-bg);
+}
+
+
+/* =========================================================
+   HEADER DIVIDER
+   ========================================================= */
+
+.header-divider {
+
+    width: 1px;
+
+    height: 28px;
+
+    background: var(--border-color);
+
+    margin:
+        0
+        4px;
+}
+
+
+/* =========================================================
+   MOBILE MENU
+   ========================================================= */
+
+.mobile-menu-button {
+
+    border: 1px solid var(--border-color);
+
+    background: var(--bg-secondary);
+
+    color: var(--text-primary);
+
+    border-radius: var(--radius-sm);
+
+    transition:
+        background var(--transition),
+        color var(--transition),
+        border-color var(--transition);
+}
+
+
+.mobile-menu-button:hover {
+
+    background: var(--bg-tertiary);
+
+    color: var(--primary);
+
+    border-color: var(--primary);
+}
+
+
+/* =========================================================
+   USER
+   ========================================================= */
+
+.user-profile {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+}
+
+
+.user-avatar {
+
+    width: 38px;
+    height: 38px;
+
+    border-radius: 50%;
+
+    background: var(--primary);
+
+    color: #FFFFFF;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 13px;
+
+    font-weight: 600;
+}
+
+
+.user-info {
+
+    display: flex;
+
+    flex-direction: column;
+}
+
+
+.user-name {
+
+    font-size: 13px;
+
+    font-weight: 600;
+}
+
+
+.user-role {
+
+    font-size: 11px;
+
+    color: var(--text-secondary);
+}
+
+
+/* =========================================================
+   PAGE
+   ========================================================= */
+
+.page-content {
+
+    padding: var(--space-xl);
+
+    flex: 1;
+}
+
+
+.page-header {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    margin-bottom: var(--space-xl);
+}
+
+
+.page-title {
+
+    font-size: 26px;
+
+    font-weight: 700;
+}
+
+
+.page-description {
+
+    margin-top: 5px;
+
+    color: var(--text-secondary);
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   CARDS
+   ========================================================= */
+
+.card {
+
+    background: var(--card-bg);
+
+    border:
+        1px solid var(--border-color);
+
+    border-radius: var(--radius-md);
+
+    box-shadow: var(--shadow);
+
+    padding: var(--space-lg);
+}
+
+
+/* =========================================================
+   STATISTICS
+   ========================================================= */
+
+.stats-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: var(--space-lg);
+
+    margin-bottom: var(--space-xl);
+}
+
+
+.stat-card {
+
+    background: var(--card-bg);
+
+    border:
+        1px solid var(--border-color);
+
+    border-radius: var(--radius-md);
+
+    padding: var(--space-lg);
+
+    box-shadow: var(--shadow);
+}
+
+
+.stat-label {
+
+    font-size: 13px;
+
+    color: var(--text-secondary);
+
+    margin-bottom: 8px;
+}
+
+
+.stat-value {
+
+    font-size: 27px;
+
+    font-weight: 700;
+}
+
+
+.stat-change {
+
+    margin-top: 8px;
+
+    font-size: 12px;
+}
+
+
+.stat-change.success {
+    color: var(--success);
+}
+
+
+.stat-change.warning {
+    color: var(--warning);
+}
+
+
+.stat-change.danger {
+    color: var(--danger);
+}
+
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+.btn {
+
+    border: none;
+
+    border-radius: var(--radius-sm);
+
+    padding:
+        10px
+        16px;
+
+    font-size: 14px;
+
+    font-weight: 500;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 8px;
+
+    transition:
+        background var(--transition),
+        transform var(--transition);
+}
+
+
+.btn:hover {
+
+    transform: translateY(-1px);
+}
+
+
+.btn-primary {
+
+    background: var(--primary);
+
+    color: #FFFFFF;
+}
+
+
+.btn-primary:hover {
+
+    background: var(--primary-hover);
+}
+
+
+.btn-success {
+
+    background: var(--success);
+
+    color: #FFFFFF;
+}
+
+
+.btn-danger {
+
+    background: var(--danger);
+
+    color: #FFFFFF;
+}
+
+
+.btn-secondary {
+
+    background: var(--bg-tertiary);
+
+    color: var(--text-primary);
+
+    border:
+        1px solid var(--border-color);
+}
+
+
+/* =========================================================
+   TABLE
+   ========================================================= */
+
+.table-container {
+
+    width: 100%;
+
+    overflow-x: auto;
+
+    background: var(--card-bg);
+
+    border:
+        1px solid var(--border-color);
+
+    border-radius: var(--radius-md);
+
+    box-shadow: var(--shadow);
+}
+
+
+.table {
+
+    width: 100%;
+
+    border-collapse: collapse;
+
+    min-width: 700px;
+}
+
+
+.table th {
+
+    text-align: left;
+
+    padding:
+        13px
+        16px;
+
+    background: var(--bg-tertiary);
+
+    color: var(--text-secondary);
+
+    font-size: 11px;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.5px;
+}
+
+
+.table td {
+
+    padding:
+        13px
+        16px;
+
+    border-top:
+        1px solid var(--border-color);
+
+    font-size: 14px;
+}
+
+
+.table tr:hover td {
+
+    background: var(--bg-tertiary);
+}
+
+
+/* =========================================================
+   BADGES
+   ========================================================= */
+
+.badge {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    padding:
+        4px
+        9px;
+
+    border-radius: 20px;
+
+    font-size: 11px;
+
+    font-weight: 600;
+}
+
+
+.badge-success {
+
+    color: var(--success);
+
+    background:
+        rgba(63,125,82,0.10);
+}
+
+
+.badge-warning {
+
+    color: var(--warning);
+
+    background:
+        rgba(176,122,50,0.10);
+}
+
+
+.badge-danger {
+
+    color: var(--danger);
+
+    background:
+        rgba(184,74,74,0.10);
+}
+
+
+/* =========================================================
+   FORMS
+   ========================================================= */
+
+.form-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: var(--space-lg);
+}
+
+
+.form-group {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 7px;
+}
+
+
+.form-group.full {
+
+    grid-column: 1 / -1;
+}
+
+
+.form-label {
+
+    font-size: 13px;
+
+    font-weight: 600;
+}
+
+
+.form-input,
+.form-select,
+.form-textarea {
+
+    width: 100%;
+
+    padding:
+        10px
+        12px;
+
+    background: var(--bg-secondary);
+
+    color: var(--text-primary);
+
+    border:
+        1px solid var(--border-color);
+
+    border-radius: var(--radius-sm);
+
+    outline: none;
+
+    transition:
+        border var(--transition),
+        box-shadow var(--transition);
+}
+
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+
+    border-color: var(--primary);
+
+    box-shadow:
+        0 0 0 3px
+        rgba(122,82,48,0.10);
+}
+
+
+/* =========================================================
+   TOOLBAR
+   ========================================================= */
+
+.toolbar {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: var(--space-md);
+
+    margin-bottom: var(--space-lg);
+}
+
+
+.search-box {
+
+    width: 300px;
+}
+
+
+.search-box input {
+
+    width: 100%;
+
+    padding:
+        10px
+        13px;
+
+    background: var(--card-bg);
+
+    color: var(--text-primary);
+
+    border:
+        1px solid var(--border-color);
+
+    border-radius: var(--radius-sm);
+
+    outline: none;
+}
+
+
+/* =========================================================
+   MOBILE BUTTON
+   ========================================================= */
+
+.mobile-menu-button {
+
+    display: none;
+
+    width: 40px;
+
+    height: 40px;
+
+    border: none;
+
+    border-radius: var(--radius-sm);
+
+    background: var(--bg-tertiary);
+
+    color: var(--text-primary);
+}
+
+
+/* =========================================================
+   MOBILE OVERLAY
+   ========================================================= */
+
+.sidebar-overlay {
+
+    display: none;
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 1199px) {
+
+    :root {
+
+        --sidebar-width: 220px;
+    }
+
+
+    .stats-grid {
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+
+    .page-content {
+
+        padding: var(--space-lg);
+    }
+
+
+    .header {
+
+        padding:
+            0
+            var(--space-lg);
+    }
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 767px) {
+
+    :root {
+
+        --header-height: 60px;
+    }
+
+
+    .sidebar {
+
+        transform:
+            translateX(-100%);
+
+        width: 260px;
+    }
+
+
+    .sidebar.open {
+
+        transform:
+            translateX(0);
+    }
+
+
+    .sidebar-overlay {
+
+        position: fixed;
+
+        inset: 0;
+
+        background:
+            rgba(0,0,0,0.45);
+
+        z-index: 999;
+
+        display: none;
+    }
+
+
+    .sidebar-overlay.open {
+
+        display: block;
+    }
+
+
+    .main-content {
+
+        width: 100%;
+
+        margin-left: 0;
+    }
+
+
+    .header {
+
+        padding:
+            0
+            var(--space-md);
+    }
+
+
+    .mobile-menu-button {
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+    }
+
+
+    .user-info {
+
+        display: none;
+    }
+
+
+    .page-content {
+
+        padding: var(--space-md);
+    }
+
+
+    .page-header {
+
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        gap: var(--space-md);
+    }
+
+
+    .page-title {
+
+        font-size: 22px;
+    }
+
+
+    .stats-grid {
+
+        grid-template-columns: 1fr;
+
+        gap: var(--space-md);
+    }
+
+
+    .form-grid {
+
+        grid-template-columns: 1fr;
+    }
+
+
+    .form-group.full {
+
+        grid-column: auto;
+    }
+
+
+    .toolbar {
+
+        align-items: stretch;
+
+        flex-direction: column;
+    }
+
+
+    .search-box {
+
+        width: 100%;
+    }
+
+
+    .header-right {
+    gap: 8px;
+}
+
+.header-divider {
+    display: none;
+}
+
+.header-icon-button {
+    width: 36px;
+    height: 36px;
+}
+}
+
+
+/* =========================================================
+   SMALL PHONE
+   ========================================================= */
+
+@media (max-width: 480px) {
+
+    html {
+
+        font-size: 14px;
+    }
+
+
+    .header-title {
+
+        font-size: 17px;
+    }
+
+
+    .page-title {
+
+        font-size: 20px;
+    }
+
+
+    .stat-value {
+
+        font-size: 24px;
+    }
+
+
+    .btn {
+
+        width: 100%;
+    }
+}
+
+
+/* =========================================================
+   DASHBOARD
+   ========================================================= */
+
+.dashboard-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 2fr)
+        minmax(300px, 1fr);
+
+    gap: var(--space-lg);
+}
+
+
+.section-header {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: var(--space-md);
+
+    margin-bottom: var(--space-lg);
+}
+
+
+.section-header h2 {
+
+    font-size: 17px;
+
+    font-weight: 600;
+
+    color: var(--text-primary);
+}
+
+
+.section-header p {
+
+    margin-top: 4px;
+
+    font-size: 12px;
+
+    color: var(--text-secondary);
+}
+
+
+/* =========================================================
+   ACTIVITIES
+   ========================================================= */
+
+.activity-list {
+
+    display: flex;
+
+    flex-direction: column;
+}
+
+
+.activity-item {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding:
+        13px
+        0;
+
+    border-bottom:
+        1px solid var(--border-color);
+}
+
+
+.activity-item:last-child {
+
+    border-bottom: none;
+}
+
+
+.activity-icon {
+
+    width: 36px;
+
+    height: 36px;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    background: var(--primary-light);
+
+    color: var(--primary-deep);
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 12px;
+
+    font-weight: 700;
+}
+
+
+[data-theme="dark"] .activity-icon {
+
+    color: var(--primary);
+}
+
+
+.activity-content {
+
+    flex: 1;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 3px;
+}
+
+
+.activity-content strong {
+
+    font-size: 13px;
+
+    font-weight: 600;
+}
+
+
+.activity-content span,
+.activity-time {
+
+    font-size: 11px;
+
+    color: var(--text-secondary);
+}
+
+
+.activity-value {
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    color: var(--success);
+}
+
+
+/* =========================================================
+   LOW STOCK
+   ========================================================= */
+
+.low-stock-list {
+
+    display: flex;
+
+    flex-direction: column;
+}
+
+
+.stock-item {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 12px;
+
+    padding:
+        14px
+        0;
+
+    border-bottom:
+        1px solid var(--border-color);
+}
+
+
+.stock-item:last-child {
+
+    border-bottom: none;
+}
+
+
+.stock-item div {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 3px;
+
+    min-width: 0;
+}
+
+
+.stock-item strong {
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+
+.stock-item span:not(.badge) {
+
+    font-size: 11px;
+
+    color: var(--text-secondary);
+}
+
+
+/* =========================================================
+   DASHBOARD RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1000px) {
+
+    .dashboard-grid {
+
+        grid-template-columns: 1fr;
+    }
+}
+
+
+@media (max-width: 767px) {
+
+    .section-header {
+
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+
+    .section-header .btn {
+
+        width: auto;
+    }
+
+
+    .activity-item {
+
+        align-items: flex-start;
+    }
+
+
+    .activity-value {
+
+        margin-left: auto;
+    }
+}
+
+
+@media (max-width: 480px) {
+
+    .page-header .btn {
+
+        width: 100%;
+    }
+
+
+    .activity-time {
+
+        display: none;
+    }
+}
+
+
+/* =========================================================
+   THEME BUTTON
+   ========================================================= */
+
+.theme-button {
+
+    width: 38px;
+    height: 38px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid var(--border-color);
+
+    border-radius: 50%;
+
+    background: var(--bg-secondary);
+
+    color: var(--text-primary);
+
+    font-size: 16px;
+
+    transition:
+        background var(--transition),
+        border-color var(--transition),
+        transform var(--transition);
+}
+
+.theme-button:hover {
+
+    background: var(--bg-tertiary);
+
+    transform: rotate(10deg);
+}
+
+
+/* =========================================================
+   LOGIN
+   ========================================================= */
+
+.login-page {
+
+    min-height: 100vh;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: var(--space-lg);
+
+    background:
+        var(--bg-primary);
+}
+
+
+.login-container {
+
+    width: 100%;
+
+    max-width: 420px;
+
+    background: var(--card-bg);
+
+    border:
+        1px solid var(--border-color);
+
+    border-radius: var(--radius-lg);
+
+    box-shadow: var(--shadow);
+
+    padding: 40px;
+}
+
+
+/* =========================================================
+   LOGO
+   ========================================================= */
+
+.login-logo {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 10px;
+
+    margin-bottom: 32px;
+}
+
+
+.login-logo-mark {
+
+    width: 40px;
+
+    height: 40px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 10px;
+
+    background: var(--primary);
+
+    color: #FFFFFF;
+
+    font-size: 20px;
+
+    font-weight: 700;
+}
+
+
+.login-logo h1 {
+
+    font-size: 22px;
+
+    font-weight: 700;
+
+    color: var(--text-primary);
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.login-header {
+
+    text-align: center;
+
+    margin-bottom: 28px;
+}
+
+
+.login-header h2 {
+
+    font-size: 24px;
+
+    font-weight: 700;
+
+    margin-bottom: 7px;
+}
+
+
+.login-header p {
+
+    font-size: 13px;
+
+    color: var(--text-secondary);
+
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   ERROR
+   ========================================================= */
+
+.login-error {
+
+    padding:
+        11px
+        13px;
+
+    margin-bottom: 18px;
+
+    border:
+        1px solid rgba(234, 67, 53, 0.2);
+
+    border-radius: var(--radius-sm);
+
+    background:
+        rgba(234, 67, 53, 0.08);
+
+    color: var(--danger);
+
+    font-size: 13px;
+
+    line-height: 1.4;
+}
+
+
+/* =========================================================
+   FORM
+   ========================================================= */
+
+.login-form {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 20px;
+}
+
+
+.login-form-group {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 7px;
+}
+
+
+.login-form-group label {
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    color: var(--text-primary);
+}
+
+
+/* =========================================================
+   INPUT
+   ========================================================= */
+
+.login-input-wrapper {
+
+    height: 46px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    padding:
+        0
+        13px;
+
+    background: var(--bg-secondary);
+
+    border:
+        1px solid var(--border-color);
+
+    border-radius: var(--radius-sm);
+
+    color: var(--text-muted);
+
+    transition:
+        border var(--transition),
+        box-shadow var(--transition);
+}
+
+
+.login-input-wrapper:focus-within {
+
+    border-color: var(--primary);
+
+    box-shadow:
+        0 0 0 3px
+        rgba(37, 211, 102, 0.12);
+}
+
+
+.login-input-wrapper input {
+
+    flex: 1;
+
+    min-width: 0;
+
+    height: 100%;
+
+    border: none;
+
+    outline: none;
+
+    background: transparent;
+
+    color: var(--text-primary);
+
+    font-size: 14px;
+}
+
+
+.login-input-wrapper input::placeholder {
+
+    color: var(--text-muted);
+}
+
+
+/* =========================================================
+   PASSWORD TOGGLE
+   ========================================================= */
+
+.password-toggle {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border: none;
+
+    background: transparent;
+
+    color: var(--text-muted);
+
+    padding: 3px;
+}
+
+
+.password-toggle:hover {
+
+    color: var(--primary);
+}
+
+
+/* =========================================================
+   LOGIN BUTTON
+   ========================================================= */
+
+.login-button {
+
+    width: 100%;
+
+    height: 46px;
+
+    margin-top: 4px;
+
+    border: none;
+
+    border-radius: var(--radius-sm);
+
+    background: var(--primary);
+
+    color: #FFFFFF;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    transition:
+        background var(--transition),
+        transform var(--transition),
+        opacity var(--transition);
+}
+
+
+.login-button:hover {
+
+    background: var(--primary-dark);
+
+    transform: translateY(-1px);
+}
+
+
+.login-button:disabled {
+
+    cursor: not-allowed;
+
+    opacity: 0.65;
+
+    transform: none;
+}
+
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.login-footer {
+
+    margin-top: 28px;
+
+    text-align: center;
+
+    color: var(--text-muted);
+
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   LOGIN MOBILE
+   ========================================================= */
+
+@media (max-width: 480px) {
+
+    .login-page {
+
+        padding: var(--space-md);
+    }
+
+
+    .login-container {
+
+        padding: 28px 22px;
+
+        border-radius: var(--radius-md);
+    }
+
+
+    .login-logo {
+
+        margin-bottom: 25px;
+    }
+}
+
+
+/* =========================================================
+   AUTH LOADING
+   ========================================================= */
+
+.auth-loading {
+
+    min-height: 100vh;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background: var(--bg-primary);
+
+    color: var(--text-secondary);
+
+    font-size: 14px;
+}
+
+
+
+
+/* =========================================================
+   CLIENTS
+   ========================================================= */
+
+.clients-toolbar {
+    align-items: center;
+}
+
+.clients-search {
+    width: 350px;
+}
+
+.clients-search-wrapper {
+    height: 42px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 9px;
+
+    padding: 0 12px;
+
+    background: var(--card-bg);
+
+    border: 1px solid var(--border-color);
+
+    border-radius: var(--radius-sm);
+
+    color: var(--text-muted);
+}
+
+.clients-search-wrapper:focus-within {
+    border-color: var(--primary);
+
+    box-shadow:
+        0 0 0 3px
+        rgba(37, 211, 102, 0.10);
+}
+
+.clients-search-wrapper input {
+    width: 100%;
+    height: 100%;
+
+    border: none;
+    outline: none;
+
+    background: transparent;
+
+    color: var(--text-primary);
+
+    font-size: 13px;
+}
+
+
+/* =========================
+   ERROR
+   ========================= */
+
+.clients-error {
+
+    padding: 11px 14px;
+
+    margin-bottom: var(--space-md);
+
+    border-radius: var(--radius-sm);
+
+    background:
+        rgba(234, 67, 53, 0.08);
+
+    border:
+        1px solid rgba(234, 67, 53, 0.20);
+
+    color: var(--danger);
+
+    font-size: 13px;
+}
+
+.modal-error {
+    margin: 0 0 20px;
+}
+
+
+/* =========================
+   LOADING / EMPTY
+   ========================= */
+
+.clients-loading,
+.clients-empty {
+
+    min-height: 260px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    flex-direction: column;
+
+    gap: 8px;
+
+    color: var(--text-secondary);
+}
+
+.clients-empty svg {
+    color: var(--primary);
+}
+
+.clients-empty h3 {
+    color: var(--text-primary);
+}
+
+.clients-empty p {
+    font-size: 13px;
+}
+
+
+/* =========================
+   ACTIONS
+   ========================= */
+
+.client-actions {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 6px;
+}
+
+.table-action {
+
+    width: 32px;
+    height: 32px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid var(--border-color);
+
+    border-radius: var(--radius-sm);
+
+    background: var(--card-bg);
+
+    transition:
+        background var(--transition),
+        color var(--transition),
+        border-color var(--transition);
+}
+
+.table-action.edit {
+    color: var(--primary-dark);
+}
+
+.table-action.delete {
+    color: var(--danger);
+}
+
+.table-action.edit:hover {
+
+    background:
+        rgba(37, 211, 102, 0.10);
+
+    border-color: var(--primary);
+}
+
+.table-action.delete:hover {
+
+    background:
+        rgba(234, 67, 53, 0.08);
+
+    border-color: var(--danger);
+}
+
+.table-action:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+
+/* =========================
+   MODAL
+   ========================= */
+
+.modal-overlay {
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 2000;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: var(--space-lg);
+
+    background:
+        rgba(0, 0, 0, 0.45);
+}
+
+
+.client-modal {
+
+    width: 100%;
+
+    max-width: 620px;
+
+    max-height: 90vh;
+
+    overflow-y: auto;
+
+    padding: var(--space-xl);
+
+    background: var(--card-bg);
+
+    border:
+        1px solid var(--border-color);
+
+    border-radius: var(--radius-lg);
+
+    box-shadow:
+        0 15px 40px rgba(0, 0, 0, 0.18);
+}
+
+
+.modal-header {
+
+    display: flex;
+
+    align-items: flex-start;
+
+    justify-content: space-between;
+
+    gap: var(--space-md);
+
+    margin-bottom: var(--space-lg);
+}
+
+.modal-header h2 {
+
+    font-size: 19px;
+
+    margin-bottom: 5px;
+}
+
+.modal-header p {
+
+    color: var(--text-secondary);
+
+    font-size: 12px;
+}
+
+
+.modal-close {
+
+    width: 34px;
+    height: 34px;
+
+    border: none;
+
+    border-radius: 50%;
+
+    background: var(--bg-tertiary);
+
+    color: var(--text-secondary);
+
+    font-size: 22px;
+
+    line-height: 1;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+}
+
+.modal-close:hover {
+
+    background: var(--danger);
+
+    color: #FFFFFF;
+}
+
+
+/* =========================
+   MODAL ACTIONS
+   ========================= */
+
+.modal-actions {
+
+    grid-column: 1 / -1;
+
+    display: flex;
+
+    justify-content: flex-end;
+
+    gap: var(--space-sm);
+
+    padding-top: var(--space-md);
+
+    border-top:
+        1px solid var(--border-color);
+}
+
+.modal-actions .btn {
+    width: auto;
+}
+
+
+/* =========================
+   SPINNER
+   ========================= */
+
+.spin {
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+
+/* =========================
+   CLIENTS MOBILE
+   ========================= */
+
+@media (max-width: 767px) {
+
+    .clients-toolbar {
+
+        align-items: stretch;
+
+        flex-direction: column;
+    }
+
+    .clients-search {
+
+        width: 100%;
+    }
+
+    .clients-toolbar > .btn {
+
+        width: 100%;
+    }
+
+    .client-modal {
+
+        max-height: 95vh;
+
+        padding: var(--space-lg);
+    }
+
+    .modal-actions {
+
+        flex-direction: column-reverse;
+    }
+
+    .modal-actions .btn {
+
+        width: 100%;
+    }
+}
+
+/* =========================================================
+   CONFIRM MODAL
+   ========================================================= */
+
+.confirm-overlay {
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 3000;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: var(--space-lg);
+
+    background: rgba(17, 27, 33, 0.48);
+
+    backdrop-filter: blur(3px);
+}
+
+
+.confirm-modal {
+
+    position: relative;
+
+    width: 100%;
+
+    max-width: 420px;
+
+    padding: 32px;
+
+    background: var(--card-bg);
+
+    border: 1px solid var(--border-color);
+
+    border-radius: 16px;
+
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.20);
+
+    text-align: center;
+
+    animation:
+        confirmModalIn 0.18s ease-out;
+}
+
+
+@keyframes confirmModalIn {
+
+    from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+
+/* =========================
+   CLOSE
+   ========================= */
+
+.confirm-close {
+
+    position: absolute;
+
+    top: 14px;
+
+    right: 14px;
+
+    width: 32px;
+
+    height: 32px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border: none;
+
+    border-radius: 50%;
+
+    background: transparent;
+
+    color: var(--text-muted);
+
+    cursor: pointer;
+}
+
+
+.confirm-close:hover {
+
+    background: var(--bg-tertiary);
+
+    color: var(--text-primary);
+}
+
+
+/* =========================
+   ICON
+   ========================= */
+
+.confirm-icon {
+
+    width: 58px;
+
+    height: 58px;
+
+    margin: 0 auto 18px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 50%;
+}
+
+
+.confirm-modal.warning .confirm-icon {
+
+    background:
+        rgba(247, 183, 49, 0.13);
+
+    color: var(--warning);
+}
+
+
+.confirm-modal.success .confirm-icon {
+
+    background:
+        rgba(37, 211, 102, 0.13);
+
+    color: var(--primary-dark);
+}
+
+
+.confirm-modal.info .confirm-icon {
+
+    background:
+        rgba(52, 183, 241, 0.13);
+
+    color: var(--info);
+}
+
+
+/* =========================
+   CONTENT
+   ========================= */
+
+.confirm-content h2 {
+
+    margin-bottom: 8px;
+
+    font-size: 19px;
+
+    font-weight: 700;
+
+    color: var(--text-primary);
+}
+
+
+.confirm-content p {
+
+    max-width: 340px;
+
+    margin: 0 auto;
+
+    color: var(--text-secondary);
+
+    font-size: 13px;
+
+    line-height: 1.6;
+}
+
+
+/* =========================
+   ACTIONS
+   ========================= */
+
+.confirm-actions {
+
+    display: flex;
+
+    justify-content: center;
+
+    gap: 10px;
+
+    margin-top: 26px;
+}
+
+
+.confirm-actions .btn {
+
+    min-width: 110px;
+
+    width: auto;
+}
+
+
+.confirm-button.warning {
+
+    background: var(--warning);
+
+    color: #FFFFFF;
+}
+
+
+.confirm-button.success {
+
+    background: var(--primary);
+
+    color: #FFFFFF;
+}
+
+
+.confirm-button.info {
+
+    background: var(--info);
+
+    color: #FFFFFF;
+}
+
+
+.confirm-button:hover {
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================
+   MOBILE
+   ========================= */
+
+@media (max-width: 480px) {
+
+    .confirm-overlay {
+
+        padding: var(--space-md);
+    }
+
+
+    .confirm-modal {
+
+        padding: 28px 20px;
+    }
+
+
+    .confirm-actions {
+
+        flex-direction: column-reverse;
+    }
+
+
+    .confirm-actions .btn {
+
+        width: 100%;
+    }
+}
+
+
+/* =========================================================
+   PRODUITS
+   ========================================================= */
+
+.products-toolbar {
+    align-items: center;
+}
+
+.products-search {
+    width: 350px;
+}
+
+.products-search-wrapper {
+
+    height: 42px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    padding: 0 12px;
+
+    background: var(--card-bg);
+
+    border: 1px solid var(--border-color);
+
+    border-radius: var(--radius-sm);
+
+    color: var(--text-muted);
+}
+
+.products-search-wrapper:focus-within {
+
+    border-color: var(--primary);
+
+    box-shadow:
+        0 0 0 3px
+        rgba(37, 211, 102, 0.10);
+}
+
+.products-search-wrapper input {
+
+    width: 100%;
+
+    height: 100%;
+
+    border: none;
+
+    outline: none;
+
+    background: transparent;
+
+    color: var(--text-primary);
+
+    font-size: 13px;
+}
+
+
+/* =========================
+   ERROR
+   ========================= */
+
+.products-error {
+
+    padding: 11px 14px;
+
+    margin-bottom: var(--space-md);
+
+    border-radius: var(--radius-sm);
+
+    background:
+        rgba(234, 67, 53, 0.08);
+
+    border:
+        1px solid rgba(234, 67, 53, 0.20);
+
+    color: var(--danger);
+
+    font-size: 13px;
+}
+
+.modal-error {
+    margin-bottom: 20px;
+}
+
+
+/* =========================
+   LOADING / EMPTY
+   ========================= */
+
+.products-loading,
+.products-empty {
+
+    min-height: 260px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    flex-direction: column;
+
+    gap: 8px;
+
+    color: var(--text-secondary);
+}
+
+.products-empty svg {
+    color: var(--primary);
+}
+
+.products-empty h3 {
+    color: var(--text-primary);
+}
+
+.products-empty p {
+    font-size: 13px;
+}
+
+
+/* =========================
+   ACTIONS
+   ========================= */
+
+.product-actions {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 6px;
+}
+
+
+/* =========================
+   STATUS
+   ========================= */
+
+.status-badge {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 5px;
+
+    padding: 5px 9px;
+
+    border-radius: 20px;
+
+    font-size: 11px;
+
+    font-weight: 600;
+}
+
+.status-badge.active {
+
+    background:
+        rgba(37, 211, 102, 0.12);
+
+    color: var(--primary-dark);
+}
+
+.status-badge.inactive {
+
+    background:
+        rgba(128, 128, 128, 0.12);
+
+    color: var(--text-secondary);
+}
+
+
+/* =========================
+   TEXTAREA
+   ========================= */
+
+.form-textarea {
+
+    min-height: 100px;
+
+    resize: vertical;
+
+    padding-top: 11px;
+
+    line-height: 1.5;
+}
+
+
+/* =========================
+   STATUS CHECKBOX
+   ========================= */
+
+.product-status-control {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    cursor: pointer;
+
+    color: var(--text-primary);
+
+    font-size: 13px;
+
+    font-weight: 500;
+}
+
+.product-status-control input {
+
+    width: 17px;
+
+    height: 17px;
+
+    accent-color: var(--primary);
+
+    cursor: pointer;
+}
+
+
+/* =========================
+   MOBILE
+   ========================= */
+
+@media (max-width: 767px) {
+
+    .products-toolbar {
+
+        flex-direction: column;
+
+        align-items: stretch;
+    }
+
+    .products-search {
+
+        width: 100%;
+    }
+
+    .products-toolbar > .btn {
+
+        width: 100%;
+    }
+
+    .product-modal {
+
+        max-height: 95vh;
+    }
+
+}
+
+
+/* =========================================================
+   STOCK — CORRECTION VISUELLE
+   ========================================================= */
+
+.stock-page {
+    width: 100%;
+    max-width: 100%;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.stock-page .page-header {
+    margin-bottom: 24px;
+}
+
+.stock-page .page-title {
+    margin-bottom: 5px;
+}
+
+.stock-page .page-description {
+    margin: 0;
+}
+
+
+/* =========================================================
+   STATISTIQUES
+   ========================================================= */
+
+.stock-stats {
+    margin-bottom: 26px;
+}
+
+
+/* =========================================================
+   TOOLBAR
+   ========================================================= */
+
+.stock-toolbar {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+
+/* =========================================================
+   RECHERCHE
+   ========================================================= */
+
+.stock-search {
+    width: 360px;
+    max-width: 100%;
+}
+
+.stock-search-wrapper {
+    width: 100%;
+    height: 42px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 0 13px;
+
+    box-sizing: border-box;
+
+    background: var(--card-bg);
+
+    border: 1px solid var(--border-color);
+
+    border-radius: 8px;
+
+    color: var(--text-muted);
+
+    transition:
+        border-color .2s ease,
+        box-shadow .2s ease,
+        background .2s ease;
+}
+
+.stock-search-wrapper svg {
+    flex-shrink: 0;
+}
+
+.stock-search-wrapper:focus-within {
+    border-color: var(--primary);
+
+    box-shadow:
+        0 0 0 3px rgba(37, 211, 102, .10);
+}
+
+.stock-search-wrapper input {
+    width: 100%;
+    height: 100%;
+
+    padding: 0;
+
+    border: 0;
+    outline: 0;
+
+    background: transparent;
+
+    color: var(--text-primary);
+
+    font-family: inherit;
+    font-size: 13px;
+}
+
+.stock-search-wrapper input::placeholder {
+    color: var(--text-muted);
+}
+
+
+/* =========================================================
+   ERREUR
+   ========================================================= */
+
+.stock-error {
+    width: 100%;
+    box-sizing: border-box;
+
+    margin-bottom: 20px;
+    padding: 12px 15px;
+
+    border: 1px solid rgba(234, 67, 53, .25);
+    border-radius: 8px;
+
+    background: rgba(234, 67, 53, .08);
+
+    color: #ff6b61;
+
+    font-size: 13px;
+}
+
+.stock-error.modal-error {
+    margin-bottom: 20px;
+}
+
+
+/* =========================================================
+   SECTION HEADING
+   ========================================================= */
+
+.stock-page .section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    margin-bottom: 16px;
+}
+
+.stock-page .section-heading h2 {
+    margin: 0 0 5px;
+
+    font-size: 18px;
+    line-height: 1.3;
+
+    color: var(--text-primary);
+}
+
+.stock-page .section-heading p {
+    margin: 0;
+
+    font-size: 12px;
+
+    color: var(--text-secondary);
+}
+
+.stock-page .section-heading > svg {
+    flex-shrink: 0;
+
+    color: var(--primary);
+}
+
+
+/* =========================================================
+   ALERTES
+   ========================================================= */
+
+.stock-alerts-section {
+    margin-bottom: 26px;
+
+    padding: 20px;
+
+    background: var(--card-bg);
+
+    border: 1px solid var(--border-color);
+
+    border-radius: 10px;
+}
+
+.stock-alerts-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(auto-fit, minmax(260px, 1fr));
+
+    gap: 12px;
+}
+
+.stock-alert {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    min-height: 64px;
+
+    padding: 13px 15px;
+
+    border-radius: 8px;
+
+    box-sizing: border-box;
+}
+
+.stock-alert > div {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 5px;
+
+    min-width: 0;
+}
+
+.stock-alert strong {
+    font-size: 13px;
+
+    color: var(--text-primary);
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+.stock-alert span {
+    font-size: 12px;
+
+    color: var(--text-secondary);
+}
+
+.stock-alert svg {
+    flex-shrink: 0;
+}
+
+.stock-alert.warning {
+    border: 1px solid rgba(245, 158, 11, .25);
+
+    background: rgba(245, 158, 11, .08);
+}
+
+.stock-alert.warning svg {
+    color: #f59e0b;
+}
+
+.stock-alert.danger {
+    border: 1px solid rgba(234, 67, 53, .25);
+
+    background: rgba(234, 67, 53, .08);
+}
+
+.stock-alert.danger svg {
+    color: #ef4444;
+}
+
+
+/* =========================================================
+   TABLEAUX
+   ========================================================= */
+
+.stock-table-container,
+.movements-container {
+    width: 100%;
+
+    margin-bottom: 26px;
+
+    overflow: hidden;
+
+    background: var(--card-bg);
+
+    border: 1px solid var(--border-color);
+
+    border-radius: 10px;
+}
+
+.stock-table-heading {
+    margin: 0 !important;
+
+    padding: 18px 20px;
+
+    border-bottom: 1px solid var(--border-color);
+}
+
+.stock-table-container .table,
+.movements-container .table {
+    margin: 0;
+}
+
+
+/* =========================================================
+   TABLE HEADER
+   ========================================================= */
+
+.stock-page .table thead th {
+    height: 42px;
+
+    padding: 0 14px;
+
+    vertical-align: middle;
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+    letter-spacing: .04em;
+
+    white-space: nowrap;
+}
+
+.stock-page .table tbody td {
+    height: 54px;
+
+    padding: 10px 14px;
+
+    vertical-align: middle;
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   NOM PRODUIT
+   ========================================================= */
+
+.stock-page .table tbody td strong {
+    font-weight: 600;
+
+    color: var(--text-primary);
+}
+
+
+/* =========================================================
+   QUANTITÉ
+   ========================================================= */
+
+.stock-page .table tbody td:nth-child(3) strong {
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   STATUT STOCK
+   ========================================================= */
+
+.stock-status {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    padding: 5px 9px;
+
+    border-radius: 20px;
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+.stock-status.success {
+    background: rgba(37, 211, 102, .10);
+
+    color: #25d366;
+}
+
+.stock-status.warning {
+    background: rgba(245, 158, 11, .10);
+
+    color: #f59e0b;
+}
+
+.stock-status.danger {
+    background: rgba(234, 67, 53, .10);
+
+    color: #ef4444;
+}
+
+
+/* =========================================================
+   TYPE MOUVEMENT
+   ========================================================= */
+
+.movement-type {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    padding: 5px 9px;
+
+    border-radius: 20px;
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+.movement-type.entry {
+    background: rgba(37, 211, 102, .10);
+
+    color: #25d366;
+}
+
+.movement-type.exit {
+    background: rgba(234, 67, 53, .10);
+
+    color: #ef4444;
+}
+
+
+/* =========================================================
+   LOADING
+   ========================================================= */
+
+.stock-loading,
+.stock-empty {
+    min-height: 220px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    padding: 30px;
+
+    box-sizing: border-box;
+
+    color: var(--text-secondary);
+
+    text-align: center;
+}
+
+.stock-empty svg {
+    color: var(--primary);
+}
+
+.stock-empty h3 {
+    margin: 3px 0;
+
+    color: var(--text-primary);
+
+    font-size: 16px;
+}
+
+.stock-empty p {
+    margin: 0;
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   MODAL MOUVEMENT
+   ========================================================= */
+
+.stock-movement-modal {
+    width: min(600px, calc(100vw - 30px));
+
+    max-height: calc(100vh - 30px);
+
+    overflow-y: auto;
+}
+
+
+/* =========================================================
+   SELECT
+   ========================================================= */
+
+.stock-movement-modal select.form-input {
+    cursor: pointer;
+}
+
+.stock-movement-modal select.form-input option {
+    background: var(--card-bg);
+
+    color: var(--text-primary);
+}
+
+
+/* =========================================================
+   SPINNER
+   ========================================================= */
+
+.spin {
+    animation: stockSpin 1s linear infinite;
+}
+
+@keyframes stockSpin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+
+/* =========================================================
+   TABLE RESPONSIVE
+   ========================================================= */
+
+.stock-table-container,
+.movements-container {
+    overflow-x: auto;
+}
+
+.stock-table-container .table,
+.movements-container .table {
+    min-width: 760px;
+}
+
+
+/* =========================================================
+   TABLETTE
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+    .stock-toolbar {
+        align-items: stretch;
+    }
+
+    .stock-search {
+        width: 100%;
+    }
+
+    .stock-toolbar .btn {
+        flex-shrink: 0;
+    }
+
+    .stock-alerts-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+/* =========================================================
+   TÉLÉPHONE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .stock-page .page-header {
+        align-items: stretch;
+
+        flex-direction: column;
+
+        gap: 15px;
+    }
+
+    .stock-page .page-header .btn {
+        width: 100%;
+
+        justify-content: center;
+    }
+
+
+    .stock-toolbar {
+        flex-direction: column;
+    }
+
+    .stock-toolbar .btn {
+        width: 100%;
+
+        justify-content: center;
+    }
+
+
+    .stock-alerts-section {
+        padding: 15px;
+    }
+
+
+    .stock-table-heading {
+        padding: 15px;
+    }
+
+
+    .stock-page .section-heading h2 {
+        font-size: 16px;
+    }
+
+
+    .stock-movement-modal {
+        width: calc(100vw - 20px);
+
+        max-height: calc(100vh - 20px);
+    }
+
+}
+
+/* =========================================================
+   MODAL RESERVATION
+========================================================= */
+
+.reservation-modal {
+    width: min(720px, calc(100vw - 32px));
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+
+/* =========================================================
+   SECTION PRODUITS
+========================================================= */
+
+.reservation-form-section {
+    margin-top: 24px;
+}
+
+
+.reservation-products-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 14px;
+}
+
+
+.reservation-products-header h3 {
+    margin: 0;
+    font-size: 17px;
+}
+
+
+.reservation-products-header p {
+    margin: 4px 0 0;
+    font-size: 13px;
+    color: #8fa3ad;
+}
+
+
+/* =========================================================
+   LIGNE PRODUIT
+========================================================= */
+
+.reservation-product-form-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 110px 42px;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+
+.reservation-product-form-row .form-input {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+
+.quantity-input {
+    text-align: center;
+}
+
+
+/* =========================================================
+   TOTAL
+========================================================= */
+
+.reservation-total-preview {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-top: 20px;
+    padding-top: 18px;
+
+    border-top: 1px solid #34444c;
+
+    font-size: 15px;
+}
+
+
+.reservation-total-preview strong {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   BOUTON SUPPRIMER PRODUIT
+========================================================= */
+
+.reservation-product-form-row .table-action {
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+/* =========================================================
+   MESSAGE ERREUR
+========================================================= */
+
+.modal-error {
+    margin-bottom: 18px;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 650px) {
+
+    .reservation-product-form-row {
+        grid-template-columns: 1fr 90px 42px;
+    }
+
+}
+
+
+@media (max-width: 500px) {
+
+    .reservation-products-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+
+    .reservation-product-form-row {
+        grid-template-columns: 1fr 80px 42px;
+    }
+
+}
+
+
+
+/* =========================================================
+   LAZARE — RESERVATIONS
+   ========================================================= */
+
+.reservations-page {
+    width: 100%;
+    min-height: 100%;
+    padding: 32px;
+    box-sizing: border-box;
+    color: #f1f5f9;
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.reservations-page .page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.reservations-page .page-title {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+    color: #f8fafc;
+    letter-spacing: -0.4px;
+}
+
+.reservations-page .page-description {
+    margin: 7px 0 0;
+    color: #7f95a5;
+    font-size: 14px;
+}
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+.reservations-page .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    border: 1px solid transparent;
+    border-radius: 7px;
+
+    min-height: 40px;
+    padding: 0 15px;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.15s ease,
+        box-shadow 0.2s ease;
+}
+
+.reservations-page .btn:active {
+    transform: translateY(1px);
+}
+
+.reservations-page .btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+/* PRIMARY */
+
+.reservations-page .btn-primary {
+    background: #20d66b;
+    color: #ffffff;
+    border-color: #20d66b;
+}
+
+.reservations-page .btn-primary:hover {
+    background: #19bd5d;
+    border-color: #19bd5d;
+    box-shadow: 0 5px 18px rgba(32, 214, 107, 0.18);
+}
+
+/* SECONDARY */
+
+.reservations-page .btn-secondary {
+    background: #293b46;
+    color: #e6edf2;
+    border-color: #354954;
+}
+
+.reservations-page .btn-secondary:hover {
+    background: #334954;
+    border-color: #45606d;
+}
+
+/* DANGER */
+
+.reservations-page .btn-danger {
+    background: #3a262b;
+    color: #ff7272;
+    border-color: #66353b;
+}
+
+.reservations-page .btn-danger:hover {
+    background: #4b2b31;
+    border-color: #814149;
+}
+
+/* =========================================================
+   STATISTICS
+   ========================================================= */
+
+.reservations-page .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.reservations-page .stat-card {
+    position: relative;
+
+    min-height: 86px;
+    padding: 20px 22px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    box-sizing: border-box;
+
+    background: #202f38;
+    border: 1px solid #30434d;
+    border-radius: 9px;
+
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.reservations-page .stat-card:hover {
+    transform: translateY(-2px);
+    border-color: #405763;
+}
+
+.reservations-page .stat-label {
+    color: #8ba0ad;
+    font-size: 13px;
+}
+
+.reservations-page .stat-value {
+    color: #f4f7f9;
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+/* =========================================================
+   TOOLBAR
+   ========================================================= */
+
+.reservations-page .toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+
+    margin-bottom: 18px;
+}
+
+.reservations-page .reservation-search-wrapper {
+    width: 360px;
+    height: 42px;
+
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    padding: 0 13px;
+
+    box-sizing: border-box;
+
+    background: #202f38;
+    border: 1px solid #344852;
+    border-radius: 7px;
+
+    color: #8ca1ad;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.reservations-page .reservation-search-wrapper:focus-within {
+    border-color: #20d66b;
+    box-shadow: 0 0 0 3px rgba(32, 214, 107, 0.08);
+}
+
+.reservations-page .reservation-search-wrapper input {
+    width: 100%;
+    height: 100%;
+
+    border: none;
+    outline: none;
+
+    background: transparent;
+
+    color: #f1f5f9;
+    font-size: 13px;
+}
+
+.reservations-page .reservation-search-wrapper input::placeholder {
+    color: #718793;
+}
+
+/* =========================================================
+   ERROR
+   ========================================================= */
+
+.reservations-page .reservation-error {
+    padding: 12px 15px;
+    margin-bottom: 18px;
+
+    border: 1px solid #68363d;
+    border-radius: 7px;
+
+    background: rgba(100, 35, 42, 0.22);
+    color: #ff6d6d;
+
+    font-size: 13px;
+}
+
+.reservations-page .modal-error {
+    margin-bottom: 20px;
+}
+
+/* =========================================================
+   TABLE
+   ========================================================= */
+
+.reservations-page .table-container {
+    width: 100%;
+    overflow-x: auto;
+
+    background: #1e2d35;
+    border: 1px solid #30434d;
+    border-radius: 9px;
+
+    scrollbar-width: thin;
+}
+
+.reservations-page .table {
+    width: 100%;
+    min-width: 760px;
+
+    border-collapse: collapse;
+}
+
+.reservations-page .table thead {
+    background: #293c47;
+}
+
+.reservations-page .table th {
+    height: 45px;
+    padding: 0 16px;
+
+    text-align: left;
+
+    color: #91a5b1;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+
+    border-bottom: 1px solid #354953;
+}
+
+.reservations-page .table td {
+    height: 64px;
+    padding: 0 16px;
+
+    color: #e5edf2;
+    font-size: 13px;
+
+    border-bottom: 1px solid #30414a;
+}
+
+.reservations-page .table tbody tr {
+    transition: background 0.18s ease;
+}
+
+.reservations-page .table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.025);
+}
+
+.reservations-page .table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* =========================================================
+   CLIENT
+   ========================================================= */
+
+.reservations-page .reservation-client {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    font-weight: 500;
+}
+
+.reservations-page .reservation-client svg {
+    color: #9aacb7;
+}
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+.reservations-page .reservation-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.reservations-page .reservation-status.pending {
+    color: #e7b95b;
+}
+
+.reservations-page .reservation-status.confirmed {
+    color: #31d978;
+}
+
+.reservations-page .reservation-status.cancelled {
+    color: #ff6868;
+}
+
+.reservations-page .reservation-status.completed {
+    color: #62b6e8;
+}
+
+/* =========================================================
+   TABLE ACTIONS
+   ========================================================= */
+
+.reservations-page .reservation-actions {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.reservations-page .table-action {
+    width: 34px;
+    height: 34px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    border-radius: 7px;
+    border: 1px solid #354952;
+
+    background: #22343e;
+    color: #9dafb9;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.15s ease;
+}
+
+.reservations-page .table-action:hover {
+    transform: translateY(-1px);
+}
+
+.reservations-page .table-action.view:hover {
+    color: #66c4f0;
+    border-color: #41677a;
+    background: #263e4a;
+}
+
+.reservations-page .table-action.confirm:hover {
+    color: #31df79;
+    border-color: #26784c;
+    background: #203d2e;
+}
+
+.reservations-page .table-action.delete {
+    color: #e96868;
+}
+
+.reservations-page .table-action.delete:hover {
+    color: #ff7373;
+    border-color: #763e44;
+    background: #43292e;
+}
+
+.reservations-page .table-action:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* =========================================================
+   LOADING
+   ========================================================= */
+
+.reservations-page .reservation-loading {
+    min-height: 180px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    color: #8fa3ae;
+    font-size: 14px;
+}
+
+.reservations-page .spin {
+    animation: reservationSpin 0.9s linear infinite;
+}
+
+@keyframes reservationSpin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* =========================================================
+   EMPTY
+   ========================================================= */
+
+.reservations-page .reservation-empty {
+    min-height: 260px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 10px;
+
+    color: #718691;
+}
+
+.reservations-page .reservation-empty svg {
+    opacity: 0.55;
+}
+
+.reservations-page .reservation-empty h3 {
+    margin: 0;
+    color: #a7b7c0;
+    font-size: 15px;
+}
+
+/* =========================================================
+   MODAL OVERLAY
+   ========================================================= */
+
+.reservations-page .modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 25px;
+
+    background: rgba(3, 10, 14, 0.76);
+    backdrop-filter: blur(5px);
+
+    animation: reservationOverlayIn 0.18s ease;
+}
+
+@keyframes reservationOverlayIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* =========================================================
+   MODALS
+   ========================================================= */
+
+.reservations-page .client-modal {
+    width: 100%;
+    max-width: 560px;
+    max-height: calc(100vh - 50px);
+
+    overflow-y: auto;
+
+    padding: 26px;
+
+    box-sizing: border-box;
+
+    background: #202f38;
+    border: 1px solid #3b4f5a;
+    border-radius: 12px;
+
+    box-shadow:
+        0 25px 70px rgba(0, 0, 0, 0.5),
+        0 5px 20px rgba(0, 0, 0, 0.25);
+
+    animation: reservationModalIn 0.22s ease;
+}
+
+@keyframes reservationModalIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.reservations-page .reservation-modal {
+    max-width: 580px;
+}
+
+.reservations-page .reservation-detail-modal {
+    max-width: 650px;
+}
+
+/* =========================================================
+   MODAL HEADER
+   ========================================================= */
+
+.reservations-page .modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+
+    margin-bottom: 25px;
+}
+
+.reservations-page .modal-header h2 {
+    margin: 0;
+
+    color: #f4f7f9;
+    font-size: 19px;
+    font-weight: 700;
+}
+
+.reservations-page .modal-header p {
+    margin: 6px 0 0;
+
+    color: #8196a2;
+    font-size: 12px;
+}
+
+.reservations-page .modal-close {
+    flex-shrink: 0;
+
+    width: 34px;
+    height: 34px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid #3a4e59;
+    border-radius: 50%;
+
+    background: #293c47;
+    color: #91a5b0;
+
+    font-size: 20px;
+    line-height: 1;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.reservations-page .modal-close:hover {
+    background: #344a56;
+    color: #ffffff;
+    transform: rotate(90deg);
+}
+
+/* =========================================================
+   FORM
+   ========================================================= */
+
+.reservations-page .form-group {
+    margin-bottom: 22px;
+}
+
+.reservations-page .form-label {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: #d9e2e7;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.reservations-page .form-input {
+    width: 100%;
+    height: 42px;
+
+    padding: 0 12px;
+
+    box-sizing: border-box;
+
+    border: 1px solid #3a505b;
+    border-radius: 7px;
+
+    outline: none;
+
+    background: #202f38;
+    color: #eaf0f3;
+
+    font-size: 13px;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+.reservations-page .form-input:focus {
+    border-color: #20d66b;
+    background: #22333c;
+    box-shadow: 0 0 0 3px rgba(32, 214, 107, 0.08);
+}
+
+.reservations-page .form-input::placeholder {
+    color: #6f8591;
+}
+
+.reservations-page select.form-input {
+    cursor: pointer;
+}
+
+.reservations-page .quantity-input {
+    width: 100px;
+    text-align: center;
+}
+
+/* =========================================================
+   PRODUCTS SECTION
+   ========================================================= */
+
+.reservations-page .reservation-form-section {
+    margin-top: 8px;
+    padding-top: 20px;
+
+    border-top: 1px solid #344852;
+}
+
+.reservations-page .reservation-products-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+
+    margin-bottom: 15px;
+}
+
+.reservations-page .reservation-products-header h3 {
+    margin: 0;
+
+    color: #edf3f6;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.reservations-page .reservation-products-header p {
+    margin: 4px 0 0;
+
+    color: #8196a2;
+    font-size: 11px;
+}
+
+/* =========================================================
+   PRODUCT FORM ROW
+   ========================================================= */
+
+.reservations-page .reservation-product-form-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 100px 38px;
+    align-items: center;
+    gap: 9px;
+
+    margin-bottom: 10px;
+}
+
+.reservations-page .reservation-product-form-row .form-input {
+    margin: 0;
+}
+
+/* =========================================================
+   TOTAL PREVIEW
+   ========================================================= */
+
+.reservations-page .reservation-total-preview {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-top: 20px;
+    padding: 15px 0;
+
+    border-top: 1px solid #354953;
+    border-bottom: 1px solid #354953;
+}
+
+.reservations-page .reservation-total-preview span {
+    color: #c1cdd3;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.reservations-page .reservation-total-preview strong {
+    color: #f2f6f8;
+    font-size: 19px;
+}
+
+/* =========================================================
+   MODAL ACTIONS
+   ========================================================= */
+
+.reservations-page .modal-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 9px;
+
+    margin-top: 20px;
+}
+
+/* =========================================================
+   DETAIL MODAL
+   ========================================================= */
+
+.reservations-page .reservation-detail-top {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+
+    margin-bottom: 25px;
+}
+
+.reservations-page .reservation-detail-top > div {
+    min-width: 0;
+
+    padding: 14px;
+
+    border: 1px solid #344852;
+    border-radius: 8px;
+
+    background: #1b2a32;
+}
+
+.reservations-page .detail-label {
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: #718792;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.reservations-page .reservation-detail-top strong {
+    display: block;
+
+    color: #eaf0f3;
+    font-size: 13px;
+}
+
+/* =========================================================
+   PRODUCT LIST
+   ========================================================= */
+
+.reservations-page .reservation-products-list {
+    display: flex;
+    flex-direction: column;
+
+    border: 1px solid #344852;
+    border-radius: 8px;
+
+    overflow: hidden;
+}
+
+.reservations-page .reservation-product-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+
+    padding: 13px 14px;
+
+    background: #1d2c34;
+
+    border-bottom: 1px solid #30424b;
+}
+
+.reservations-page .reservation-product-row:last-child {
+    border-bottom: none;
+}
+
+.reservations-page .reservation-product-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    min-width: 0;
+}
+
+.reservations-page .reservation-product-icon {
+    width: 34px;
+    height: 34px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 7px;
+
+    background: #263c47;
+    color: #7fa8ba;
+}
+
+.reservations-page .reservation-product-info strong {
+    display: block;
+
+    color: #e6edf0;
+    font-size: 13px;
+}
+
+.reservations-page .reservation-product-info span {
+    display: block;
+
+    margin-top: 3px;
+
+    color: #7f95a1;
+    font-size: 11px;
+}
+
+.reservations-page .reservation-product-row > strong {
+    flex-shrink: 0;
+
+    color: #eaf0f3;
+    font-size: 13px;
+}
+
+/* =========================================================
+   DETAIL TOTAL
+   ========================================================= */
+
+.reservations-page .reservation-total-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 17px 0;
+
+    border-bottom: 1px solid #344852;
+}
+
+.reservations-page .reservation-total-row span {
+    color: #a8b7bf;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.reservations-page .reservation-total-row strong {
+    color: #20d66b;
+    font-size: 21px;
+}
+
+/* =========================================================
+   SCROLLBAR
+   ========================================================= */
+
+.reservations-page .client-modal::-webkit-scrollbar,
+.reservations-page .table-container::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+}
+
+.reservations-page .client-modal::-webkit-scrollbar-track,
+.reservations-page .table-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.reservations-page .client-modal::-webkit-scrollbar-thumb,
+.reservations-page .table-container::-webkit-scrollbar-thumb {
+    background: #3b505b;
+    border-radius: 10px;
+}
+
+.reservations-page .client-modal::-webkit-scrollbar-thumb:hover,
+.reservations-page .table-container::-webkit-scrollbar-thumb:hover {
+    background: #506773;
+}
+
+/* =========================================================
+   RESPONSIVE — TABLET
+   ========================================================= */
+
+@media (max-width: 1100px) {
+
+    .reservations-page {
+        padding: 24px;
+    }
+
+    .reservations-page .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .reservations-page .reservation-detail-top {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* =========================================================
+   RESPONSIVE — MOBILE
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    .reservations-page {
+        padding: 18px;
+    }
+
+    .reservations-page .page-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .reservations-page .page-title {
+        font-size: 23px;
+    }
+
+    .reservations-page .page-header .btn {
+        width: 100%;
+    }
+
+    .reservations-page .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .reservations-page .stat-card {
+        min-height: 72px;
+    }
+
+    .reservations-page .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .reservations-page .reservation-search-wrapper {
+        width: 100%;
+    }
+
+    .reservations-page .toolbar .btn {
+        width: 100%;
+    }
+
+    .reservations-page .modal-overlay {
+        padding: 12px;
+        align-items: center;
+    }
+
+    .reservations-page .client-modal {
+        max-height: calc(100vh - 24px);
+        padding: 20px;
+        border-radius: 10px;
+    }
+
+    .reservations-page .reservation-product-form-row {
+        grid-template-columns: minmax(0, 1fr) 80px 36px;
+        gap: 6px;
+    }
+
+    .reservations-page .reservation-detail-top {
+        grid-template-columns: 1fr;
+    }
+
+    .reservations-page .modal-actions {
+        flex-direction: column-reverse;
+    }
+
+    .reservations-page .modal-actions .btn {
+        width: 100%;
+    }
+}
+
+/* =========================================================
+   RESPONSIVE — SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 450px) {
+
+    .reservations-page {
+        padding: 14px;
+    }
+
+    .reservations-page .reservation-product-form-row {
+        grid-template-columns: 1fr 70px 34px;
+    }
+
+    .reservations-page .form-input {
+        font-size: 12px;
+    }
+
+    .reservations-page .reservation-products-header {
+        align-items: flex-start;
+    }
+
+    .reservations-page .reservation-products-header .btn {
+        padding: 0 10px;
+    }
+}

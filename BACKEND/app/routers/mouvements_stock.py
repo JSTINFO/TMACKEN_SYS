@@ -6,6 +6,7 @@ from app.models.mouvement_stock import MouvementStock
 from app.models.stock import Stock
 from app.models.produit import Produit
 from app.models.utilisateur import Utilisateur
+from app.core.security import get_current_user
 
 from app.schemas.mouvement_stock import (
     MouvementStockCreate,
@@ -27,7 +28,8 @@ router = APIRouter(
 )
 def create_mouvement_stock(
     mouvement_data: MouvementStockCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: Utilisateur = Depends(get_current_user)
 ):
     # Vérifier que le produit existe
     produit = db.query(Produit).filter(
@@ -40,17 +42,6 @@ def create_mouvement_stock(
             detail="Produit introuvable"
         )
 
-    # Vérifier que l'utilisateur existe
-    utilisateur = db.query(Utilisateur).filter(
-        Utilisateur.id_utilisateur == mouvement_data.id_utilisateur
-    ).first()
-
-    if utilisateur is None:
-        raise HTTPException(
-            status_code=404,
-            detail="Utilisateur introuvable"
-        )
-
     # Vérifier la quantité
     if mouvement_data.quantite <= 0:
         raise HTTPException(
@@ -59,7 +50,10 @@ def create_mouvement_stock(
         )
 
     # Vérifier le type de mouvement
-    if mouvement_data.type_mouvement not in ["ENTREE", "SORTIE"]:
+    if mouvement_data.type_mouvement not in [
+        "ENTREE",
+        "SORTIE"
+    ]:
         raise HTTPException(
             status_code=400,
             detail="Type de mouvement invalide"
@@ -70,8 +64,10 @@ def create_mouvement_stock(
         Stock.id_produit == mouvement_data.id_produit
     ).first()
 
-    # Si le stock n'existe pas encore, on le crée à 0
+    # Si le stock n'existe pas encore,
+    # on le crée à 0
     if stock is None:
+
         stock = Stock(
             id_produit=mouvement_data.id_produit,
             quantite=0
@@ -80,15 +76,16 @@ def create_mouvement_stock(
         db.add(stock)
         db.flush()
 
-    # Gérer ENTREE
+    # Gérer une entrée
     if mouvement_data.type_mouvement == "ENTREE":
 
         stock.quantite += mouvement_data.quantite
 
-    # Gérer SORTIE
+    # Gérer une sortie
     elif mouvement_data.type_mouvement == "SORTIE":
 
         if mouvement_data.quantite > stock.quantite:
+
             raise HTTPException(
                 status_code=400,
                 detail="Stock insuffisant"
@@ -102,16 +99,16 @@ def create_mouvement_stock(
         quantite=mouvement_data.quantite,
         motif=mouvement_data.motif,
         id_produit=mouvement_data.id_produit,
-        id_utilisateur=mouvement_data.id_utilisateur
+        id_utilisateur=current_user.id_utilisateur
     )
 
     db.add(mouvement)
 
     db.commit()
+
     db.refresh(mouvement)
 
     return mouvement
-
 
 @router.get("/", response_model=list[MouvementStockResponse])
 def get_mouvements_stock(

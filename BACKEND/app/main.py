@@ -16,6 +16,7 @@ from app.routers.paiements import router as paiements_router
 from app.routers.rapports import router as rapports_router
 from app.routers.auth import router as auth_router
 from app.routers.parametres import router as parametres_router
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(
     title=settings.app_name,
@@ -23,6 +24,19 @@ app = FastAPI(
     description="API du système de gestion Tmacken"
 )
 
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://192.168.1.226:5173",
+
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.on_event("startup")
 def startup():

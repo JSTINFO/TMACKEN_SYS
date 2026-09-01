@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 StatutVente = Literal[
@@ -11,9 +11,15 @@ StatutVente = Literal[
 ]
 
 
+class VenteDetailCreate(BaseModel):
+    id_produit: int
+    quantite: int = Field(gt=0)
+
+
 class VenteCreate(BaseModel):
     id_client: int
     id_utilisateur: int
+    details: list[VenteDetailCreate]
     statut: StatutVente = "EN_COURS"
 
 

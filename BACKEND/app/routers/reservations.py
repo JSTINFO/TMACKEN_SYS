@@ -1,15 +1,16 @@
+from decimal import Decimal
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.database.dependencies import get_db
 
 from app.models.reservation import Reservation
-from app.models.client import Client
-from app.models.utilisateur import Utilisateur
 from app.models.detail_reservation import DetailReservation
+from app.models.client import Client
 from app.models.produit import Produit
 from app.models.stock import Stock
-from app.models.mouvement_stock import MouvementStock
+from app.models.utilisateur import Utilisateur
 
 from app.schemas.reservation import (
     ReservationCreate,
@@ -18,61 +19,101 @@ from app.schemas.reservation import (
     ReservationCompleteResponse
 )
 
+from app.core.security import get_current_user
+
 
 router = APIRouter(
     prefix="/reservations",
-    tags=["Reservations"]
+    tags=["Réservations"]
 )
 
 
 # =========================================================
-# POST - CREER UNE RESERVATION
+# FONCTION UTILITAIRE
 # =========================================================
 
-@router.post(
-    "/",
-    response_model=ReservationResponse,
-    status_code=201
-)
-def create_reservation(
-    reservation_data: ReservationCreate,
-    db: Session = Depends(get_db)
+def build_reservation_complete(
+    reservation,
+    db: Session
 ):
 
-    # Vérifier le client
-    client = db.query(Client).filter(
-        Client.id_client == reservation_data.id_client
-    ).first()
-
-    if client is None:
-        raise HTTPException(
-            status_code=404,
-            detail="Client introuvable"
+    details_db = (
+        db.query(
+            DetailReservation,
+            Produit
         )
-
-    # Vérifier l'utilisateur
-    utilisateur = db.query(Utilisateur).filter(
-        Utilisateur.id_utilisateur == reservation_data.id_utilisateur
-    ).first()
-
-    if utilisateur is None:
-        raise HTTPException(
-            status_code=404,
-            detail="Utilisateur introuvable"
+        .join(
+            Produit,
+            Produit.id_produit ==
+            DetailReservation.id_produit
         )
-
-    # Créer la réservation
-    reservation = Reservation(
-        id_client=reservation_data.id_client,
-        id_utilisateur=reservation_data.id_utilisateur,
-        statut=reservation_data.statut
+        .filter(
+            DetailReservation.id_reservation ==
+            reservation.id_reservation
+        )
+        .all()
     )
 
-    db.add(reservation)
-    db.commit()
-    db.refresh(reservation)
+    details = []
 
-    return reservation
+    total = Decimal("0")
+
+    for detail, produit in details_db:
+
+        prix = Decimal(
+            str(detail.prix_unitaire)
+        )
+
+        sous_total = (
+            prix *
+            detail.quantite
+        )
+
+        total += sous_total
+
+        details.append({
+
+            "id_produit":
+                detail.id_produit,
+
+            "nom_produit":
+                produit.nom,
+
+            "prix_unitaire":
+                prix,
+
+            "quantite":
+                detail.quantite,
+
+            "sous_total":
+                sous_total
+
+        })
+
+    return {
+
+        "id_reservation":
+            reservation.id_reservation,
+
+        "date_reservation":
+            reservation.date_reservation,
+
+        "statut":
+            reservation.statut,
+
+        "id_client":
+            reservation.id_client,
+
+        "id_utilisateur":
+            reservation.id_utilisateur,
+
+        "details":
+            details,
+
+        "total":
+            total
+
+    }
 
 
 # =========================================================
@@ -84,20 +125,25 @@ def create_reservation(
     response_model=list[ReservationResponse]
 )
 def get_reservations(
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: Utilisateur = Depends(
+        get_current_user
+    )
 ):
 
-    reservations = db.query(
-        Reservation
-    ).order_by(
-        Reservation.id_reservation.desc()
-    ).all()
+    reservations = (
+        db.query(Reservation)
+        .order_by(
+            Reservation.date_reservation.desc()
+        )
+        .all()
+    )
 
     return reservations
 
 
 # =========================================================
-# GET - UNE RESERVATION COMPLETE
+# GET - RESERVATION COMPLETE
 # =========================================================
 
 @router.get(
@@ -106,70 +152,268 @@ def get_reservations(
 )
 def get_reservation(
     id_reservation: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: Utilisateur = Depends(
+        get_current_user
+    )
 ):
 
-    # Chercher la réservation
-    reservation = db.query(Reservation).filter(
-        Reservation.id_reservation == id_reservation
-    ).first()
+    reservation = (
+        db.query(Reservation)
+        .filter(
+            Reservation.id_reservation ==
+            id_reservation
+        )
+        .first()
+    )
 
     if reservation is None:
+
         raise HTTPException(
             status_code=404,
             detail="Réservation introuvable"
         )
 
-    # Chercher les détails + produits
-    details_db = (
-        db.query(
-            DetailReservation.id_detail_reservation,
-            DetailReservation.id_produit,
-            Produit.nom.label("nom_produit"),
-            Produit.prix.label("prix_unitaire"),
-            DetailReservation.quantite
-        )
-        .join(
-            Produit,
-            DetailReservation.id_produit == Produit.id_produit
-        )
-        .filter(
-            DetailReservation.id_reservation == id_reservation
-        )
-        .all()
+    return build_reservation_complete(
+        reservation,
+        db
     )
 
-    details = []
 
-    total = 0
+# =========================================================
+# POST - CREER RESERVATION COMPLETE
+# =========================================================
 
-    for detail in details_db:
+@router.post(
+    "/",
+    response_model=ReservationCompleteResponse,
+    status_code=201
+)
+def create_reservation(
+    reservation_data: ReservationCreate,
+    db: Session = Depends(get_db),
+    current_user: Utilisateur = Depends(
+        get_current_user
+    )
+):
 
-        sous_total = (
-            float(detail.prix_unitaire)
-            * detail.quantite
+    # =====================================================
+    # VERIFIER CLIENT
+    # =====================================================
+
+    client = (
+        db.query(Client)
+        .filter(
+            Client.id_client ==
+            reservation_data.id_client
+        )
+        .first()
+    )
+
+    if client is None:
+
+        raise HTTPException(
+            status_code=404,
+            detail="Client introuvable"
         )
 
-        details.append({
-            "id_detail_reservation": detail.id_detail_reservation,
-            "id_produit": detail.id_produit,
-            "nom_produit": detail.nom_produit,
-            "prix_unitaire": float(detail.prix_unitaire),
-            "quantite": detail.quantite,
-            "sous_total": sous_total
-        })
 
-        total += sous_total
+    # =====================================================
+    # VERIFIER QU'IL Y A DES PRODUITS
+    # =====================================================
 
-    return {
-        "id_reservation": reservation.id_reservation,
-        "date_reservation": reservation.date_reservation,
-        "statut": reservation.statut,
-        "id_client": reservation.id_client,
-        "id_utilisateur": reservation.id_utilisateur,
-        "details": details,
-        "total": total
-    }
+    if not reservation_data.details:
+
+        raise HTTPException(
+            status_code=400,
+            detail="La réservation doit contenir au moins un produit."
+        )
+
+
+    # =====================================================
+    # EMPECHER DOUBLON PRODUIT
+    # =====================================================
+
+    produits_ids = [
+        detail.id_produit
+        for detail in reservation_data.details
+    ]
+
+    if len(produits_ids) != len(
+        set(produits_ids)
+    ):
+
+        raise HTTPException(
+            status_code=400,
+            detail="Un même produit ne peut pas être ajouté deux fois."
+        )
+
+
+    # =====================================================
+    # VERIFIER TOUS LES PRODUITS
+    # =====================================================
+
+    produits_valides = []
+
+
+    for detail_data in reservation_data.details:
+
+        produit = (
+            db.query(Produit)
+            .filter(
+                Produit.id_produit ==
+                detail_data.id_produit
+            )
+            .first()
+        )
+
+        if produit is None:
+
+            raise HTTPException(
+                status_code=404,
+                detail=(
+                    f"Produit #{detail_data.id_produit} "
+                    "introuvable."
+                )
+            )
+
+
+        # Produit actif
+
+        if not produit.statut:
+
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    f"Le produit « {produit.nom} » "
+                    "est désactivé."
+                )
+            )
+
+
+        # Quantité
+
+        if detail_data.quantite <= 0:
+
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    f"La quantité du produit "
+                    f"« {produit.nom} » doit être supérieure à 0."
+                )
+            )
+
+
+        # Stock
+
+        stock = (
+            db.query(Stock)
+            .filter(
+                Stock.id_produit ==
+                detail_data.id_produit
+            )
+            .first()
+        )
+
+        if stock is None:
+
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    f"Aucun stock disponible "
+                    f"pour « {produit.nom} »."
+                )
+            )
+
+
+        if detail_data.quantite > stock.quantite:
+
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    f"Stock insuffisant pour "
+                    f"« {produit.nom} ». "
+                    f"Disponible : {stock.quantite}."
+                )
+            )
+
+
+        produits_valides.append(
+            (
+                detail_data,
+                produit
+            )
+        )
+
+
+    # =====================================================
+    # CREATION RESERVATION
+    # =====================================================
+
+    try:
+
+        reservation = Reservation(
+
+            id_client=
+                reservation_data.id_client,
+
+            id_utilisateur=
+                current_user.id_utilisateur,
+
+            statut=
+                "EN_ATTENTE"
+
+        )
+
+        db.add(reservation)
+
+        db.flush()
+
+
+        # =================================================
+        # CREER LES DETAILS
+        # =================================================
+
+        for detail_data, produit in produits_valides:
+
+            detail = DetailReservation(
+
+                id_reservation=
+                    reservation.id_reservation,
+
+                id_produit=
+                    detail_data.id_produit,
+
+                prix_unitaire=
+                    produit.prix,
+
+                quantite=
+                    detail_data.quantite
+
+            )
+
+            db.add(detail)
+
+
+        db.commit()
+
+        db.refresh(reservation)
+
+
+    except Exception:
+
+        db.rollback()
+
+        raise HTTPException(
+            status_code=500,
+            detail="Impossible de créer la réservation."
+        )
+
+
+    return build_reservation_complete(
+        reservation,
+        db
+    )
 
 
 # =========================================================
@@ -183,215 +427,260 @@ def get_reservation(
 def update_reservation(
     id_reservation: int,
     reservation_data: ReservationUpdate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: Utilisateur = Depends(
+        get_current_user
+    )
 ):
 
-    # =====================================================
-    # 1. CHERCHER LA RESERVATION
-    # =====================================================
-
-    reservation = db.query(Reservation).filter(
-        Reservation.id_reservation == id_reservation
-    ).first()
+    reservation = (
+        db.query(Reservation)
+        .filter(
+            Reservation.id_reservation ==
+            id_reservation
+        )
+        .first()
+    )
 
     if reservation is None:
+
         raise HTTPException(
             status_code=404,
             detail="Réservation introuvable"
         )
 
-    ancien_statut = reservation.statut
-    nouveau_statut = reservation_data.statut
+
+    new_status = reservation_data.statut
+
+
+    if new_status is None:
+
+        return reservation
+
+
+    old_status = reservation.statut
+
 
     # =====================================================
-    # 2. VERIFIER LA TRANSITION
+    # RIEN A FAIRE
     # =====================================================
 
-    transitions_autorisees = {
-        "EN_ATTENTE": [
-            "CONFIRMEE",
-            "ANNULEE"
-        ],
-        "CONFIRMEE": [
-            "TERMINEE",
-            "ANNULEE"
-        ],
-        "ANNULEE": [],
-        "TERMINEE": []
-    }
+    if old_status == new_status:
 
-    if nouveau_statut not in transitions_autorisees[ancien_statut]:
+        return reservation
+
+
+    # =====================================================
+    # RESERVATION TERMINEE
+    # =====================================================
+
+    if old_status == "TERMINEE":
 
         raise HTTPException(
             status_code=400,
-            detail=(
-                f"Transition impossible : "
-                f"{ancien_statut} → {nouveau_statut}"
-            )
+            detail="Une réservation terminée ne peut plus être modifiée."
         )
 
+
     # =====================================================
-    # 3. CONFIRMATION DE LA RESERVATION
+    # RESERVATION ANNULEE
+    # =====================================================
+
+    if old_status == "ANNULEE":
+
+        raise HTTPException(
+            status_code=400,
+            detail="Une réservation annulée ne peut plus être modifiée."
+        )
+
+
+    # =====================================================
+    # EN_ATTENTE -> CONFIRMEE
     # =====================================================
 
     if (
-        ancien_statut == "EN_ATTENTE"
-        and nouveau_statut == "CONFIRMEE"
+        old_status == "EN_ATTENTE"
+        and new_status == "CONFIRMEE"
     ):
 
-        # -------------------------------------------------
-        # Récupérer les détails
-        # -------------------------------------------------
+        details = (
+            db.query(DetailReservation)
+            .filter(
+                DetailReservation.id_reservation ==
+                reservation.id_reservation
+            )
+            .all()
+        )
 
-        details = db.query(DetailReservation).filter(
-            DetailReservation.id_reservation == id_reservation
-        ).all()
 
         if not details:
 
             raise HTTPException(
                 status_code=400,
-                detail=(
-                    "Impossible de confirmer une réservation "
-                    "sans produit"
-                )
+                detail="Impossible de confirmer une réservation sans produit."
             )
 
-        # -------------------------------------------------
-        # Vérifier TOUS les stocks AVANT de modifier
-        # -------------------------------------------------
 
-        stocks_a_modifier = []
+        # Vérifier le stock AVANT de modifier quoi que ce soit
 
         for detail in details:
 
-            stock = db.query(Stock).filter(
-                Stock.id_produit == detail.id_produit
-            ).first()
+            stock = (
+                db.query(Stock)
+                .filter(
+                    Stock.id_produit ==
+                    detail.id_produit
+                )
+                .first()
+            )
+
+            produit = (
+                db.query(Produit)
+                .filter(
+                    Produit.id_produit ==
+                    detail.id_produit
+                )
+                .first()
+            )
+
 
             if stock is None:
 
                 raise HTTPException(
                     status_code=400,
                     detail=(
-                        f"Aucun stock disponible pour "
-                        f"le produit {detail.id_produit}"
+                        f"Aucun stock disponible "
+                        f"pour le produit #{detail.id_produit}."
                     )
                 )
 
-            if detail.quantite > stock.quantite:
+
+            if stock.quantite < detail.quantite:
 
                 raise HTTPException(
                     status_code=400,
                     detail=(
-                        f"Stock insuffisant pour le produit "
-                        f"{detail.id_produit}. "
-                        f"Disponible : {stock.quantite}, "
-                        f"demandé : {detail.quantite}"
+                        f"Stock insuffisant pour "
+                        f"« {produit.nom} »."
                     )
                 )
 
-            stocks_a_modifier.append(
-                (detail, stock)
+
+        # Maintenant seulement diminuer le stock
+
+        for detail in details:
+
+            stock = (
+                db.query(Stock)
+                .filter(
+                    Stock.id_produit ==
+                    detail.id_produit
+                )
+                .first()
             )
-
-        # -------------------------------------------------
-        # Tous les stocks sont suffisants
-        # On peut maintenant effectuer les sorties
-        # -------------------------------------------------
-
-        for detail, stock in stocks_a_modifier:
 
             stock.quantite -= detail.quantite
 
-            mouvement = MouvementStock(
-                type_mouvement="SORTIE",
-                quantite=detail.quantite,
-                motif=f"Réservation #{id_reservation}",
-                id_produit=detail.id_produit,
-                id_utilisateur=reservation.id_utilisateur
+
+    # =====================================================
+    # CONFIRMEE -> ANNULEE
+    # =====================================================
+
+    elif (
+        old_status == "CONFIRMEE"
+        and new_status == "ANNULEE"
+    ):
+
+        details = (
+            db.query(DetailReservation)
+            .filter(
+                DetailReservation.id_reservation ==
+                reservation.id_reservation
             )
+            .all()
+        )
 
-            db.add(mouvement)
-
-        # -------------------------------------------------
-        # Confirmer
-        # -------------------------------------------------
-
-        reservation.statut = "CONFIRMEE"
-
-    # =====================================================
-    # 4. ANNULATION AVANT CONFIRMATION
-    # =====================================================
-
-    elif (
-        ancien_statut == "EN_ATTENTE"
-        and nouveau_statut == "ANNULEE"
-    ):
-
-        reservation.statut = "ANNULEE"
-
-    # =====================================================
-    # 5. ANNULATION APRES CONFIRMATION
-    # =====================================================
-
-    elif (
-        ancien_statut == "CONFIRMEE"
-        and nouveau_statut == "ANNULEE"
-    ):
-
-        details = db.query(DetailReservation).filter(
-            DetailReservation.id_reservation == id_reservation
-        ).all()
 
         for detail in details:
 
-            stock = db.query(Stock).filter(
-                Stock.id_produit == detail.id_produit
-            ).first()
+            stock = (
+                db.query(Stock)
+                .filter(
+                    Stock.id_produit ==
+                    detail.id_produit
+                )
+                .first()
+            )
+
 
             if stock is None:
 
-                raise HTTPException(
-                    status_code=400,
-                    detail=(
-                        f"Stock introuvable pour "
-                        f"le produit {detail.id_produit}"
-                    )
+                stock = Stock(
+
+                    id_produit=
+                        detail.id_produit,
+
+                    quantite=0
+
                 )
 
-            # Restitution du stock
+                db.add(stock)
+
+                db.flush()
+
+
             stock.quantite += detail.quantite
 
-            # Mouvement d'entrée
-            mouvement = MouvementStock(
-                type_mouvement="ENTREE",
-                quantite=detail.quantite,
-                motif=f"Annulation réservation #{id_reservation}",
-                id_produit=detail.id_produit,
-                id_utilisateur=reservation.id_utilisateur
-            )
-
-            db.add(mouvement)
-
-        reservation.statut = "ANNULEE"
 
     # =====================================================
-    # 6. CONFIRMEE → TERMINEE
+    # EN_ATTENTE -> ANNULEE
     # =====================================================
 
     elif (
-        ancien_statut == "CONFIRMEE"
-        and nouveau_statut == "TERMINEE"
+        old_status == "EN_ATTENTE"
+        and new_status == "ANNULEE"
     ):
 
-        reservation.statut = "TERMINEE"
+        # Aucun stock à remettre,
+        # car le stock n'a pas encore été diminué.
+
+        pass
+
 
     # =====================================================
-    # 7. SAUVEGARDER
+    # CONFIRMEE -> TERMINEE
     # =====================================================
+
+    elif (
+        old_status == "CONFIRMEE"
+        and new_status == "TERMINEE"
+    ):
+
+        # Le stock a déjà été diminué
+        # lors de la confirmation.
+
+        pass
+
+
+    else:
+
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                f"Transition impossible : "
+                f"{old_status} → {new_status}"
+            )
+        )
+
+
+    # =====================================================
+    # ENREGISTRER LE NOUVEAU STATUT
+    # =====================================================
+
+    reservation.statut = new_status
 
     db.commit()
+
     db.refresh(reservation)
 
     return reservation

@@ -13,7 +13,6 @@ class MouvementStockBase(BaseModel):
 
 class MouvementStockCreate(MouvementStockBase):
     id_produit: int
-    id_utilisateur: int
 
 
 class MouvementStockResponse(MouvementStockBase):

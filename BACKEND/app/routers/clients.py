@@ -8,6 +8,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from app.schemas.client import ClientCreate, ClientUpdate, ClientResponse
 from app.core.security import get_current_user
 from app.core.security import require_role
+from app.models.utilisateur import Utilisateur
 
 
 router = APIRouter(
@@ -41,11 +42,11 @@ def get_client(
 
     return client
 
-
 @router.post("/", response_model=ClientResponse, status_code=201)
 def create_client(
     client_data: ClientCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: Utilisateur = Depends(get_current_user)
 ):
     client = Client(
         nom=client_data.nom,
@@ -53,7 +54,7 @@ def create_client(
         telephone=client_data.telephone,
         email=client_data.email,
         adresse=client_data.adresse,
-        id_utilisateur=client_data.id_utilisateur
+        id_utilisateur=current_user.id_utilisateur
     )
 
     db.add(client)
