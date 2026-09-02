@@ -1,20 +1,20 @@
-/* =====================================================
-   PAGE VENTES
-===================================================== */
+/* =========================================================
+   LAZARE — PAGE VENTES
+========================================================= */
 
 .ventes-page {
     width: 100%;
     min-height: 100%;
     padding: 32px;
     box-sizing: border-box;
+    color: #e8eef1;
 }
 
-
-/* =====================================================
+/* =========================================================
    HEADER
-===================================================== */
+========================================================= */
 
-.page-header {
+.ventes-page .page-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -22,984 +22,731 @@
     margin-bottom: 28px;
 }
 
-
-.page-title {
+.ventes-page .page-title {
     margin: 0;
+    color: #ffffff;
     font-size: 28px;
     font-weight: 700;
 }
 
-
-.page-description {
-    margin: 6px 0 0;
-    color: #82909b;
+.ventes-page .page-description {
+    margin: 7px 0 0;
+    color: #82929d;
     font-size: 14px;
 }
 
-
-/* =====================================================
+/* =========================================================
    BOUTONS
-===================================================== */
+========================================================= */
 
-.btn {
-    border: none;
-    border-radius: 7px;
+.ventes-page .btn {
     min-height: 40px;
     padding: 0 16px;
-
+    border: 0;
+    border-radius: 7px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-
     font-size: 14px;
     font-weight: 600;
-
     cursor: pointer;
-
-    transition:
-        background 0.2s,
-        transform 0.2s,
-        opacity 0.2s;
+    transition: 0.2s ease;
 }
 
-
-.btn:hover {
+.ventes-page .btn:hover {
     transform: translateY(-1px);
 }
 
-
-.btn:disabled {
+.ventes-page .btn:disabled {
     opacity: 0.55;
     cursor: not-allowed;
     transform: none;
 }
 
-
-.btn-primary {
+.ventes-page .btn-primary {
     background: #19d36b;
     color: #ffffff;
 }
 
-
-.btn-primary:hover {
-    background: #15bd5e;
+.ventes-page .btn-primary:hover {
+    background: #13bc5d;
 }
 
-
-.btn-secondary {
+.ventes-page .btn-secondary {
     background: #293943;
     color: #ffffff;
 }
 
-
-.btn-secondary:hover {
-    background: #334954;
+.ventes-page .btn-secondary:hover {
+    background: #354954;
 }
 
-
-.btn-danger {
-    background: #d83d3d;
+.ventes-page .btn-danger {
+    background: #d84242;
     color: #ffffff;
 }
 
-
-.btn-danger:hover {
-    background: #bd3030;
-}
-
-
-/* =====================================================
+/* =========================================================
    ERREUR
-===================================================== */
+========================================================= */
 
-.vente-error {
-    width: 100%;
-    box-sizing: border-box;
-
+.ventes-page .vente-error {
     margin-bottom: 20px;
     padding: 13px 16px;
-
+    border: 1px solid rgba(255, 80, 80, 0.35);
     border-radius: 8px;
-
-    background: rgba(220, 53, 69, 0.12);
-    border: 1px solid rgba(220, 53, 69, 0.35);
-
-    color: #ff7676;
-
-    font-size: 14px;
+    background: rgba(255, 70, 70, 0.10);
+    color: #ff7272;
 }
 
-
-/* =====================================================
+/* =========================================================
    STATISTIQUES
-===================================================== */
+========================================================= */
 
-.stats-grid {
+.ventes-page .stats-grid {
+    width: 100%;
     display: grid;
-
-    grid-template-columns:
-        repeat(4, minmax(0, 1fr));
-
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 18px;
-
     margin-bottom: 28px;
 }
 
-
-.stat-card {
+.ventes-page .stat-card {
     min-height: 105px;
-
     padding: 22px;
-
     box-sizing: border-box;
-
-    border-radius: 9px;
-
+    border: 1px solid #2d3e47;
+    border-radius: 10px;
     background: #202d34;
 
-    border: 1px solid #2c3c45;
-
     display: flex;
-
     align-items: center;
-
     justify-content: space-between;
 
-    gap: 15px;
+    transition: 0.2s ease;
 }
 
+.ventes-page .stat-card:hover {
+    border-color: #3b515d;
+    transform: translateY(-1px);
+}
 
-.stat-label {
+.ventes-page .stat-label {
     display: block;
-
-    color: #8da0ad;
-
-    font-size: 13px;
-
     margin-bottom: 6px;
+    color: #8da0ad;
+    font-size: 13px;
 }
 
-
-.stat-value {
+.ventes-page .stat-value {
     display: block;
-
     color: #ffffff;
-
-    font-size: 24px;
-
+    font-size: 25px;
     font-weight: 700;
 }
 
+/* =========================================================
+   BARRE DE RECHERCHE
+========================================================= */
 
-/* =====================================================
-   TOOLBAR
-===================================================== */
-
-.toolbar {
+.ventes-page .toolbar {
+    width: 100%;
     display: flex;
-
     align-items: center;
-
     justify-content: space-between;
-
+    gap: 15px;
     margin-bottom: 18px;
 }
 
-
-.vente-search-wrapper {
-    width: 350px;
-
+.ventes-page .vente-search-wrapper {
+    width: 360px;
     min-height: 42px;
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 9px;
-
     padding: 0 13px;
-
     box-sizing: border-box;
 
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    border: 1px solid #30434d;
     border-radius: 7px;
-
-    border: 1px solid #2d404a;
-
     background: #17242b;
 
-    color: #8ea0ab;
+    transition: 0.2s ease;
 }
 
+.ventes-page .vente-search-wrapper:focus-within {
+    border-color: #20d66f;
+    box-shadow: 0 0 0 3px rgba(32, 214, 111, 0.08);
+}
 
-.vente-search-wrapper input {
+.ventes-page .vente-search-wrapper svg {
+    color: #8fa1ab;
+    flex-shrink: 0;
+}
+
+.ventes-page .vente-search-wrapper input {
     width: 100%;
-
-    border: none;
-
-    outline: none;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
 
     background: transparent;
-
     color: #ffffff;
 
     font-size: 14px;
 }
 
-
-.vente-search-wrapper input::placeholder {
-    color: #758792;
+.ventes-page .vente-search-wrapper input::placeholder {
+    color: #71838e;
 }
 
+/* =========================================================
+   TABLEAU
+========================================================= */
 
-/* =====================================================
-   TABLE
-===================================================== */
-
-.table-container {
+.ventes-page .table-container {
     width: 100%;
-
     overflow-x: auto;
 
-    border-radius: 9px;
-
-    border: 1px solid #2c3c45;
-
+    border: 1px solid #2d3e47;
+    border-radius: 10px;
     background: #18252c;
+
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
 }
 
-
-.table {
+.ventes-page .table {
     width: 100%;
-
-    border-collapse: collapse;
-
-    min-width: 800px;
+    min-width: 820px;
+    border-collapse: separate;
+    border-spacing: 0;
 }
 
-
-.table thead {
+.ventes-page .table thead {
     background: #253640;
 }
 
-
-.table th {
-    padding: 15px;
-
+.ventes-page .table th {
+    padding: 15px 16px;
+    color: #91a2ad;
     text-align: left;
 
-    color: #8ea0ad;
-
-    font-size: 12px;
-
-    font-weight: 600;
-
+    font-size: 11px;
+    font-weight: 700;
     text-transform: uppercase;
+    letter-spacing: 0.04em;
+
+    white-space: nowrap;
 }
 
+.ventes-page .table td {
+    padding: 16px;
+    border-top: 1px solid #293a43;
 
-.table td {
-    padding: 16px 15px;
-
-    border-top: 1px solid #293941;
-
-    color: #d7e0e5;
-
+    color: #dbe4e8;
     font-size: 14px;
+    vertical-align: middle;
 }
 
+.ventes-page .table tbody tr {
+    transition: background 0.15s ease;
+}
 
-.table tbody tr:hover {
+.ventes-page .table tbody tr:hover {
     background: rgba(255, 255, 255, 0.025);
 }
 
-
-/* =====================================================
+/* =========================================================
    CLIENT
-===================================================== */
+========================================================= */
 
-.vente-client {
+.ventes-page .vente-client {
     display: flex;
-
     align-items: center;
-
     gap: 8px;
 }
 
+.ventes-page .vente-client svg {
+    color: #9aaab4;
+    flex-shrink: 0;
+}
 
-/* =====================================================
+.ventes-page .vente-client span {
+    color: #e2e9ec;
+    white-space: nowrap;
+}
+
+/* =========================================================
    STATUT
-===================================================== */
+========================================================= */
 
-.vente-status {
+.ventes-page .vente-status {
     display: inline-flex;
-
     align-items: center;
+    justify-content: center;
 
-    gap: 5px;
+    min-width: 70px;
+    padding: 6px 11px;
 
-    font-size: 13px;
+    border-radius: 999px;
 
+    font-size: 12px;
     font-weight: 600;
+
+    white-space: nowrap;
 }
 
-
-.vente-status.pending {
+.ventes-page .vente-status.pending {
     color: #f4c95d;
+    background: rgba(244, 201, 93, 0.11);
 }
 
-
-.vente-status.paid {
-    color: #26d978;
+.ventes-page .vente-status.paid {
+    color: #25d879;
+    background: rgba(37, 216, 121, 0.11);
 }
 
-
-.vente-status.cancelled {
-    color: #ff6666;
+.ventes-page .vente-status.cancelled {
+    color: #ff6868;
+    background: rgba(255, 104, 104, 0.11);
 }
 
-
-/* =====================================================
+/* =========================================================
    ACTIONS
-===================================================== */
+========================================================= */
 
-.vente-actions {
+.ventes-page .vente-actions {
     display: flex;
-
     align-items: center;
-
     gap: 7px;
 }
 
+.ventes-page .table-action {
+    width: 34px;
+    height: 34px;
 
-.table-action {
-    width: 32px;
-
-    height: 32px;
-
-    border-radius: 6px;
-
-    border: 1px solid #2d404a;
-
-    background: transparent;
-
-    color: #9baab4;
+    padding: 0;
 
     display: inline-flex;
-
     align-items: center;
-
     justify-content: center;
+
+    border: 1px solid #30434d;
+    border-radius: 7px;
+
+    background: transparent;
+    color: #9baab4;
 
     cursor: pointer;
+
+    transition: 0.2s ease;
 }
 
-
-.table-action:hover {
-    background: #263740;
+.ventes-page .table-action:hover {
+    background: #263840;
+    transform: translateY(-1px);
 }
 
-
-.table-action.view:hover {
-    color: #6cb8ff;
+.ventes-page .table-action.view:hover {
+    color: #70baff;
+    border-color: rgba(112, 186, 255, 0.4);
 }
 
-
-.table-action.confirm:hover {
-    color: #28dd79;
+.ventes-page .table-action.confirm:hover {
+    color: #2be17b;
+    border-color: rgba(43, 225, 123, 0.4);
 }
 
-
-.table-action.delete:hover {
-    color: #ff6464;
+.ventes-page .table-action.delete:hover {
+    color: #ff6565;
+    border-color: rgba(255, 101, 101, 0.4);
 }
 
-
-.table-action:disabled {
-    opacity: 0.4;
-
-    cursor: not-allowed;
-}
-
-
-/* =====================================================
-   EMPTY
-===================================================== */
-
-.vente-empty {
-    min-height: 300px;
-
-    display: flex;
-
-    flex-direction: column;
-
-    align-items: center;
-
-    justify-content: center;
-
-    gap: 8px;
-
-    color: #738692;
-}
-
-
-.vente-empty h3 {
-    margin: 8px 0 0;
-
-    color: #dce5e9;
-}
-
-
-.vente-empty p {
-    margin: 0;
-
-    font-size: 14px;
-}
-
-
-/* =====================================================
-   LOADING
-===================================================== */
-
-.vente-loading {
-    min-height: 400px;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    gap: 10px;
-
-    color: #9aaab4;
-}
-
-
-.spin {
-    animation: spin 1s linear infinite;
-}
-
-
-@keyframes spin {
-
-    from {
-        transform: rotate(0deg);
-    }
-
-    to {
-        transform: rotate(360deg);
-    }
-
-}
-
-
-/* =====================================================
+/* =========================================================
    MODAL
-===================================================== */
+========================================================= */
 
-.modal-overlay {
+.ventes-page .modal-overlay {
     position: fixed;
-
     inset: 0;
-
     z-index: 1000;
 
     padding: 20px;
-
     box-sizing: border-box;
 
     display: flex;
-
     align-items: center;
-
     justify-content: center;
 
     background: rgba(0, 0, 0, 0.72);
-
-    overflow-y: auto;
 }
 
-
-.client-modal {
+.ventes-page .client-modal {
     width: 100%;
-
     max-width: 560px;
-
     max-height: 90vh;
 
     overflow-y: auto;
 
     padding: 26px;
-
     box-sizing: border-box;
 
+    border: 1px solid #344650;
     border-radius: 12px;
 
     background: #202d34;
 
-    border: 1px solid #344650;
-
-    box-shadow:
-        0 20px 60px rgba(0, 0, 0, 0.45);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
 }
 
-
-.vente-modal {
+.ventes-page .vente-modal {
     max-width: 620px;
 }
 
-
-.vente-detail-modal {
+.ventes-page .vente-detail-modal {
     max-width: 700px;
 }
 
+/* =========================================================
+   HEADER MODAL
+========================================================= */
 
-/* =====================================================
-   MODAL HEADER
-===================================================== */
-
-.modal-header {
+.ventes-page .modal-header {
     display: flex;
-
     align-items: flex-start;
-
     justify-content: space-between;
 
     gap: 20px;
-
     margin-bottom: 25px;
 }
 
-
-.modal-header h2 {
+.ventes-page .modal-header h2 {
     margin: 0;
-
     color: #ffffff;
-
     font-size: 20px;
 }
 
-
-.modal-header p {
+.ventes-page .modal-header p {
     margin: 6px 0 0;
-
     color: #82939e;
-
     font-size: 13px;
 }
 
-
-.modal-close {
+.ventes-page .modal-close {
     width: 34px;
-
     height: 34px;
 
-    flex-shrink: 0;
+    padding: 0;
 
-    display: inline-flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    border: none;
-
+    border: 0;
     border-radius: 50%;
 
     background: #2b3d47;
-
     color: #a8b6be;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     cursor: pointer;
 }
 
-
-.modal-close:hover {
+.ventes-page .modal-close:hover {
     background: #374b57;
-
     color: #ffffff;
 }
 
-
-/* =====================================================
+/* =========================================================
    FORMULAIRE
-===================================================== */
+========================================================= */
 
-.form-group {
+.ventes-page .form-group {
     margin-bottom: 20px;
 }
 
-
-.form-label {
+.ventes-page .form-label {
     display: block;
-
     margin-bottom: 8px;
 
     color: #dce5e9;
-
     font-size: 13px;
-
     font-weight: 600;
 }
 
-
-.form-input {
+.ventes-page .form-input {
     width: 100%;
-
     min-height: 42px;
 
     padding: 0 12px;
-
     box-sizing: border-box;
 
-    border-radius: 6px;
-
     border: 1px solid #354954;
+    border-radius: 6px;
 
     outline: none;
 
     background: #1a2930;
-
     color: #ffffff;
 
     font-size: 14px;
 }
 
-
-.form-input:focus {
+.ventes-page .form-input:focus {
     border-color: #20d66f;
+    box-shadow: 0 0 0 3px rgba(32, 214, 111, 0.08);
 }
 
-
-.form-input option {
+.ventes-page .form-input option {
     background: #1a2930;
-
     color: #ffffff;
 }
 
-
-/* =====================================================
+/* =========================================================
    PRODUITS
-===================================================== */
+========================================================= */
 
-.reservation-form-section {
-    margin-top: 20px;
-}
-
-
-.reservation-products-header {
+.ventes-page .reservation-products-header {
     display: flex;
-
     align-items: center;
-
     justify-content: space-between;
 
     gap: 15px;
-
     margin-bottom: 15px;
 }
 
-
-.reservation-products-header h3 {
+.ventes-page .reservation-products-header h3 {
     margin: 0;
-
     color: #ffffff;
-
     font-size: 16px;
 }
 
-
-.reservation-products-header p {
+.ventes-page .reservation-products-header p {
     margin: 4px 0 0;
-
     color: #82939e;
-
     font-size: 12px;
 }
 
-
-.reservation-product-form-row {
+.ventes-page .reservation-product-form-row {
     display: grid;
-
-    grid-template-columns:
-        minmax(0, 1fr)
-        100px
-        38px;
-
+    grid-template-columns: minmax(0, 1fr) 100px 38px;
     gap: 8px;
 
     margin-bottom: 10px;
 }
 
-
-.quantity-input {
+.ventes-page .quantity-input {
     text-align: center;
 }
 
-
-/* =====================================================
+/* =========================================================
    TOTAL
-===================================================== */
+========================================================= */
 
-.reservation-total-preview,
-.reservation-total-row {
+.ventes-page .reservation-total-preview,
+.ventes-page .reservation-total-row {
     display: flex;
-
     align-items: center;
-
     justify-content: space-between;
 
-    gap: 15px;
-
     margin-top: 20px;
-
     padding-top: 18px;
 
     border-top: 1px solid #344650;
-
-    color: #d8e1e5;
 }
 
-
-.reservation-total-preview strong,
-.reservation-total-row strong {
+.ventes-page .reservation-total-preview strong,
+.ventes-page .reservation-total-row strong {
     color: #ffffff;
-
     font-size: 19px;
 }
 
+/* =========================================================
+   ACTIONS MODAL
+========================================================= */
 
-/* =====================================================
-   MODAL ACTIONS
-===================================================== */
-
-.modal-actions {
+.ventes-page .modal-actions {
     display: flex;
-
     align-items: center;
-
     justify-content: flex-end;
 
-    flex-wrap: wrap;
-
     gap: 10px;
-
     margin-top: 22px;
 }
 
-
-/* =====================================================
+/* =========================================================
    DÉTAIL VENTE
-===================================================== */
+========================================================= */
 
-.vente-detail-top {
+.ventes-page .vente-detail-top {
     display: grid;
-
-    grid-template-columns:
-        repeat(2, minmax(0, 1fr));
-
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 15px;
 
     margin-bottom: 20px;
 }
 
-
-.vente-detail-top > div {
+.ventes-page .vente-detail-top > div {
     padding: 14px;
 
+    border: 1px solid #2d404a;
     border-radius: 7px;
 
     background: #1a2930;
-
-    border: 1px solid #2d404a;
 }
 
-
-.detail-label {
+.ventes-page .detail-label {
     display: block;
-
     margin-bottom: 6px;
 
     color: #81939e;
-
     font-size: 12px;
 }
 
-
-.vente-detail-top strong {
+.ventes-page .vente-detail-top strong {
     color: #ffffff;
-
     font-size: 14px;
 }
 
+/* =========================================================
+   PRODUITS DÉTAIL
+========================================================= */
 
-/* =====================================================
-   LISTE PRODUITS
-===================================================== */
-
-.reservation-products-list {
+.ventes-page .reservation-products-list {
     display: flex;
-
     flex-direction: column;
-
     gap: 8px;
 }
 
-
-.reservation-product-row {
+.ventes-page .reservation-product-row {
     display: flex;
-
     align-items: center;
-
     justify-content: space-between;
 
     gap: 15px;
-
     padding: 13px;
 
+    border: 1px solid #2d404a;
     border-radius: 7px;
 
     background: #1a2930;
-
-    border: 1px solid #2d404a;
 }
 
-
-.reservation-product-info {
+.ventes-page .reservation-product-info {
     display: flex;
-
     align-items: center;
 
+    min-width: 0;
     gap: 10px;
 }
 
-
-.reservation-product-icon {
+.ventes-page .reservation-product-icon {
     width: 34px;
-
     height: 34px;
+
+    flex-shrink: 0;
 
     border-radius: 7px;
 
     display: flex;
-
     align-items: center;
-
     justify-content: center;
 
     background: #263a44;
-
     color: #78a5bb;
 }
 
-
-.reservation-product-info strong {
+.ventes-page .reservation-product-info strong {
     display: block;
 
     color: #ffffff;
-
     font-size: 14px;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
-
-.reservation-product-info span {
+.ventes-page .reservation-product-info span {
     display: block;
 
     margin-top: 4px;
 
     color: #82939e;
-
     font-size: 12px;
 }
 
-
-.reservation-product-row > strong {
+.ventes-page .reservation-product-row > strong {
     color: #ffffff;
-
     white-space: nowrap;
 }
 
-
-/* =====================================================
-   CONFIRMATION MODAL
-===================================================== */
+/* =========================================================
+   CONFIRM MODAL
+========================================================= */
 
 .confirm-overlay {
     position: fixed;
-
     inset: 0;
-
     z-index: 2000;
 
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
     padding: 20px;
-
     box-sizing: border-box;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     background: rgba(0, 0, 0, 0.78);
 }
-
 
 .confirm-modal {
     position: relative;
 
     width: 100%;
-
     max-width: 430px;
 
     padding: 28px;
-
     box-sizing: border-box;
 
+    border: 1px solid #344650;
     border-radius: 12px;
 
     background: #202d34;
 
-    border: 1px solid #344650;
-
-    box-shadow:
-        0 20px 60px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
 }
-
 
 .confirm-close {
     position: absolute;
-
     top: 15px;
-
     right: 15px;
 
     width: 32px;
-
     height: 32px;
 
-    border: none;
-
+    border: 0;
     border-radius: 50%;
 
     background: #2b3d47;
-
     color: #a8b6be;
 
-    cursor: pointer;
-
     display: flex;
-
     align-items: center;
-
     justify-content: center;
+
+    cursor: pointer;
 }
 
+.confirm-close:hover {
+    background: #374b57;
+    color: #ffffff;
+}
 
 .confirm-icon {
     width: 52px;
-
     height: 52px;
 
     margin-bottom: 16px;
@@ -1007,120 +754,111 @@
     border-radius: 50%;
 
     display: flex;
-
     align-items: center;
-
     justify-content: center;
 
     background: rgba(244, 201, 93, 0.12);
-
     color: #f4c95d;
 }
 
-
 .confirm-modal.danger .confirm-icon {
     background: rgba(255, 90, 90, 0.12);
-
     color: #ff6666;
 }
 
-
 .confirm-modal.success .confirm-icon {
     background: rgba(38, 217, 120, 0.12);
-
     color: #26d978;
 }
 
-
 .confirm-content h2 {
     margin: 0 0 8px;
-
     color: #ffffff;
-
     font-size: 19px;
 }
 
-
 .confirm-content p {
     margin: 0;
-
-    line-height: 1.6;
-
     color: #94a5ae;
-
     font-size: 14px;
+    line-height: 1.6;
 }
-
 
 .confirm-actions {
     display: flex;
-
     justify-content: flex-end;
-
     gap: 10px;
 
     margin-top: 25px;
 }
 
-
-/* =====================================================
+/* =========================================================
    RESPONSIVE
-===================================================== */
+========================================================= */
 
-@media (max-width: 1000px) {
+@media (max-width: 1100px) {
 
-    .stats-grid {
-        grid-template-columns:
-            repeat(2, minmax(0, 1fr));
+    .ventes-page .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
-
 }
 
-
-@media (max-width: 700px) {
+@media (max-width: 800px) {
 
     .ventes-page {
-        padding: 20px;
+        padding: 22px;
     }
 
-
-    .page-header {
+    .ventes-page .page-header {
         align-items: flex-start;
-
         flex-direction: column;
     }
 
-
-    .page-header .btn {
+    .ventes-page .page-header .btn {
         width: 100%;
     }
 
-
-    .stats-grid {
-        grid-template-columns:
-            1fr;
-    }
-
-
-    .vente-search-wrapper {
+    .ventes-page .vente-search-wrapper {
         width: 100%;
     }
 
+    .ventes-page .vente-detail-top {
+        grid-template-columns: 1fr;
+    }
+}
 
-    .reservation-product-form-row {
-        grid-template-columns:
-            1fr 90px 38px;
+@media (max-width: 600px) {
+
+    .ventes-page {
+        padding: 16px;
     }
 
-
-    .vente-detail-top {
-        grid-template-columns:
-            1fr;
+    .ventes-page .stats-grid {
+        grid-template-columns: 1fr;
     }
 
+    .ventes-page .page-title {
+        font-size: 24px;
+    }
 
-    .client-modal {
+    .ventes-page .reservation-products-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .ventes-page .reservation-products-header .btn {
+        width: 100%;
+    }
+
+    .ventes-page .reservation-product-form-row {
+        grid-template-columns: minmax(0, 1fr) 82px 38px;
+    }
+
+    .ventes-page .client-modal {
         padding: 20px;
     }
 
+    .confirm-modal {
+        padding: 24px;
+    }
 }

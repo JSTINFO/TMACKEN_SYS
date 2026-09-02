@@ -37,6 +37,22 @@ class Vente(Base):
         default=0
     )
 
+    rabais: Mapped[Decimal] = mapped_column(
+    Numeric(10, 2),
+    nullable=False,
+    default=0
+    )
+
+    type_rabais: Mapped[str] = mapped_column(
+        Enum(
+            "MONTANT",
+            "POURCENTAGE"
+        ),
+        nullable=False,
+        default="MONTANT"
+    )
+
+
     statut: Mapped[str] = mapped_column(
         Enum(
             "EN_COURS",
@@ -58,6 +74,7 @@ class Vente(Base):
         ForeignKey("utilisateur.id_utilisateur"),
         nullable=False
     )
+
 
     client: Mapped["Client"] = relationship(
         back_populates="ventes"

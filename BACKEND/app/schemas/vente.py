@@ -10,6 +10,11 @@ StatutVente = Literal[
     "ANNULEE"
 ]
 
+TypeRabais = Literal[
+    "MONTANT",
+    "POURCENTAGE"
+]
+
 
 class VenteDetailCreate(BaseModel):
     id_produit: int
@@ -19,8 +24,17 @@ class VenteDetailCreate(BaseModel):
 class VenteCreate(BaseModel):
     id_client: int
     id_utilisateur: int
+
     details: list[VenteDetailCreate]
+
     statut: StatutVente = "EN_COURS"
+
+    rabais: float = Field(
+        default=0,
+        ge=0
+    )
+
+    type_rabais: TypeRabais = "MONTANT"
 
 
 class VenteUpdate(BaseModel):
@@ -30,8 +44,14 @@ class VenteUpdate(BaseModel):
 class VenteResponse(BaseModel):
     id_vente: int
     date_vente: datetime
+
     total: float
+
+    rabais: float
+    type_rabais: str
+
     statut: str
+
     id_client: int
     id_utilisateur: int
 
@@ -42,8 +62,10 @@ class VenteResponse(BaseModel):
 
 class VenteDetailProduitResponse(BaseModel):
     id_detail_vente: int
+
     id_produit: int
     nom_produit: str
+
     prix_unitaire: float
     quantite: int
     sous_total: float
@@ -52,8 +74,14 @@ class VenteDetailProduitResponse(BaseModel):
 class VenteCompleteResponse(BaseModel):
     id_vente: int
     date_vente: datetime
+
     total: float
+
+    rabais: float
+    type_rabais: str
+
     statut: str
+
     id_client: int
     id_utilisateur: int
 
