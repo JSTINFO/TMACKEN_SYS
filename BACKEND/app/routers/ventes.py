@@ -161,6 +161,78 @@ def create_vente(
         )
 
     # =====================================================
+    # VERIFIER RABAIS
+    # =====================================================
+
+    rabais = Decimal(
+        str(vente_data.rabais or 0)
+    )
+
+    if rabais < 0:
+        raise HTTPException(
+            status_code=400,
+            detail="Le rabais ne peut pas être négatif"
+        )
+
+    # -----------------------------------------------------
+    # RABAIS EN POURCENTAGE
+    # -----------------------------------------------------
+
+    if vente_data.type_rabais == "POURCENTAGE":
+
+        if rabais > Decimal("100"):
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    "Le rabais en pourcentage "
+                    "ne peut pas dépasser 100 %."
+                )
+            )
+
+        montant_rabais = (
+            total * rabais / Decimal("100")
+        )
+
+    # -----------------------------------------------------
+    # RABAIS EN MONTANT
+    # -----------------------------------------------------
+
+    else:
+
+        montant_rabais = rabais
+
+    # -----------------------------------------------------
+    # EMPECHER UN TOTAL NEGATIF
+    # -----------------------------------------------------
+
+    if montant_rabais > total:
+        montant_rabais = total
+
+    # =====================================================
+    # TOTAL FINAL
+    # =====================================================
+
+    total_final = total - montant_rabais
+
+    # =====================================================
+    # VERIFIER DOUBLON PRODUIT
+    # =====================================================
+
+    produits_ids = [
+        detail.id_produit
+        for detail in vente_data.details
+    ]
+
+    if len(produits_ids) != len(set(produits_ids)):
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "Un même produit ne peut pas "
+                "être ajouté deux fois dans une vente."
+            )
+        )
+
+    # =====================================================
     # CREER LA VENTE
     # =====================================================
 
@@ -168,7 +240,9 @@ def create_vente(
         id_client=vente_data.id_client,
         id_utilisateur=vente_data.id_utilisateur,
         statut="EN_COURS",
-        total=total
+        total=total_final,
+        rabais=rabais,
+        type_rabais=vente_data.type_rabais
     )
 
     db.add(vente)
@@ -307,6 +381,10 @@ def get_vente(
         "total":
             float(vente.total),
 
+        "rabais": float(vente.rabais or 0),
+        
+        "type_rabais": vente.type_rabais,
+
         "statut":
             vente.statut,
 
@@ -321,6 +399,8 @@ def get_vente(
 
         "total_calcul":
             float(total_calcul)
+
+        
     }
 
 

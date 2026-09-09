@@ -54,3 +54,20 @@ export const updateReservation = async (
 
     return response.data;
 };
+
+
+// ==========================================
+// CONFIRMER ET PAYER UNE RÉSERVATION
+// ==========================================
+
+export const payerReservation = async (
+    idReservation,
+    paiementData
+) => {
+    const response = await api.post(
+        `/reservations/${idReservation}/payer`,
+        paiementData
+    );
+
+    return response.data;
+};

@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 from datetime import datetime
+from decimal import Decimal
 from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, Enum, ForeignKey, Integer, func
+from sqlalchemy import DateTime, Enum, ForeignKey, Integer, Numeric, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database.base import Base
@@ -13,6 +14,7 @@ if TYPE_CHECKING:
     from app.models.client import Client
     from app.models.utilisateur import Utilisateur
     from app.models.detail_reservation import DetailReservation
+    from app.models.paiement import Paiement
 
 
 class Reservation(Base):
@@ -30,6 +32,29 @@ class Reservation(Base):
         server_default=func.current_timestamp()
     )
 
+    # =========================================================
+    # RABAIS
+    # =========================================================
+
+    rabais: Mapped[Decimal] = mapped_column(
+        Numeric(10, 2),
+        nullable=False,
+        default=0
+    )
+
+    type_rabais: Mapped[str] = mapped_column(
+        Enum(
+            "MONTANT",
+            "POURCENTAGE"
+        ),
+        nullable=False,
+        default="MONTANT"
+    )
+
+    # =========================================================
+    # STATUT
+    # =========================================================
+
     statut: Mapped[str] = mapped_column(
         Enum(
             "EN_ATTENTE",
@@ -40,6 +65,10 @@ class Reservation(Base):
         nullable=False,
         default="EN_ATTENTE"
     )
+
+    # =========================================================
+    # RELATIONS
+    # =========================================================
 
     id_client: Mapped[int] = mapped_column(
         Integer,
@@ -62,5 +91,9 @@ class Reservation(Base):
     )
 
     details: Mapped[list["DetailReservation"]] = relationship(
+        back_populates="reservation"
+    )
+
+    paiements: Mapped[list["Paiement"]] = relationship(
         back_populates="reservation"
     )

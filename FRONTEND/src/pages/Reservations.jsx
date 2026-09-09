@@ -11,20 +11,23 @@ import {
     CalendarDays,
     UserRound,
     Package,
-    Trash2
+    Trash2,
+    CreditCard
 } from "lucide-react";
 
 import {
     getReservations,
     getReservation,
     createReservation,
-    updateReservation
+    updateReservation,
+    payerReservation
 } from "../services/reservationService";
 
 import { getClients } from "../services/clientService";
 import { getProduits } from "../services/produitService";
 
 import ConfirmModal from "../components/ConfirmModal";
+import PaymentModal from "../components/PaymentModal";
 
 
 function Reservations() {
@@ -33,29 +36,17 @@ function Reservations() {
     // DONNEES
     // =====================================================
 
-    const [reservations, setReservations] =
-        useState([]);
-
-    const [clients, setClients] =
-        useState([]);
-
-    const [produits, setProduits] =
-        useState([]);
-
+    const [reservations, setReservations] = useState([]);
+    const [clients, setClients] = useState([]);
+    const [produits, setProduits] = useState([]);
 
     // =====================================================
     // ETATS
     // =====================================================
 
-    const [loading, setLoading] =
-        useState(true);
-
-    const [error, setError] =
-        useState("");
-
-    const [search, setSearch] =
-        useState("");
-
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+    const [search, setSearch] = useState("");
 
     // =====================================================
     // CREATION
@@ -67,20 +58,17 @@ function Reservations() {
     const [creating, setCreating] =
         useState(false);
 
-
     const [form, setForm] = useState({
-
         id_client: "",
-
+        rabais: 0,
+        type_rabais: "MONTANT",
         details: [
             {
                 id_produit: "",
                 quantite: 1
             }
         ]
-
     });
-
 
     // =====================================================
     // DETAIL
@@ -95,31 +83,31 @@ function Reservations() {
     const [loadingDetail, setLoadingDetail] =
         useState(false);
 
-
     // =====================================================
     // CONFIRMATION
     // =====================================================
 
-    const [confirmModal, setConfirmModal] =
-        useState({
-
-            open: false,
-
-            type: "warning",
-
-            title: "",
-
-            message: "",
-
-            confirmText: "Confirmer",
-
-            action: null
-
-        });
-
+    const [confirmModal, setConfirmModal] = useState({
+        open: false,
+        type: "warning",
+        title: "",
+        message: "",
+        confirmText: "Confirmer",
+        action: null
+    });
 
     const [confirmLoading, setConfirmLoading] =
         useState(false);
+
+    // =====================================================
+    // PAIEMENT
+    // =====================================================
+
+    const [paymentModal, setPaymentModal] = useState({
+        open: false,
+        reservation: null,
+        loading: false
+    });
 
 
     // =====================================================
@@ -131,24 +119,17 @@ function Reservations() {
         try {
 
             setLoading(true);
-
             setError("");
-
 
             const [
                 reservationsData,
                 clientsData,
                 produitsData
             ] = await Promise.all([
-
                 getReservations(),
-
                 getClients(),
-
                 getProduits()
-
             ]);
-
 
             setReservations(
                 reservationsData || []
@@ -162,7 +143,6 @@ function Reservations() {
                 produitsData || []
             );
 
-
         } catch (err) {
 
             console.error(err);
@@ -172,13 +152,11 @@ function Reservations() {
                 "Impossible de charger les données."
             );
 
-
         } finally {
 
             setLoading(false);
 
         }
-
     };
 
 
@@ -199,8 +177,7 @@ function Reservations() {
 
         clients.forEach(client => {
 
-            map[client.id_client] =
-                client;
+            map[client.id_client] = client;
 
         });
 
@@ -219,8 +196,7 @@ function Reservations() {
 
         produits.forEach(produit => {
 
-            map[produit.id_produit] =
-                produit;
+            map[produit.id_produit] = produit;
 
         });
 
@@ -236,18 +212,15 @@ function Reservations() {
     const totalReservations =
         reservations.length;
 
-
     const enAttente =
         reservations.filter(
             r => r.statut === "EN_ATTENTE"
         ).length;
 
-
     const confirmees =
         reservations.filter(
             r => r.statut === "CONFIRMEE"
         ).length;
-
 
     const annulees =
         reservations.filter(
@@ -265,33 +238,23 @@ function Reservations() {
             const query =
                 search.toLowerCase().trim();
 
-
             if (!query) {
-
                 return true;
-
             }
-
 
             const client =
                 clientsMap[
                     reservation.id_client
                 ];
 
-
             const nomClient = client
-
                 ? `${client.prenom} ${client.nom}`
-
                 : "";
 
-
             return (
-
                 String(
                     reservation.id_reservation
-                )
-                    .includes(query)
+                ).includes(query)
 
                 ||
 
@@ -304,9 +267,7 @@ function Reservations() {
                 reservation.statut
                     .toLowerCase()
                     .includes(query)
-
             );
-
         });
 
 
@@ -317,12 +278,59 @@ function Reservations() {
     const handleClientChange = event => {
 
         setForm(previous => ({
-
             ...previous,
-
             id_client:
                 event.target.value
+        }));
 
+    };
+
+
+    // =====================================================
+    // TYPE RABAIS
+    // =====================================================
+
+    const handleDiscountTypeChange = event => {
+
+        setForm(previous => ({
+            ...previous,
+            type_rabais:
+                event.target.value,
+            rabais: 0
+        }));
+
+    };
+
+
+    // =====================================================
+    // MONTANT RABAIS
+    // =====================================================
+
+    const handleDiscountChange = event => {
+
+        let value =
+            Number(event.target.value);
+
+        if (Number.isNaN(value)) {
+            value = 0;
+        }
+
+        if (value < 0) {
+            value = 0;
+        }
+
+        if (
+            form.type_rabais ===
+            "POURCENTAGE"
+            &&
+            value > 100
+        ) {
+            value = 100;
+        }
+
+        setForm(previous => ({
+            ...previous,
+            rabais: value
         }));
 
     };
@@ -344,19 +352,13 @@ function Reservations() {
             ];
 
             details[index] = {
-
                 ...details[index],
-
                 id_produit: value
-
             };
 
             return {
-
                 ...previous,
-
                 details
-
             };
 
         });
@@ -373,6 +375,17 @@ function Reservations() {
         value
     ) => {
 
+        let quantity =
+            Number(value);
+
+        if (Number.isNaN(quantity)) {
+            quantity = 1;
+        }
+
+        if (quantity < 1) {
+            quantity = 1;
+        }
+
         setForm(previous => {
 
             const details = [
@@ -380,20 +393,13 @@ function Reservations() {
             ];
 
             details[index] = {
-
                 ...details[index],
-
-                quantite:
-                    Number(value)
-
+                quantite: quantity
             };
 
             return {
-
                 ...previous,
-
                 details
-
             };
 
         });
@@ -402,7 +408,7 @@ function Reservations() {
 
 
     // =====================================================
-    // AJOUTER LIGNE PRODUIT
+    // AJOUTER PRODUIT
     // =====================================================
 
     const addProductLine = () => {
@@ -412,14 +418,12 @@ function Reservations() {
             ...previous,
 
             details: [
-
                 ...previous.details,
 
                 {
                     id_produit: "",
                     quantite: 1
                 }
-
             ]
 
         }));
@@ -428,7 +432,7 @@ function Reservations() {
 
 
     // =====================================================
-    // SUPPRIMER LIGNE
+    // SUPPRIMER PRODUIT
     // =====================================================
 
     const removeProductLine = index => {
@@ -438,11 +442,8 @@ function Reservations() {
             if (
                 previous.details.length === 1
             ) {
-
                 return previous;
-
             }
-
 
             return {
 
@@ -450,7 +451,8 @@ function Reservations() {
 
                 details:
                     previous.details.filter(
-                        (_, i) => i !== index
+                        (_, i) =>
+                            i !== index
                     )
 
             };
@@ -461,10 +463,10 @@ function Reservations() {
 
 
     // =====================================================
-    // TOTAL
+    // TOTAL BRUT
     // =====================================================
 
-    const calculateTotal = () => {
+    const calculateGrossTotal = () => {
 
         return form.details.reduce(
             (total, detail) => {
@@ -476,25 +478,78 @@ function Reservations() {
                         )
                     ];
 
-
                 if (!produit) {
-
                     return total;
-
                 }
 
-
                 return (
-                    total
-                    +
-                    Number(produit.prix || 0)
-                    *
-                    Number(detail.quantite || 0)
+                    total +
+                    Number(
+                        produit.prix || 0
+                    ) *
+                    Number(
+                        detail.quantite || 0
+                    )
                 );
 
             },
-
             0
+        );
+
+    };
+
+
+    // =====================================================
+    // MONTANT RABAIS
+    // =====================================================
+
+    const calculateDiscountAmount = () => {
+
+        const totalBrut =
+            calculateGrossTotal();
+
+        const rabais =
+            Number(form.rabais || 0);
+
+        if (rabais <= 0) {
+            return 0;
+        }
+
+        if (
+            form.type_rabais ===
+            "POURCENTAGE"
+        ) {
+
+            return Math.min(
+                totalBrut,
+                totalBrut * rabais / 100
+            );
+
+        }
+
+        return Math.min(
+            totalBrut,
+            rabais
+        );
+
+    };
+
+
+    // =====================================================
+    // TOTAL FINAL
+    // =====================================================
+
+    const calculateFinalTotal = () => {
+
+        const totalBrut =
+            calculateGrossTotal();
+
+        const discount =
+            calculateDiscountAmount();
+
+        return Math.max(
+            0,
+            totalBrut - discount
         );
 
     };
@@ -526,11 +581,8 @@ function Reservations() {
     const formatDate = date => {
 
         if (!date) {
-
             return "—";
-
         }
-
 
         return new Date(
             date
@@ -555,13 +607,15 @@ function Reservations() {
 
             id_client: "",
 
-            details: [
+            rabais: 0,
 
+            type_rabais: "MONTANT",
+
+            details: [
                 {
                     id_produit: "",
                     quantite: 1
                 }
-
             ]
 
         });
@@ -591,11 +645,8 @@ function Reservations() {
     const closeCreateModal = () => {
 
         if (creating) {
-
             return;
-
         }
-
 
         setShowCreateModal(false);
 
@@ -615,6 +666,7 @@ function Reservations() {
         setError("");
 
 
+        // CLIENT
         if (!form.id_client) {
 
             setError(
@@ -622,10 +674,10 @@ function Reservations() {
             );
 
             return;
-
         }
 
 
+        // PRODUITS
         if (!form.details.length) {
 
             setError(
@@ -633,7 +685,6 @@ function Reservations() {
             );
 
             return;
-
         }
 
 
@@ -651,7 +702,6 @@ function Reservations() {
                 );
 
                 return;
-
             }
 
 
@@ -665,7 +715,6 @@ function Reservations() {
                 );
 
                 return;
-
             }
 
 
@@ -686,12 +735,43 @@ function Reservations() {
                 );
 
                 return;
-
             }
 
 
-            productIds.push(productId);
+            productIds.push(
+                productId
+            );
 
+        }
+
+
+        // RABAIS
+        const rabais =
+            Number(form.rabais || 0);
+
+
+        if (rabais < 0) {
+
+            setError(
+                "Le rabais ne peut pas être négatif."
+            );
+
+            return;
+        }
+
+
+        if (
+            form.type_rabais ===
+            "POURCENTAGE"
+            &&
+            rabais > 100
+        ) {
+
+            setError(
+                "Le rabais en pourcentage ne peut pas dépasser 100 %."
+            );
+
+            return;
         }
 
 
@@ -699,6 +779,16 @@ function Reservations() {
             clientsMap[
                 Number(form.id_client)
             ];
+
+
+        const totalBrut =
+            calculateGrossTotal();
+
+        const montantRabais =
+            calculateDiscountAmount();
+
+        const totalFinal =
+            calculateFinalTotal();
 
 
         setConfirmModal({
@@ -711,7 +801,7 @@ function Reservations() {
                 "Créer la réservation ?",
 
             message:
-                `Créer une réservation pour ${client.prenom} ${client.nom} avec ${form.details.length} produit(s) pour un total de ${formatPrice(calculateTotal())} ?`,
+                `Créer une réservation pour ${client?.prenom || ""} ${client?.nom || ""} avec ${form.details.length} produit(s). Total brut : ${formatPrice(totalBrut)} $, rabais : ${formatPrice(montantRabais)} $, total à payer : ${formatPrice(totalFinal)} $.`,
 
             confirmText:
                 "Créer",
@@ -728,77 +818,142 @@ function Reservations() {
     // CREATION CONFIRMEE
     // =====================================================
 
-const createReservationConfirmed = async () => {
-    try {
-        console.log("1️⃣ DEBUT CREATION");
+    const createReservationConfirmed =
+        async () => {
 
-        setConfirmLoading(true);
-        setCreating(true);
-        setError("");
+            try {
 
-        const data = {
-            id_client: Number(form.id_client),
+                setConfirmLoading(true);
 
-            details: form.details.map(detail => ({
-                id_produit: Number(detail.id_produit),
-                quantite: Number(detail.quantite)
-            }))
+                setCreating(true);
+
+                setError("");
+
+
+                const data = {
+
+                    id_client:
+                        Number(
+                            form.id_client
+                        ),
+
+                    rabais:
+                        Number(
+                            form.rabais || 0
+                        ),
+
+                    type_rabais:
+                        form.type_rabais,
+
+                    details:
+                        form.details.map(
+                            detail => ({
+
+                                id_produit:
+                                    Number(
+                                        detail.id_produit
+                                    ),
+
+                                quantite:
+                                    Number(
+                                        detail.quantite
+                                    )
+
+                            })
+                        )
+
+                };
+
+
+                console.log(
+                    "DONNEES RESERVATION :",
+                    data
+                );
+
+
+                const reservation =
+                    await createReservation(
+                        data
+                    );
+
+
+                setReservations(
+                    previous => [
+                        reservation,
+                        ...previous
+                    ]
+                );
+
+
+                setShowCreateModal(
+                    false
+                );
+
+                resetForm();
+
+
+                setConfirmModal({
+
+                    open: false,
+
+                    type: "warning",
+
+                    title: "",
+
+                    message: "",
+
+                    confirmText:
+                        "Confirmer",
+
+                    action: null
+
+                });
+
+
+            } catch (err) {
+
+                console.error(
+                    err
+                );
+
+                setError(
+                    err.response?.data?.detail ||
+                    err.message ||
+                    "Impossible de créer la réservation."
+                );
+
+
+                setConfirmModal({
+
+                    open: false,
+
+                    type: "warning",
+
+                    title: "",
+
+                    message: "",
+
+                    confirmText:
+                        "Confirmer",
+
+                    action: null
+
+                });
+
+            } finally {
+
+                setConfirmLoading(
+                    false
+                );
+
+                setCreating(
+                    false
+                );
+
+            }
+
         };
 
-        console.log("2️⃣ DONNEES ENVOYEES :", data);
-
-        const reservation = await createReservation(data);
-
-        console.log("3️⃣ RESERVATION RECUE :", reservation);
-
-        setReservations(previous => [
-            reservation,
-            ...previous
-        ]);
-
-        console.log("4️⃣ FERMETURE MODAL");
-
-        setShowCreateModal(false);
-        resetForm();
-
-        setConfirmModal({
-            open: false,
-            type: "warning",
-            title: "",
-            message: "",
-            confirmText: "Confirmer",
-            action: null
-        });
-
-        console.log("5️⃣ FIN SANS ERREUR");
-
-    } catch (err) {
-
-        console.error("🔥 ERREUR COMPLETE :", err);
-        console.error("🔥 RESPONSE :", err.response);
-        console.error("🔥 DATA :", err.response?.data);
-        console.error("🔥 STATUS :", err.response?.status);
-
-        setError(
-            err.response?.data?.detail ||
-            err.message ||
-            "Impossible de créer la réservation."
-        );
-
-        setConfirmModal({
-            open: false,
-            type: "warning",
-            title: "",
-            message: "",
-            confirmText: "Confirmer",
-            action: null
-        });
-
-    } finally {
-        setConfirmLoading(false);
-        setCreating(false);
-    }
-};
 
     // =====================================================
     // OUVRIR DETAIL
@@ -809,9 +964,13 @@ const createReservationConfirmed = async () => {
 
             try {
 
-                setLoadingDetail(true);
+                setLoadingDetail(
+                    true
+                );
 
-                setShowDetailModal(true);
+                setShowDetailModal(
+                    true
+                );
 
                 setSelectedReservation(
                     null
@@ -830,24 +989,26 @@ const createReservationConfirmed = async () => {
                     data
                 );
 
-
             } catch (err) {
 
-                console.error(err);
-
+                console.error(
+                    err
+                );
 
                 setError(
                     err.response?.data?.detail ||
                     "Impossible de charger la réservation."
                 );
 
-
-                setShowDetailModal(false);
-
+                setShowDetailModal(
+                    false
+                );
 
             } finally {
 
-                setLoadingDetail(false);
+                setLoadingDetail(
+                    false
+                );
 
             }
 
@@ -860,13 +1021,307 @@ const createReservationConfirmed = async () => {
 
     const closeDetailModal = () => {
 
-        setShowDetailModal(false);
+        setShowDetailModal(
+            false
+        );
 
         setSelectedReservation(
             null
         );
 
     };
+
+
+    // =====================================================
+    // OUVRIR PAIEMENT
+    // =====================================================
+
+    const openPaymentModal =
+        async reservation => {
+
+            setError("");
+
+            let fullReservation =
+                reservation;
+
+
+            if (
+                !fullReservation.details ||
+                fullReservation.details.length === 0 ||
+                fullReservation.total === undefined
+            ) {
+
+                try {
+
+                    fullReservation =
+                        await getReservation(
+                            reservation.id_reservation
+                        );
+
+                } catch (err) {
+
+                    console.warn(
+                        "Impossible de charger les détails :",
+                        err
+                    );
+
+                }
+
+            }
+
+
+            setPaymentModal({
+
+                open: true,
+
+                reservation:
+                    fullReservation,
+
+                loading: false
+
+            });
+
+        };
+
+
+    // =====================================================
+    // FERMER PAIEMENT
+    // =====================================================
+
+    const closePaymentModal = () => {
+
+        if (
+            paymentModal.loading
+        ) {
+            return;
+        }
+
+        setPaymentModal({
+
+            open: false,
+
+            reservation: null,
+
+            loading: false
+
+        });
+
+    };
+
+
+    // =====================================================
+    // PAYER RESERVATION
+    // =====================================================
+
+    const handleConfirmPaymentReservation =
+        async ({
+            mode_paiement,
+            montant
+        }) => {
+
+            if (
+                !paymentModal.reservation
+            ) {
+                return;
+            }
+
+
+            setPaymentModal(
+                previous => ({
+                    ...previous,
+                    loading: true
+                })
+            );
+
+
+            try {
+
+                const res =
+                    await payerReservation(
+
+                        paymentModal
+                            .reservation
+                            .id_reservation,
+
+                        {
+                            mode_paiement,
+                            montant
+                        }
+
+                    );
+
+
+                const updatedReservation =
+                    res.reservation;
+
+
+                setReservations(
+                    previous =>
+                        previous.map(
+                            item =>
+
+                                item.id_reservation ===
+                                paymentModal
+                                    .reservation
+                                    .id_reservation
+
+                                    ? updatedReservation
+
+                                    : item
+                        )
+                );
+
+
+                if (
+                    selectedReservation
+                    &&
+                    selectedReservation
+                        .id_reservation ===
+                    paymentModal
+                        .reservation
+                        .id_reservation
+                ) {
+
+                    setSelectedReservation(
+                        updatedReservation
+                    );
+
+                }
+
+
+                setPaymentModal({
+
+                    open: false,
+
+                    reservation: null,
+
+                    loading: false
+
+                });
+
+
+            } catch (err) {
+
+                setPaymentModal(
+                    previous => ({
+                        ...previous,
+                        loading: false
+                    })
+                );
+
+                throw err;
+
+            }
+
+        };
+
+
+    // =====================================================
+    // CONFIRMER SANS PAIEMENT
+    // =====================================================
+
+    const handleConfirmWithoutPaymentReservation =
+        async () => {
+
+            if (
+                !paymentModal.reservation
+            ) {
+                return;
+            }
+
+
+            setPaymentModal(
+                previous => ({
+                    ...previous,
+                    loading: true
+                })
+            );
+
+
+            try {
+
+                const updated =
+                    await updateReservation(
+
+                        paymentModal
+                            .reservation
+                            .id_reservation,
+
+                        {
+                            statut:
+                                "CONFIRMEE"
+                        }
+
+                    );
+
+
+                setReservations(
+                    previous =>
+                        previous.map(
+                            item =>
+
+                                item.id_reservation ===
+                                updated.id_reservation
+
+                                    ? updated
+
+                                    : item
+                        )
+                );
+
+
+                if (
+                    selectedReservation
+                    &&
+                    selectedReservation
+                        .id_reservation ===
+                    updated.id_reservation
+                ) {
+
+                    const detail =
+                        await getReservation(
+                            updated.id_reservation
+                        );
+
+                    setSelectedReservation(
+                        detail
+                    );
+
+                }
+
+
+                setPaymentModal({
+
+                    open: false,
+
+                    reservation: null,
+
+                    loading: false
+
+                });
+
+
+            } catch (err) {
+
+                console.error(
+                    err
+                );
+
+                setError(
+                    err.response?.data?.detail ||
+                    "Impossible de confirmer la réservation sans paiement."
+                );
+
+                setPaymentModal(
+                    previous => ({
+                        ...previous,
+                        loading: false
+                    })
+                );
+
+            }
+
+        };
 
 
     // =====================================================
@@ -879,9 +1334,7 @@ const createReservationConfirmed = async () => {
     ) => {
 
         let title = "";
-
         let message = "";
-
         let confirmText = "";
 
 
@@ -979,7 +1432,6 @@ const createReservationConfirmed = async () => {
 
                         setReservations(
                             previous =>
-
                                 previous.map(
                                     item =>
 
@@ -989,7 +1441,6 @@ const createReservationConfirmed = async () => {
                                             ? updated
 
                                             : item
-
                                 )
                         );
 
@@ -1008,7 +1459,6 @@ const createReservationConfirmed = async () => {
                                         .id_reservation
                                 );
 
-
                             setSelectedReservation(
                                 detail
                             );
@@ -1018,17 +1468,16 @@ const createReservationConfirmed = async () => {
 
                         closeConfirmModal();
 
-
                     } catch (err) {
 
-                        console.error(err);
-
+                        console.error(
+                            err
+                        );
 
                         setError(
                             err.response?.data?.detail ||
                             "Impossible de modifier la réservation."
                         );
-
 
                         closeConfirmModal();
 
@@ -1048,17 +1497,16 @@ const createReservationConfirmed = async () => {
 
 
     // =====================================================
-    // CONFIRM MODAL
+    // FERMER CONFIRMATION
     // =====================================================
 
     const closeConfirmModal = () => {
 
-        if (confirmLoading) {
-
+        if (
+            confirmLoading
+        ) {
             return;
-
         }
-
 
         setConfirmModal({
 
@@ -1070,7 +1518,8 @@ const createReservationConfirmed = async () => {
 
             message: "",
 
-            confirmText: "Confirmer",
+            confirmText:
+                "Confirmer",
 
             action: null
 
@@ -1087,15 +1536,15 @@ const createReservationConfirmed = async () => {
         idClient => {
 
             const client =
-                clientsMap[idClient];
-
+                clientsMap[
+                    idClient
+                ];
 
             if (!client) {
 
                 return `Client #${idClient}`;
 
             }
-
 
             return `${client.prenom} ${client.nom}`;
 
@@ -1106,91 +1555,92 @@ const createReservationConfirmed = async () => {
     // STATUT
     // =====================================================
 
-    const renderStatus = statut => {
+    const renderStatus =
+        statut => {
 
-        if (
-            statut ===
-            "EN_ATTENTE"
-        ) {
+            if (
+                statut ===
+                "EN_ATTENTE"
+            ) {
 
-            return (
+                return (
 
-                <span className="reservation-status pending">
+                    <span className="reservation-status pending">
 
-                    <Clock3 size={14} />
+                        <Clock3 size={14} />
 
-                    En attente
+                        En attente
 
-                </span>
+                    </span>
 
-            );
+                );
 
-        }
-
-
-        if (
-            statut ===
-            "CONFIRMEE"
-        ) {
-
-            return (
-
-                <span className="reservation-status confirmed">
-
-                    <CheckCircle2 size={14} />
-
-                    Confirmée
-
-                </span>
-
-            );
-
-        }
+            }
 
 
-        if (
-            statut ===
-            "ANNULEE"
-        ) {
+            if (
+                statut ===
+                "CONFIRMEE"
+            ) {
 
-            return (
+                return (
 
-                <span className="reservation-status cancelled">
+                    <span className="reservation-status confirmed">
 
-                    <XCircle size={14} />
+                        <CheckCircle2 size={14} />
 
-                    Annulée
+                        Confirmée
 
-                </span>
+                    </span>
 
-            );
+                );
 
-        }
-
-
-        if (
-            statut ===
-            "TERMINEE"
-        ) {
-
-            return (
-
-                <span className="reservation-status completed">
-
-                    <CheckCircle2 size={14} />
-
-                    Terminée
-
-                </span>
-
-            );
-
-        }
+            }
 
 
-        return statut;
+            if (
+                statut ===
+                "ANNULEE"
+            ) {
 
-    };
+                return (
+
+                    <span className="reservation-status cancelled">
+
+                        <XCircle size={14} />
+
+                        Annulée
+
+                    </span>
+
+                );
+
+            }
+
+
+            if (
+                statut ===
+                "TERMINEE"
+            ) {
+
+                return (
+
+                    <span className="reservation-status completed">
+
+                        <CheckCircle2 size={14} />
+
+                        Terminée
+
+                    </span>
+
+                );
+
+            }
+
+
+            return statut;
+
+        };
 
 
     // =====================================================
@@ -1201,27 +1651,13 @@ const createReservationConfirmed = async () => {
 
         <div className="reservations-page">
 
-
-            {/* HEADER */}
+            {/* =================================================
+                HEADER
+            ================================================= */}
 
             <div className="page-header">
 
-                <div>
-
-                    {/* <h1 className="page-title">
-
-                        Réservations
-
-                    </h1>
-
-                    <p className="page-description">
-
-                        Gérez les réservations clients et leurs produits.
-
-                    </p> */}
-
-                </div>
-
+                <div />
 
                 <button
                     className="btn btn-primary"
@@ -1239,23 +1675,20 @@ const createReservationConfirmed = async () => {
             </div>
 
 
-            {/* STATS */}
+            {/* =================================================
+                STATS
+            ================================================= */}
 
             <div className="stats-grid">
 
-
                 <div className="stat-card">
 
                     <span className="stat-label">
-
                         Total
-
                     </span>
 
                     <strong className="stat-value">
-
                         {totalReservations}
-
                     </strong>
 
                 </div>
@@ -1264,15 +1697,11 @@ const createReservationConfirmed = async () => {
                 <div className="stat-card">
 
                     <span className="stat-label">
-
                         En attente
-
                     </span>
 
                     <strong className="stat-value">
-
                         {enAttente}
-
                     </strong>
 
                 </div>
@@ -1281,15 +1710,11 @@ const createReservationConfirmed = async () => {
                 <div className="stat-card">
 
                     <span className="stat-label">
-
                         Confirmées
-
                     </span>
 
                     <strong className="stat-value">
-
                         {confirmees}
-
                     </strong>
 
                 </div>
@@ -1298,15 +1723,11 @@ const createReservationConfirmed = async () => {
                 <div className="stat-card">
 
                     <span className="stat-label">
-
                         Annulées
-
                     </span>
 
                     <strong className="stat-value">
-
                         {annulees}
-
                     </strong>
 
                 </div>
@@ -1314,7 +1735,9 @@ const createReservationConfirmed = async () => {
             </div>
 
 
-            {/* TOOLBAR */}
+            {/* =================================================
+                TOOLBAR
+            ================================================= */}
 
             <div className="toolbar">
 
@@ -1324,11 +1747,10 @@ const createReservationConfirmed = async () => {
 
                     <input
                         value={search}
-                        onChange={
-                            e =>
-                                setSearch(
-                                    e.target.value
-                                )
+                        onChange={e =>
+                            setSearch(
+                                e.target.value
+                            )
                         }
                         placeholder="Rechercher une réservation..."
                     />
@@ -1352,7 +1774,9 @@ const createReservationConfirmed = async () => {
             </div>
 
 
-            {/* ERROR */}
+            {/* =================================================
+                ERROR
+            ================================================= */}
 
             {error && (
 
@@ -1365,10 +1789,11 @@ const createReservationConfirmed = async () => {
             )}
 
 
-            {/* TABLE */}
+            {/* =================================================
+                TABLE
+            ================================================= */}
 
             <div className="table-container">
-
 
                 {loading ? (
 
@@ -1386,14 +1811,10 @@ const createReservationConfirmed = async () => {
 
                     <div className="reservation-empty">
 
-                        <CalendarDays
-                            size={40}
-                        />
+                        <CalendarDays size={40} />
 
                         <h3>
-
                             Aucune réservation
-
                         </h3>
 
                     </div>
@@ -1407,13 +1828,9 @@ const createReservationConfirmed = async () => {
                             <tr>
 
                                 <th>ID</th>
-
                                 <th>Client</th>
-
                                 <th>Date</th>
-
                                 <th>Statut</th>
-
                                 <th>Actions</th>
 
                             </tr>
@@ -1492,6 +1909,8 @@ const createReservationConfirmed = async () => {
 
                                             <div className="reservation-actions">
 
+                                                {/* VOIR */}
+
                                                 <button
                                                     className="table-action view"
                                                     title="Voir"
@@ -1508,16 +1927,17 @@ const createReservationConfirmed = async () => {
                                                 </button>
 
 
+                                                {/* CONFIRMER + PAYER */}
+
                                                 {reservation.statut ===
                                                     "EN_ATTENTE" && (
 
                                                     <button
                                                         className="table-action confirm"
-                                                        title="Confirmer"
+                                                        title="Confirmer & Encaisser"
                                                         onClick={() =>
-                                                            changeStatus(
-                                                                reservation,
-                                                                "CONFIRMEE"
+                                                            openPaymentModal(
+                                                                reservation
                                                             )
                                                         }
                                                     >
@@ -1530,6 +1950,36 @@ const createReservationConfirmed = async () => {
 
                                                 )}
 
+
+                                                {/* PAYER */}
+
+                                                {reservation.statut ===
+                                                    "CONFIRMEE" && (
+
+                                                    <button
+                                                        className="table-action confirm"
+                                                        title="Encaisser"
+                                                        style={{
+                                                            color:
+                                                                "#19d36b"
+                                                        }}
+                                                        onClick={() =>
+                                                            openPaymentModal(
+                                                                reservation
+                                                            )
+                                                        }
+                                                    >
+
+                                                        <CreditCard
+                                                            size={16}
+                                                        />
+
+                                                    </button>
+
+                                                )}
+
+
+                                                {/* ANNULER */}
 
                                                 {(
                                                     reservation.statut ===
@@ -1584,24 +2034,20 @@ const createReservationConfirmed = async () => {
 
                 <div className="modal-overlay">
 
-
                     <div className="client-modal reservation-modal">
 
+                        {/* HEADER */}
 
                         <div className="modal-header">
 
                             <div>
 
                                 <h2>
-
                                     Nouvelle réservation
-
                                 </h2>
 
                                 <p>
-
-                                    Ajoutez le client et les produits.
-
+                                    Ajoutez le client, les produits, le rabais et les quantités.
                                 </p>
 
                             </div>
@@ -1613,13 +2059,13 @@ const createReservationConfirmed = async () => {
                                     closeCreateModal
                                 }
                             >
-
                                 ×
-
                             </button>
 
                         </div>
 
+
+                        {/* ERROR */}
 
                         {error && (
 
@@ -1638,17 +2084,15 @@ const createReservationConfirmed = async () => {
                             }
                         >
 
-
-                            {/* CLIENT */}
+                            {/* =================================================
+                                CLIENT
+                            ================================================= */}
 
                             <div className="form-group">
 
                                 <label className="form-label">
-
                                     Client *
-
                                 </label>
-
 
                                 <select
                                     className="form-input"
@@ -1662,11 +2106,8 @@ const createReservationConfirmed = async () => {
                                 >
 
                                     <option value="">
-
                                         Sélectionner un client
-
                                     </option>
-
 
                                     {clients.map(
                                         client => (
@@ -1683,7 +2124,9 @@ const createReservationConfirmed = async () => {
                                                 {
                                                     client.prenom
                                                 }
+
                                                 {" "}
+
                                                 {
                                                     client.nom
                                                 }
@@ -1698,7 +2141,9 @@ const createReservationConfirmed = async () => {
                             </div>
 
 
-                            {/* PRODUITS */}
+                            {/* =================================================
+                                PRODUITS
+                            ================================================= */}
 
                             <div className="reservation-form-section">
 
@@ -1707,15 +2152,11 @@ const createReservationConfirmed = async () => {
                                     <div>
 
                                         <h3>
-
                                             Produits
-
                                         </h3>
 
                                         <p>
-
                                             Ajoutez les produits et leurs quantités.
-
                                         </p>
 
                                     </div>
@@ -1739,33 +2180,32 @@ const createReservationConfirmed = async () => {
 
 
                                 {form.details.map(
-                                    (detail, index) => (
+                                    (
+                                        detail,
+                                        index
+                                    ) => (
 
                                         <div
                                             className="reservation-product-form-row"
                                             key={index}
                                         >
 
-
                                             <select
                                                 className="form-input"
                                                 value={
                                                     detail.id_produit
                                                 }
-                                                onChange={
-                                                    e =>
-                                                        handleProductChange(
-                                                            index,
-                                                            e.target.value
-                                                        )
+                                                onChange={e =>
+                                                    handleProductChange(
+                                                        index,
+                                                        e.target.value
+                                                    )
                                                 }
                                                 required
                                             >
 
                                                 <option value="">
-
                                                     Sélectionner un produit
-
                                                 </option>
 
 
@@ -1798,6 +2238,8 @@ const createReservationConfirmed = async () => {
                                                                     )
                                                                 }
 
+                                                                {" $"}
+
                                                             </option>
 
                                                         )
@@ -1813,12 +2255,11 @@ const createReservationConfirmed = async () => {
                                                 value={
                                                     detail.quantite
                                                 }
-                                                onChange={
-                                                    e =>
-                                                        handleQuantityChange(
-                                                            index,
-                                                            e.target.value
-                                                        )
+                                                onChange={e =>
+                                                    handleQuantityChange(
+                                                        index,
+                                                        e.target.value
+                                                    )
                                                 }
                                                 required
                                             />
@@ -1852,31 +2293,200 @@ const createReservationConfirmed = async () => {
                             </div>
 
 
-                            {/* TOTAL */}
+                            {/* =================================================
+                                RABAIS
+                            ================================================= */}
 
-                            <div className="reservation-total-preview">
+                            <div className="reservation-form-section">
 
-                                <span>
+                                <div className="reservation-products-header">
 
-                                    Total
+                                    <div>
 
-                                </span>
+                                        <h3>
+                                            Rabais
+                                        </h3>
+
+                                        <p>
+                                            Appliquez une réduction à la réservation.
+                                        </p>
+
+                                    </div>
+
+                                </div>
 
 
-                                <strong>
+                                <div
+                                    style={{
+                                        display: "grid",
+                                        gridTemplateColumns:
+                                            "1fr 1fr",
+                                        gap: "12px"
+                                    }}
+                                >
 
-                                    {
-                                        formatPrice(
-                                            calculateTotal()
-                                        )
-                                    }
+                                    {/* TYPE */}
 
-                                </strong>
+                                    <div className="form-group">
+
+                                        <label className="form-label">
+                                            Type de rabais
+                                        </label>
+
+                                        <select
+                                            className="form-input"
+                                            value={
+                                                form.type_rabais
+                                            }
+                                            onChange={
+                                                handleDiscountTypeChange
+                                            }
+                                        >
+
+                                            <option value="MONTANT">
+                                                Montant
+                                            </option>
+
+                                            <option value="POURCENTAGE">
+                                                Pourcentage
+                                            </option>
+
+                                        </select>
+
+                                    </div>
+
+
+                                    {/* VALEUR */}
+
+                                    <div className="form-group">
+
+                                        <label className="form-label">
+
+                                            {form.type_rabais ===
+                                            "POURCENTAGE"
+                                                ? "Pourcentage"
+                                                : "Montant"}
+
+                                        </label>
+
+                                        <input
+                                            className="form-input"
+                                            type="number"
+                                            min="0"
+                                            max={
+                                                form.type_rabais ===
+                                                "POURCENTAGE"
+                                                    ? "100"
+                                                    : undefined
+                                            }
+                                            step="0.01"
+                                            value={
+                                                form.rabais
+                                            }
+                                            onChange={
+                                                handleDiscountChange
+                                            }
+                                        />
+
+                                    </div>
+
+                                </div>
 
                             </div>
 
 
-                            {/* ACTIONS */}
+                            {/* =================================================
+                                TOTAL
+                            ================================================= */}
+
+                            <div className="reservation-total-preview">
+
+                                <div
+                                    style={{
+                                        display: "flex",
+                                        justifyContent:
+                                            "space-between",
+                                        marginBottom:
+                                            "8px"
+                                    }}
+                                >
+
+                                    <span>
+                                        Total brut
+                                    </span>
+
+                                    <strong>
+                                        {
+                                            formatPrice(
+                                                calculateGrossTotal()
+                                            )
+                                        } $
+                                    </strong>
+
+                                </div>
+
+
+                                <div
+                                    style={{
+                                        display: "flex",
+                                        justifyContent:
+                                            "space-between",
+                                        marginBottom:
+                                            "8px"
+                                    }}
+                                >
+
+                                    <span>
+                                        Rabais
+                                    </span>
+
+                                    <strong>
+
+                                        -{" "}
+
+                                        {
+                                            formatPrice(
+                                                calculateDiscountAmount()
+                                            )
+                                        }
+
+                                        {" $"}
+
+                                    </strong>
+
+                                </div>
+
+
+                                <div
+                                    style={{
+                                        display: "flex",
+                                        justifyContent:
+                                            "space-between",
+                                        fontSize:
+                                            "18px"
+                                    }}
+                                >
+
+                                    <strong>
+                                        Total à payer
+                                    </strong>
+
+                                    <strong>
+                                        {
+                                            formatPrice(
+                                                calculateFinalTotal()
+                                            )
+                                        } $
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+
+                            {/* =================================================
+                                ACTIONS
+                            ================================================= */}
 
                             <div className="modal-actions">
 
@@ -1929,9 +2539,7 @@ const createReservationConfirmed = async () => {
 
                 <div className="modal-overlay">
 
-
                     <div className="client-modal reservation-detail-modal">
-
 
                         <div className="modal-header">
 
@@ -1967,9 +2575,7 @@ const createReservationConfirmed = async () => {
                                     closeDetailModal
                                 }
                             >
-
                                 ×
-
                             </button>
 
                         </div>
@@ -1991,15 +2597,14 @@ const createReservationConfirmed = async () => {
 
                             <>
 
+                                {/* INFOS */}
 
                                 <div className="reservation-detail-top">
 
                                     <div>
 
                                         <span className="detail-label">
-
                                             Client
-
                                         </span>
 
                                         <strong>
@@ -2019,9 +2624,7 @@ const createReservationConfirmed = async () => {
                                     <div>
 
                                         <span className="detail-label">
-
                                             Date
-
                                         </span>
 
                                         <strong>
@@ -2041,9 +2644,7 @@ const createReservationConfirmed = async () => {
                                     <div>
 
                                         <span className="detail-label">
-
                                             Statut
-
                                         </span>
 
                                         {
@@ -2059,9 +2660,7 @@ const createReservationConfirmed = async () => {
                                     <div>
 
                                         <span className="detail-label">
-
                                             Total
-
                                         </span>
 
                                         <strong>
@@ -2073,6 +2672,8 @@ const createReservationConfirmed = async () => {
                                                 )
                                             }
 
+                                            {" $"}
+
                                         </strong>
 
                                     </div>
@@ -2080,14 +2681,14 @@ const createReservationConfirmed = async () => {
                                 </div>
 
 
+                                {/* PRODUITS */}
+
                                 <div className="reservation-products-header">
 
                                     <div>
 
                                         <h3>
-
                                             Produits
-
                                         </h3>
 
                                     </div>
@@ -2099,14 +2700,14 @@ const createReservationConfirmed = async () => {
 
                                     {selectedReservation
                                         .details
-                                        .map(
+                                        ?.map(
                                             detail => (
 
                                                 <div
                                                     className="reservation-product-row"
                                                     key={
-                                                        detail
-                                                            .id_detail_reservation
+                                                        detail.id_detail_reservation ||
+                                                        `${detail.id_produit}-${detail.nom_produit}`
                                                     }
                                                 >
 
@@ -2126,8 +2727,7 @@ const createReservationConfirmed = async () => {
                                                             <strong>
 
                                                                 {
-                                                                    detail
-                                                                        .nom_produit
+                                                                    detail.nom_produit
                                                                 }
 
                                                             </strong>
@@ -2136,18 +2736,18 @@ const createReservationConfirmed = async () => {
                                                             <span>
 
                                                                 {
-                                                                    detail
-                                                                        .quantite
+                                                                    detail.quantite
                                                                 }
 
                                                                 {" × "}
 
                                                                 {
                                                                     formatPrice(
-                                                                        detail
-                                                                            .prix_unitaire
+                                                                        detail.prix_unitaire
                                                                     )
                                                                 }
+
+                                                                {" $"}
 
                                                             </span>
 
@@ -2160,10 +2760,11 @@ const createReservationConfirmed = async () => {
 
                                                         {
                                                             formatPrice(
-                                                                detail
-                                                                    .sous_total
+                                                                detail.sous_total
                                                             )
                                                         }
+
+                                                        {" $"}
 
                                                     </strong>
 
@@ -2175,13 +2776,112 @@ const createReservationConfirmed = async () => {
                                 </div>
 
 
+                                {/* TOTAL DETAIL */}
+
                                 <div className="reservation-total-row">
 
                                     <span>
-
-                                        Total
-
+                                        Total brut
                                     </span>
+
+                                    <strong>
+
+                                        {
+                                            formatPrice(
+                                                selectedReservation
+                                                    .details
+                                                    ?.reduce(
+                                                        (
+                                                            total,
+                                                            detail
+                                                        ) =>
+                                                            total +
+                                                            Number(
+                                                                detail.sous_total ||
+                                                                0
+                                                            ),
+                                                        0
+                                                    )
+                                            )
+                                        }
+
+                                        {" $"}
+
+                                    </strong>
+
+                                </div>
+
+
+                                <div className="reservation-total-row">
+
+                                    <span>
+                                        Rabais
+                                        {" "}
+                                        (
+                                        {
+                                            selectedReservation
+                                                .type_rabais ===
+                                            "POURCENTAGE"
+                                                ? `${selectedReservation.rabais || 0}%`
+                                                : `${formatPrice(selectedReservation.rabais || 0)} $`
+                                        }
+                                        )
+                                    </span>
+
+                                    <strong>
+
+                                        -
+
+                                        {" "}
+
+                                        {
+                                            formatPrice(
+                                                Math.max(
+                                                    0,
+                                                    (
+                                                        selectedReservation
+                                                            .details
+                                                            ?.reduce(
+                                                                (
+                                                                    total,
+                                                                    detail
+                                                                ) =>
+                                                                    total +
+                                                                    Number(
+                                                                        detail.sous_total ||
+                                                                        0
+                                                                    ),
+                                                                0
+                                                            ) || 0
+                                                    )
+                                                    -
+                                                    Number(
+                                                        selectedReservation
+                                                            .total ||
+                                                        0
+                                                    )
+                                                )
+                                            )
+                                        }
+
+                                        {" $"}
+
+                                    </strong>
+
+                                </div>
+
+
+                                <div
+                                    className="reservation-total-row"
+                                    style={{
+                                        fontSize:
+                                            "18px"
+                                    }}
+                                >
+
+                                    <strong>
+                                        Total à payer
+                                    </strong>
 
                                     <strong>
 
@@ -2192,10 +2892,14 @@ const createReservationConfirmed = async () => {
                                             )
                                         }
 
+                                        {" $"}
+
                                     </strong>
 
                                 </div>
 
+
+                                {/* ACTIONS */}
 
                                 <div className="modal-actions">
 
@@ -2207,9 +2911,8 @@ const createReservationConfirmed = async () => {
                                         <button
                                             className="btn btn-primary"
                                             onClick={() =>
-                                                changeStatus(
-                                                    selectedReservation,
-                                                    "CONFIRMEE"
+                                                openPaymentModal(
+                                                    selectedReservation
                                                 )
                                             }
                                         >
@@ -2218,7 +2921,7 @@ const createReservationConfirmed = async () => {
                                                 size={16}
                                             />
 
-                                            Confirmer
+                                            Confirmer & Encaisser
 
                                         </button>
 
@@ -2260,23 +2963,45 @@ const createReservationConfirmed = async () => {
                                         .statut ===
                                         "CONFIRMEE" && (
 
-                                        <button
-                                            className="btn btn-primary"
-                                            onClick={() =>
-                                                changeStatus(
-                                                    selectedReservation,
-                                                    "TERMINEE"
-                                                )
-                                            }
-                                        >
+                                        <>
 
-                                            <CheckCircle2
-                                                size={16}
-                                            />
+                                            <button
+                                                className="btn btn-primary"
+                                                onClick={() =>
+                                                    openPaymentModal(
+                                                        selectedReservation
+                                                    )
+                                                }
+                                            >
 
-                                            Terminer
+                                                <CreditCard
+                                                    size={16}
+                                                />
 
-                                        </button>
+                                                Encaisser
+
+                                            </button>
+
+
+                                            <button
+                                                className="btn btn-secondary"
+                                                onClick={() =>
+                                                    changeStatus(
+                                                        selectedReservation,
+                                                        "TERMINEE"
+                                                    )
+                                                }
+                                            >
+
+                                                <CheckCircle2
+                                                    size={16}
+                                                />
+
+                                                Marquer terminée
+
+                                            </button>
+
+                                        </>
 
                                     )}
 
@@ -2346,6 +3071,48 @@ const createReservationConfirmed = async () => {
                 }
 
             />
+
+
+            {/* =================================================
+                PAIEMENT
+            ================================================= */}
+
+            <PaymentModal
+    open={paymentModal.open}
+    onClose={closePaymentModal}
+
+    title={`Règlement — Réservation #${paymentModal.reservation?.id_reservation || ""}`}
+
+    clientName={
+        paymentModal.reservation
+            ? getClientName(paymentModal.reservation.id_client)
+            : ""
+    }
+
+    reference={`Réservation #${paymentModal.reservation?.id_reservation || ""}`}
+
+    totalAmount={paymentModal.reservation?.total || 0}
+
+    items={paymentModal.reservation?.details || []}
+
+    rabaisInitial={
+        paymentModal.reservation?.rabais || 0
+    }
+
+    typeRabaisInitial={
+        paymentModal.reservation?.type_rabais || "MONTANT"
+    }
+
+    onConfirmPayment={handleConfirmPaymentReservation}
+
+    onConfirmWithoutPayment={
+        paymentModal.reservation?.statut === "EN_ATTENTE"
+            ? handleConfirmWithoutPaymentReservation
+            : undefined
+    }
+
+    loading={paymentModal.loading}
+/>
 
         </div>
 

@@ -25,8 +25,10 @@ import {
 import { getClients } from "../services/clientService";
 import { getProduits } from "../services/produitService";
 import { getCurrentUser } from "../services/authService";
+import { createPaiement } from "../services/paiementService";
 
 import ConfirmModal from "../components/ConfirmModal";
+import PaymentModal from "../components/PaymentModal";
 
 import "./Ventes.css";
 
@@ -75,13 +77,23 @@ function Ventes() {
     // =====================================================
 
     const [form, setForm] = useState({
+
         id_client: "",
+
         details: [
             {
                 id_produit: "",
                 quantite: 1
             }
-        ]
+        ],
+
+        // -----------------------------
+        // RABAIS
+        // -----------------------------
+
+        rabais: 0,
+
+        type_rabais: "MONTANT"
     });
 
 
@@ -90,12 +102,32 @@ function Ventes() {
     // =====================================================
 
     const [confirmModal, setConfirmModal] = useState({
+
         open: false,
+
         type: "warning",
+
         title: "",
+
         message: "",
+
         confirmText: "Confirmer",
+
         action: null
+    });
+
+
+    // =====================================================
+    // MODAL PAIEMENT
+    // =====================================================
+
+    const [paymentModal, setPaymentModal] = useState({
+
+        open: false,
+
+        vente: null,
+
+        loading: false
     });
 
 
@@ -108,6 +140,7 @@ function Ventes() {
         try {
 
             setLoading(true);
+
             setError("");
 
             const [
@@ -116,9 +149,13 @@ function Ventes() {
                 produitsData,
                 currentUserData
             ] = await Promise.all([
+
                 getVentes(),
+
                 getClients(),
+
                 getProduits(),
+
                 getCurrentUser()
             ]);
 
@@ -148,7 +185,6 @@ function Ventes() {
                 currentUserData
             );
 
-
         } catch (err) {
 
             console.error(
@@ -164,7 +200,6 @@ function Ventes() {
         } finally {
 
             setLoading(false);
-
         }
     };
 
@@ -187,15 +222,20 @@ function Ventes() {
     const resetForm = () => {
 
         setForm({
+
             id_client: "",
+
             details: [
                 {
                     id_produit: "",
                     quantite: 1
                 }
-            ]
-        });
+            ],
 
+            rabais: 0,
+
+            type_rabais: "MONTANT"
+        });
     };
 
 
@@ -210,7 +250,6 @@ function Ventes() {
         setError("");
 
         setShowCreateModal(true);
-
     };
 
 
@@ -229,7 +268,6 @@ function Ventes() {
         resetForm();
 
         setError("");
-
     };
 
 
@@ -240,10 +278,12 @@ function Ventes() {
     const handleClientChange = (event) => {
 
         setForm(previous => ({
-            ...previous,
-            id_client: event.target.value
-        }));
 
+            ...previous,
+
+            id_client:
+                event.target.value
+        }));
     };
 
 
@@ -263,17 +303,19 @@ function Ventes() {
             ];
 
             details[index] = {
+
                 ...details[index],
+
                 id_produit: value
             };
 
             return {
+
                 ...previous,
+
                 details
             };
-
         });
-
     };
 
 
@@ -300,17 +342,64 @@ function Ventes() {
             ];
 
             details[index] = {
+
                 ...details[index],
+
                 quantite: quantity
             };
 
             return {
+
                 ...previous,
+
                 details
             };
-
         });
+    };
 
+
+    // =====================================================
+    // RABAIS
+    // =====================================================
+
+    const handleRabaisChange = (
+        event
+    ) => {
+
+        const value =
+            event.target.value;
+
+        setForm(previous => ({
+
+            ...previous,
+
+            rabais: value
+        }));
+    };
+
+
+    // =====================================================
+    // TYPE RABAIS
+    // =====================================================
+
+    const handleTypeRabaisChange = (
+        event
+    ) => {
+
+        const type =
+            event.target.value;
+
+        setForm(previous => ({
+
+            ...previous,
+
+            type_rabais: type,
+
+            // Lorsque l'on change
+            // de type, on repart
+            // proprement à zéro.
+            rabais: 0
+        }));
     };
 
 
@@ -325,6 +414,7 @@ function Ventes() {
             ...previous,
 
             details: [
+
                 ...previous.details,
 
                 {
@@ -332,9 +422,7 @@ function Ventes() {
                     quantite: 1
                 }
             ]
-
         }));
-
     };
 
 
@@ -342,13 +430,16 @@ function Ventes() {
     // SUPPRIMER PRODUIT
     // =====================================================
 
-    const supprimerProduit = (index) => {
+    const supprimerProduit = (
+        index
+    ) => {
 
         setForm(previous => {
 
             if (
                 previous.details.length === 1
             ) {
+
                 return previous;
             }
 
@@ -362,11 +453,8 @@ function Ventes() {
                         (_, i) =>
                             i !== index
                     )
-
             };
-
         });
-
     };
 
 
@@ -397,15 +485,14 @@ function Ventes() {
                     produit.id_produit
                 )
         );
-
     };
 
 
     // =====================================================
-    // CALCUL TOTAL
+    // TOTAL BRUT
     // =====================================================
 
-    const totalFormulaire = useMemo(() => {
+    const totalBrutFormulaire = useMemo(() => {
 
         return form.details.reduce(
             (total, detail) => {
@@ -421,17 +508,23 @@ function Ventes() {
 
 
                 if (!produit) {
+
                     return total;
                 }
 
 
                 return (
                     total +
-                    Number(produit.prix || 0) *
-                    Number(detail.quantite || 0)
+                    Number(
+                        produit.prix || 0
+                    ) *
+                    Number(
+                        detail.quantite || 0
+                    )
                 );
 
             },
+
             0
         );
 
@@ -439,6 +532,61 @@ function Ventes() {
         form.details,
         produits
     ]);
+
+
+    // =====================================================
+    // MONTANT RABAIS
+    // =====================================================
+
+    const montantRabaisFormulaire =
+        useMemo(() => {
+
+            const rabais =
+                Math.max(
+                    0,
+                    Number(
+                        form.rabais || 0
+                    )
+                );
+
+
+            if (
+                form.type_rabais ===
+                "POURCENTAGE"
+            ) {
+
+                return Math.min(
+                    totalBrutFormulaire,
+
+                    totalBrutFormulaire *
+                    rabais /
+                    100
+                );
+            }
+
+
+            return Math.min(
+                totalBrutFormulaire,
+                rabais
+            );
+
+        }, [
+            form.rabais,
+            form.type_rabais,
+            totalBrutFormulaire
+        ]);
+
+
+    // =====================================================
+    // TOTAL FINAL
+    // =====================================================
+
+    const totalFormulaire =
+        Math.max(
+            0,
+            totalBrutFormulaire -
+            montantRabaisFormulaire
+        );
 
 
     // =====================================================
@@ -493,7 +641,56 @@ function Ventes() {
 
                 return false;
             }
+        }
 
+
+        // =================================================
+        // VALIDATION RABAIS
+        // =================================================
+
+        const rabais =
+            Number(
+                form.rabais || 0
+            );
+
+
+        if (rabais < 0) {
+
+            setError(
+                "Le rabais ne peut pas être négatif."
+            );
+
+            return false;
+        }
+
+
+        if (
+            form.type_rabais ===
+            "POURCENTAGE"
+            &&
+            rabais > 100
+        ) {
+
+            setError(
+                "Le rabais en pourcentage ne peut pas dépasser 100 %."
+            );
+
+            return false;
+        }
+
+
+        if (
+            form.type_rabais ===
+            "MONTANT"
+            &&
+            rabais > totalBrutFormulaire
+        ) {
+
+            setError(
+                "Le rabais ne peut pas être supérieur au total de la vente."
+            );
+
+            return false;
         }
 
 
@@ -510,7 +707,6 @@ function Ventes() {
 
 
         return true;
-
     };
 
 
@@ -526,8 +722,28 @@ function Ventes() {
         if (
             !validerFormulaire()
         ) {
+
             return;
         }
+
+
+        const rabais =
+            Number(
+                form.rabais || 0
+            );
+
+
+        const messageRabais =
+            rabais > 0
+
+                ? form.type_rabais ===
+                    "POURCENTAGE"
+
+                    ? `Rabais : ${rabais.toFixed(2)} %`
+
+                    : `Rabais : ${formatMoney(rabais)}`
+
+                : "Aucun rabais";
 
 
         setConfirmModal({
@@ -536,19 +752,20 @@ function Ventes() {
 
             type: "warning",
 
-            title: "Créer la vente ?",
+            title:
+                "Créer la vente ?",
 
             message:
-                `Cette vente sera créée pour un montant de ${formatMoney(totalFormulaire)}.`,
+                `Total brut : ${formatMoney(totalBrutFormulaire)}\n` +
+                `${messageRabais}\n` +
+                `Total final : ${formatMoney(totalFormulaire)}`,
 
             confirmText:
                 "Créer la vente",
 
             action:
                 createVenteConfirmed
-
         });
-
     };
 
 
@@ -556,222 +773,265 @@ function Ventes() {
     // CREER VENTE
     // =====================================================
 
-    const createVenteConfirmed = async () => {
+    const createVenteConfirmed =
+        async () => {
 
-        try {
+            try {
 
-            setConfirmLoading(true);
+                setConfirmLoading(true);
 
-            setCreating(true);
+                setCreating(true);
 
-            setError("");
-
-
-            // -------------------------------------------------
-            // DONNEES ENVOYEES AU BACKEND
-            // -------------------------------------------------
-
-            const data = {
-
-                id_client:
-                    Number(
-                        form.id_client
-                    ),
-
-                id_utilisateur:
-                    Number(
-                        currentUser.id_utilisateur
-                    ),
-
-                details:
-                    form.details.map(
-                        detail => ({
-
-                            id_produit:
-                                Number(
-                                    detail.id_produit
-                                ),
-
-                            quantite:
-                                Number(
-                                    detail.quantite
-                                )
-
-                        })
-                    ),
-
-                statut:
-                    "EN_COURS"
-
-            };
+                setError("");
 
 
-            console.log(
-                "DEBUT CREATION VENTE"
-            );
+                // -------------------------------------------------
+                // DONNEES ENVOYEES AU BACKEND
+                // -------------------------------------------------
 
-            console.log(
-                "DONNEES ENVOYEES :",
-                data
-            );
+                const data = {
+
+                    id_client:
+                        Number(
+                            form.id_client
+                        ),
+
+                    id_utilisateur:
+                        Number(
+                            currentUser.id_utilisateur
+                        ),
 
 
-            // -------------------------------------------------
-            // APPEL API
-            // -------------------------------------------------
+                    details:
+                        form.details.map(
+                            detail => ({
 
-            const vente =
-                await createVente(
+                                id_produit:
+                                    Number(
+                                        detail.id_produit
+                                    ),
+
+                                quantite:
+                                    Number(
+                                        detail.quantite
+                                    )
+                            })
+                        ),
+
+
+                    statut:
+                        "EN_COURS",
+
+
+                    // -------------------------------------------------
+                    // RABAIS
+                    // -------------------------------------------------
+
+                    rabais:
+                        Number(
+                            form.rabais || 0
+                        ),
+
+                    type_rabais:
+                        form.type_rabais
+                };
+
+
+                console.log(
+                    "DEBUT CREATION VENTE"
+                );
+
+
+                console.log(
+                    "DONNEES ENVOYEES :",
                     data
                 );
 
 
-            console.log(
-                "VENTE CREEE :",
-                vente
-            );
+                // -------------------------------------------------
+                // APPEL API
+                // -------------------------------------------------
+
+                const vente =
+                    await createVente(
+                        data
+                    );
 
 
-            // -------------------------------------------------
-            // FERMER MODAL CONFIRMATION
-            // -------------------------------------------------
-
-            setConfirmModal({
-                open: false,
-                type: "warning",
-                title: "",
-                message: "",
-                confirmText: "Confirmer",
-                action: null
-            });
+                console.log(
+                    "VENTE CREEE :",
+                    vente
+                );
 
 
-            // -------------------------------------------------
-            // FERMER MODAL CREATION
-            // -------------------------------------------------
+                // -------------------------------------------------
+                // FERMER MODAL CONFIRMATION
+                // -------------------------------------------------
 
-            setShowCreateModal(
-                false
-            );
+                setConfirmModal({
 
+                    open: false,
 
-            // -------------------------------------------------
-            // RESET FORMULAIRE
-            // -------------------------------------------------
+                    type: "warning",
 
-            resetForm();
+                    title: "",
 
+                    message: "",
 
-            // -------------------------------------------------
-            // RECHARGER LES DONNEES
-            // -------------------------------------------------
+                    confirmText:
+                        "Confirmer",
 
-            await chargerDonnees();
+                    action: null
+                });
 
 
-        } catch (err) {
+                // -------------------------------------------------
+                // FERMER MODAL CREATION
+                // -------------------------------------------------
 
-            console.error(
-                "ERREUR CREATION VENTE :",
-                err
-            );
-
-
-            console.error(
-                "RESPONSE :",
-                err.response
-            );
+                setShowCreateModal(
+                    false
+                );
 
 
-            console.error(
-                "DATA :",
-                err.response?.data
-            );
+                // -------------------------------------------------
+                // RESET FORMULAIRE
+                // -------------------------------------------------
+
+                resetForm();
 
 
-            const message =
-                err.response?.data?.detail ||
-                "Impossible de créer la vente.";
+                // -------------------------------------------------
+                // RECHARGER LES DONNEES
+                // -------------------------------------------------
+
+                await chargerDonnees();
 
 
-            setError(
-                message
-            );
+                // -------------------------------------------------
+                // OUVRIR LE MODAL DE PAIEMENT
+                // -------------------------------------------------
+
+                demanderPaiement(
+                    vente
+                );
 
 
-            // Fermer uniquement
-            // le modal de confirmation.
-            setConfirmModal({
-                open: false,
-                type: "warning",
-                title: "",
-                message: "",
-                confirmText: "Confirmer",
-                action: null
-            });
+            } catch (err) {
 
-        } finally {
+                console.error(
+                    "ERREUR CREATION VENTE :",
+                    err
+                );
 
-            setConfirmLoading(false);
 
-            setCreating(false);
+                console.error(
+                    "RESPONSE :",
+                    err.response
+                );
 
-        }
 
-    };
+                console.error(
+                    "DATA :",
+                    err.response?.data
+                );
+
+
+                const message =
+                    err.response?.data?.detail ||
+                    "Impossible de créer la vente.";
+
+
+                setError(
+                    message
+                );
+
+
+                setConfirmModal({
+
+                    open: false,
+
+                    type: "warning",
+
+                    title: "",
+
+                    message: "",
+
+                    confirmText:
+                        "Confirmer",
+
+                    action: null
+                });
+
+
+            } finally {
+
+                setConfirmLoading(
+                    false
+                );
+
+                setCreating(
+                    false
+                );
+            }
+        };
 
 
     // =====================================================
     // OUVRIR DETAIL
     // =====================================================
 
-    const openVente = async (
-        idVente
-    ) => {
+    const openVente =
+        async (
+            idVente
+        ) => {
 
-        try {
+            try {
 
-            setLoadingDetail(true);
+                setLoadingDetail(
+                    true
+                );
 
-            setError("");
+                setError("");
 
 
-            const data =
-                await getVente(
-                    idVente
+                const data =
+                    await getVente(
+                        idVente
+                    );
+
+
+                setSelectedVente(
+                    data
                 );
 
 
-            setSelectedVente(
-                data
-            );
+                setShowDetailModal(
+                    true
+                );
 
 
-            setShowDetailModal(
-                true
-            );
+            } catch (err) {
+
+                console.error(
+                    "ERREUR DETAIL VENTE :",
+                    err
+                );
 
 
-        } catch (err) {
-
-            console.error(
-                "ERREUR DETAIL VENTE :",
-                err
-            );
+                setError(
+                    err.response?.data?.detail ||
+                    "Impossible de charger la vente."
+                );
 
 
-            setError(
-                err.response?.data?.detail ||
-                "Impossible de charger la vente."
-            );
+            } finally {
 
-        } finally {
-
-            setLoadingDetail(false);
-
-        }
-
-    };
+                setLoadingDetail(
+                    false
+                );
+            }
+        };
 
 
     // =====================================================
@@ -789,10 +1049,10 @@ function Ventes() {
             false
         );
 
+
         setSelectedVente(
             null
         );
-
     };
 
 
@@ -800,268 +1060,359 @@ function Ventes() {
     // DEMANDER PAIEMENT
     // =====================================================
 
-    const demanderPaiement = (
-        vente
-    ) => {
-
-        setConfirmModal({
-
-            open: true,
-
-            type: "warning",
-
-            title:
-                "Confirmer le paiement ?",
-
-            message:
-                `La vente #${vente.id_vente} sera marquée comme payée et le stock sera diminué.`,
-
-            confirmText:
-                "Confirmer le paiement",
-
-            action:
-                () =>
-                    payerVente(vente)
-
-        });
-
-    };
-
-
-    // =====================================================
-    // PAYER VENTE
-    // =====================================================
-
-    const payerVente = async (
-        vente
-    ) => {
-
-        try {
-
-            setConfirmLoading(true);
+    const demanderPaiement =
+        async (
+            vente
+        ) => {
 
             setError("");
 
 
-            const updated =
-                await updateVente(
-
-                    vente.id_vente,
-
-                    {
-                        statut:
-                            "PAYEE"
-                    }
-
-                );
-
-
-            setVentes(
-                previous =>
-                    previous.map(
-                        item =>
-                            item.id_vente ===
-                            updated.id_vente
-                                ? updated
-                                : item
-                    )
-            );
+            let fullVente =
+                vente;
 
 
             if (
-                selectedVente &&
-                selectedVente.id_vente ===
-                updated.id_vente
+                !fullVente.details ||
+                fullVente.details.length === 0
             ) {
 
-                const detail =
-                    await getVente(
-                        updated.id_vente
+                try {
+
+                    fullVente =
+                        await getVente(
+                            vente.id_vente
+                        );
+
+                } catch (err) {
+
+                    console.warn(
+                        "Impossible de précharger les détails complets de la vente:",
+                        err
                     );
-
-                setSelectedVente(
-                    detail
-                );
-
+                }
             }
 
 
-            setConfirmModal({
-                open: false,
-                type: "warning",
-                title: "",
-                message: "",
-                confirmText: "Confirmer",
-                action: null
+            setPaymentModal({
+
+                open: true,
+
+                vente:
+                    fullVente,
+
+                loading: false
             });
+        };
 
 
-        } catch (err) {
+    // =====================================================
+    // FERMER PAIEMENT
+    // =====================================================
 
-            console.error(
-                "ERREUR PAIEMENT :",
-                err
-            );
+    const closePaymentModal = () => {
 
+        if (
+            paymentModal.loading
+        ) {
 
-            setError(
-                err.response?.data?.detail ||
-                "Impossible de payer la vente."
-            );
-
-
-            setConfirmModal({
-                open: false,
-                type: "warning",
-                title: "",
-                message: "",
-                confirmText: "Confirmer",
-                action: null
-            });
-
-        } finally {
-
-            setConfirmLoading(
-                false
-            );
-
+            return;
         }
 
+
+        setPaymentModal({
+
+            open: false,
+
+            vente: null,
+
+            loading: false
+        });
     };
+
+
+    // =====================================================
+    // CONFIRMER PAIEMENT VENTE
+    // =====================================================
+
+    const handleConfirmPaymentVente =
+        async ({
+            mode_paiement,
+            montant
+        }) => {
+
+            if (
+                !paymentModal.vente
+            ) {
+
+                return;
+            }
+
+
+            setPaymentModal(
+                prev => ({
+
+                    ...prev,
+
+                    loading: true
+                })
+            );
+
+
+            try {
+
+                // =================================================
+                // CREER PAIEMENT
+                // =================================================
+
+                await createPaiement({
+
+                    id_vente:
+                        paymentModal
+                            .vente
+                            .id_vente,
+
+                    id_utilisateur:
+                        currentUser?.id_utilisateur ||
+                        paymentModal
+                            .vente
+                            .id_utilisateur,
+
+                    montant:
+                        Number(
+                            montant
+                        ),
+
+                    mode_paiement
+                });
+
+
+                // =================================================
+                // RECUPERER VENTE MISE A JOUR
+                // =================================================
+
+                const updated =
+                    await getVente(
+                        paymentModal
+                            .vente
+                            .id_vente
+                    );
+
+
+                // =================================================
+                // METTRE A JOUR LISTE
+                // =================================================
+
+                setVentes(
+                    prev =>
+                        prev.map(
+                            item =>
+                                item.id_vente ===
+                                updated.id_vente
+
+                                    ? updated
+
+                                    : item
+                        )
+                );
+
+
+                // =================================================
+                // METTRE A JOUR DETAIL
+                // =================================================
+
+                if (
+                    selectedVente &&
+                    selectedVente.id_vente ===
+                    updated.id_vente
+                ) {
+
+                    setSelectedVente(
+                        updated
+                    );
+                }
+
+
+                // =================================================
+                // FERMER PAIEMENT
+                // =================================================
+
+                setPaymentModal({
+
+                    open: false,
+
+                    vente: null,
+
+                    loading: false
+                });
+
+
+            } catch (err) {
+
+                setPaymentModal(
+                    prev => ({
+
+                        ...prev,
+
+                        loading: false
+                    })
+                );
+
+
+                throw err;
+            }
+        };
 
 
     // =====================================================
     // DEMANDER ANNULATION
     // =====================================================
 
-    const demanderAnnulation = (
-        vente
-    ) => {
+    const demanderAnnulation =
+        (
+            vente
+        ) => {
 
-        setConfirmModal({
+            setConfirmModal({
 
-            open: true,
+                open: true,
 
-            type: "warning",
+                type: "warning",
 
-            title:
-                "Annuler la vente ?",
+                title:
+                    "Annuler la vente ?",
 
-            message:
-                `La vente #${vente.id_vente} sera définitivement annulée.`,
+                message:
+                    `La vente #${vente.id_vente} sera définitivement annulée.`,
 
-            confirmText:
-                "Annuler la vente",
+                confirmText:
+                    "Annuler la vente",
 
-            action:
-                () =>
-                    annulerVente(vente)
-
-        });
-
-    };
+                action:
+                    () =>
+                        annulerVente(
+                            vente
+                        )
+            });
+        };
 
 
     // =====================================================
     // ANNULER VENTE
     // =====================================================
 
-    const annulerVente = async (
-        vente
-    ) => {
+    const annulerVente =
+        async (
+            vente
+        ) => {
 
-        try {
+            try {
 
-            setConfirmLoading(
-                true
-            );
+                setConfirmLoading(
+                    true
+                );
 
-            setError("");
+                setError("");
 
 
-            const updated =
-                await updateVente(
+                const updated =
+                    await updateVente(
 
-                    vente.id_vente,
+                        vente.id_vente,
 
-                    {
-                        statut:
-                            "ANNULEE"
-                    }
+                        {
+                            statut:
+                                "ANNULEE"
+                        }
+                    );
 
+
+                setVentes(
+                    previous =>
+                        previous.map(
+                            item =>
+                                item.id_vente ===
+                                updated.id_vente
+
+                                    ? updated
+
+                                    : item
+                        )
                 );
 
 
-            setVentes(
-                previous =>
-                    previous.map(
-                        item =>
-                            item.id_vente ===
-                            updated.id_vente
-                                ? updated
-                                : item
-                    )
-            );
+                if (
+                    selectedVente &&
+                    selectedVente.id_vente ===
+                    updated.id_vente
+                ) {
+
+                    setSelectedVente(
+                        previous => ({
+
+                            ...previous,
+
+                            ...updated
+                        })
+                    );
+                }
 
 
-            if (
-                selectedVente &&
-                selectedVente.id_vente ===
-                updated.id_vente
-            ) {
+                setConfirmModal({
 
-                setSelectedVente(
-                    previous => ({
-                        ...previous,
-                        ...updated
-                    })
+                    open: false,
+
+                    type: "warning",
+
+                    title: "",
+
+                    message: "",
+
+                    confirmText:
+                        "Confirmer",
+
+                    action: null
+                });
+
+
+            } catch (err) {
+
+                console.error(
+                    "ERREUR ANNULATION :",
+                    err
                 );
 
+
+                setError(
+                    err.response?.data?.detail ||
+                    "Impossible d'annuler la vente."
+                );
+
+
+                setConfirmModal({
+
+                    open: false,
+
+                    type: "warning",
+
+                    title: "",
+
+                    message: "",
+
+                    confirmText:
+                        "Confirmer",
+
+                    action: null
+                });
+
+
+            } finally {
+
+                setConfirmLoading(
+                    false
+                );
             }
-
-
-            setConfirmModal({
-                open: false,
-                type: "warning",
-                title: "",
-                message: "",
-                confirmText: "Confirmer",
-                action: null
-            });
-
-
-        } catch (err) {
-
-            console.error(
-                "ERREUR ANNULATION :",
-                err
-            );
-
-
-            setError(
-                err.response?.data?.detail ||
-                "Impossible d'annuler la vente."
-            );
-
-
-            setConfirmModal({
-                open: false,
-                type: "warning",
-                title: "",
-                message: "",
-                confirmText: "Confirmer",
-                action: null
-            });
-
-        } finally {
-
-            setConfirmLoading(
-                false
-            );
-
-        }
-
-    };
+        };
 
 
     // =====================================================
@@ -1078,6 +1429,7 @@ function Ventes() {
 
 
             if (!valeur) {
+
                 return ventes;
             }
 
@@ -1126,9 +1478,7 @@ function Ventes() {
                             .includes(
                                 valeur
                             )
-
                     );
-
                 }
             );
 
@@ -1181,6 +1531,7 @@ function Ventes() {
                             vente.total ||
                             0
                         ),
+
                     0
                 );
 
@@ -1198,136 +1549,153 @@ function Ventes() {
                 annulees,
 
                 chiffreAffaires
-
             };
 
-        }, [ventes]);
+        }, [
+            ventes
+        ]);
 
 
     // =====================================================
     // NOM CLIENT
     // =====================================================
 
-    const getClientName = (
-        idClient
-    ) => {
+    const getClientName =
+        (
+            idClient
+        ) => {
 
-        const client =
-            clients.find(
-                c =>
-                    c.id_client ===
-                    idClient
-            );
-
-
-        if (!client) {
-            return `Client #${idClient}`;
-        }
+            const client =
+                clients.find(
+                    c =>
+                        c.id_client ===
+                        idClient
+                );
 
 
-        return `${client.nom} ${client.prenom}`;
+            if (!client) {
 
-    };
+                return `Client #${idClient}`;
+            }
+
+
+            return `${client.nom} ${client.prenom}`;
+        };
 
 
     // =====================================================
     // FORMAT MONNAIE
     // =====================================================
 
-    const formatMoney = (
-        value
-    ) => {
+    const formatMoney =
+        (
+            value
+        ) => {
 
-        return (
-            Number(
-                value || 0
-            ).toLocaleString(
-                "fr-FR",
-                {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                }
-            ) + " $"
-        );
+            return (
 
-    };
+                Number(
+                    value || 0
+                ).toLocaleString(
+                    "fr-FR",
+                    {
+
+                        minimumFractionDigits:
+                            2,
+
+                        maximumFractionDigits:
+                            2
+                    }
+                ) + " $"
+            );
+        };
 
 
     // =====================================================
     // FORMAT DATE
     // =====================================================
 
-    const formatDate = (
-        date
-    ) => {
-
-        if (!date) {
-            return "—";
-        }
-
-
-        return new Date(
+    const formatDate =
+        (
             date
-        ).toLocaleDateString(
-            "fr-FR",
-            {
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit"
-            }
-        );
+        ) => {
 
-    };
+            if (!date) {
+
+                return "—";
+            }
+
+
+            return new Date(
+                date
+            ).toLocaleDateString(
+                "fr-FR",
+                {
+
+                    day: "2-digit",
+
+                    month: "2-digit",
+
+                    year: "numeric",
+
+                    hour: "2-digit",
+
+                    minute: "2-digit"
+                }
+            );
+        };
 
 
     // =====================================================
     // STATUS CLASS
     // =====================================================
 
-    const getStatusClass = (
-        statut
-    ) => {
+    const getStatusClass =
+        (
+            statut
+        ) => {
 
-        switch (statut) {
+            switch (statut) {
 
-            case "PAYEE":
-                return "paid";
+                case "PAYEE":
 
-            case "ANNULEE":
-                return "cancelled";
+                    return "paid";
 
-            default:
-                return "pending";
+                case "ANNULEE":
 
-        }
+                    return "cancelled";
 
-    };
+                default:
+
+                    return "pending";
+            }
+        };
 
 
     // =====================================================
     // STATUS LABEL
     // =====================================================
 
-    const getStatusLabel = (
-        statut
-    ) => {
+    const getStatusLabel =
+        (
+            statut
+        ) => {
 
-        switch (statut) {
+            switch (statut) {
 
-            case "PAYEE":
-                return "Payée";
+                case "PAYEE":
 
-            case "ANNULEE":
-                return "Annulée";
+                    return "Payée";
 
-            default:
-                return "En cours";
+                case "ANNULEE":
 
-        }
+                    return "Annulée";
 
-    };
+                default:
+
+                    return "En cours";
+            }
+        };
 
 
     // =====================================================
@@ -1354,9 +1722,7 @@ function Ventes() {
                 </div>
 
             </div>
-
         );
-
     }
 
 
@@ -1367,6 +1733,7 @@ function Ventes() {
     return (
 
         <div className="ventes-page">
+
 
             {/* =================================================
                 HEADER
@@ -1410,11 +1777,8 @@ function Ventes() {
             {error && (
 
                 <div className="vente-error">
-
                     {error}
-
                 </div>
-
             )}
 
 
@@ -1423,6 +1787,7 @@ function Ventes() {
             ================================================= */}
 
             <div className="stats-grid">
+
 
                 <div className="stat-card">
 
@@ -1496,9 +1861,13 @@ function Ventes() {
                         </span>
 
                         <strong className="stat-value">
-                            {formatMoney(
-                                statistiques.chiffreAffaires
-                            )}
+
+                            {
+                                formatMoney(
+                                    statistiques.chiffreAffaires
+                                )
+                            }
+
                         </strong>
 
                     </div>
@@ -1630,11 +1999,13 @@ function Ventes() {
                                                 />
 
                                                 <span>
+
                                                     {
                                                         getClientName(
                                                             vente.id_client
                                                         )
                                                     }
+
                                                 </span>
 
                                             </div>
@@ -1692,6 +2063,7 @@ function Ventes() {
                                         <td>
 
                                             <div className="vente-actions">
+
 
                                                 {/* VOIR */}
 
@@ -1753,7 +2125,6 @@ function Ventes() {
                                                         </button>
 
                                                     </>
-
                                                 )}
 
                                             </div>
@@ -1761,14 +2132,12 @@ function Ventes() {
                                         </td>
 
                                     </tr>
-
                                 )
                             )}
 
                         </tbody>
 
                     </table>
-
                 )}
 
             </div>
@@ -1790,13 +2159,12 @@ function Ventes() {
                         ) {
 
                             closeCreateModal();
-
                         }
-
                     }}
                 >
 
                     <div className="client-modal vente-modal">
+
 
                         {/* HEADER */}
 
@@ -1809,7 +2177,7 @@ function Ventes() {
                                 </h2>
 
                                 <p>
-                                    Ajoutez le client, les produits et les quantités.
+                                    Ajoutez le client, les produits, le rabais et les quantités.
                                 </p>
 
                             </div>
@@ -1876,12 +2244,12 @@ function Ventes() {
                                             {
                                                 client.nom
                                             }{" "}
+
                                             {
                                                 client.prenom
                                             }
 
                                         </option>
-
                                     )
                                 )}
 
@@ -1942,6 +2310,7 @@ function Ventes() {
                                         key={index}
                                     >
 
+
                                         {/* PRODUIT */}
 
                                         <select
@@ -1992,7 +2361,6 @@ function Ventes() {
                                                         }
 
                                                     </option>
-
                                                 )
                                             )}
 
@@ -2045,28 +2413,212 @@ function Ventes() {
                                         </button>
 
                                     </div>
-
                                 )
                             )}
 
                         </div>
 
 
-                        {/* TOTAL */}
+                        {/* =================================================
+                            RABAIS
+                        ================================================= */}
+
+                        <div className="reservation-form-section">
+
+                            <div className="reservation-products-header">
+
+                                <div>
+
+                                    <h3>
+                                        Rabais
+                                    </h3>
+
+                                    <p>
+                                        Appliquez une réduction à la vente.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+
+                            <div
+                                style={{
+                                    display: "grid",
+                                    gridTemplateColumns:
+                                        "1fr 1fr",
+                                    gap: "12px"
+                                }}
+                            >
+
+
+                                {/* TYPE */}
+
+                                <div className="form-group">
+
+                                    <label className="form-label">
+                                        Type de rabais
+                                    </label>
+
+
+                                    <select
+                                        className="form-input"
+                                        value={
+                                            form.type_rabais
+                                        }
+                                        onChange={
+                                            handleTypeRabaisChange
+                                        }
+                                        disabled={
+                                            creating
+                                        }
+                                    >
+
+                                        <option value="MONTANT">
+                                            Montant
+                                        </option>
+
+                                        <option value="POURCENTAGE">
+                                            Pourcentage
+                                        </option>
+
+                                    </select>
+
+                                </div>
+
+
+                                {/* VALEUR */}
+
+                                <div className="form-group">
+
+                                    <label className="form-label">
+
+                                        {
+                                            form.type_rabais ===
+                                            "POURCENTAGE"
+
+                                                ? "Pourcentage"
+                                                : "Montant"
+                                        }
+
+                                    </label>
+
+
+                                    <input
+                                        className="form-input"
+                                        type="number"
+                                        min="0"
+                                        max={
+                                            form.type_rabais ===
+                                            "POURCENTAGE"
+
+                                                ? "100"
+
+                                                : undefined
+                                        }
+                                        step="0.01"
+                                        value={
+                                            form.rabais
+                                        }
+                                        onChange={
+                                            handleRabaisChange
+                                        }
+                                        disabled={
+                                            creating
+                                        }
+                                        placeholder={
+                                            form.type_rabais ===
+                                            "POURCENTAGE"
+
+                                                ? "Ex. 10"
+                                                : "Ex. 50"
+                                        }
+                                    />
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        {/* =================================================
+                            TOTAL
+                        ================================================= */}
 
                         <div className="reservation-total-preview">
 
-                            <span>
-                                Total
-                            </span>
+                            <div
+                                style={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    gap: "6px"
+                                }}
+                            >
 
-                            <strong>
-                                {
-                                    formatMoney(
-                                        totalFormulaire
-                                    )
-                                }
-                            </strong>
+                                <span>
+                                    Total brut
+                                </span>
+
+                                <span>
+                                    Rabais
+                                </span>
+
+                                <strong>
+                                    Total à payer
+                                </strong>
+
+                            </div>
+
+
+                            <div
+                                style={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    gap: "6px",
+                                    textAlign: "right"
+                                }}
+                            >
+
+                                <span>
+                                    {
+                                        formatMoney(
+                                            totalBrutFormulaire
+                                        )
+                                    }
+                                </span>
+
+
+                                <span>
+
+                                    {form.type_rabais ===
+                                    "POURCENTAGE"
+
+                                        ? `- ${formatMoney(
+                                            montantRabaisFormulaire
+                                        )} (${Number(
+                                            form.rabais || 0
+                                        ).toFixed(2)} %)`
+                                        
+                                        : `- ${formatMoney(
+                                            montantRabaisFormulaire
+                                        )}`
+                                    }
+
+                                </span>
+
+
+                                <strong>
+
+                                    {
+                                        formatMoney(
+                                            totalFormulaire
+                                        )
+                                    }
+
+                                </strong>
+
+                            </div>
 
                         </div>
 
@@ -2127,7 +2679,6 @@ function Ventes() {
                                         Créer la vente
 
                                     </>
-
                                 )}
 
                             </button>
@@ -2137,7 +2688,6 @@ function Ventes() {
                     </div>
 
                 </div>
-
             )}
 
 
@@ -2158,13 +2708,12 @@ function Ventes() {
                             ) {
 
                                 closeDetailModal();
-
                             }
-
                         }}
                     >
 
                         <div className="client-modal vente-detail-modal">
+
 
                             {/* HEADER */}
 
@@ -2173,10 +2722,12 @@ function Ventes() {
                                 <div>
 
                                     <h2>
+
                                         Vente #
                                         {
                                             selectedVente.id_vente
                                         }
+
                                     </h2>
 
                                     <p>
@@ -2206,6 +2757,7 @@ function Ventes() {
 
                             <div className="vente-detail-top">
 
+
                                 <div>
 
                                     <span className="detail-label">
@@ -2213,11 +2765,13 @@ function Ventes() {
                                     </span>
 
                                     <strong>
+
                                         {
                                             getClientName(
                                                 selectedVente.id_client
                                             )
                                         }
+
                                     </strong>
 
                                 </div>
@@ -2230,11 +2784,13 @@ function Ventes() {
                                     </span>
 
                                     <strong>
+
                                         {
                                             formatDate(
                                                 selectedVente.date_vente
                                             )
                                         }
+
                                     </strong>
 
                                 </div>
@@ -2272,11 +2828,13 @@ function Ventes() {
                                     </span>
 
                                     <strong>
+
                                         {
                                             formatMoney(
                                                 selectedVente.total
                                             )
                                         }
+
                                     </strong>
 
                                 </div>
@@ -2351,7 +2909,6 @@ function Ventes() {
                                                 </strong>
 
                                             </div>
-
                                         )
                                     )
 
@@ -2368,27 +2925,123 @@ function Ventes() {
                                         </p>
 
                                     </div>
-
                                 )}
 
                             </div>
 
 
-                            {/* TOTAL */}
+                            {/* =================================================
+                                TOTAL DETAIL
+                            ================================================= */}
 
                             <div className="reservation-total-row">
 
-                                <span>
-                                    Total
-                                </span>
+                                <div
+                                    style={{
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        gap: "5px"
+                                    }}
+                                >
 
-                                <strong>
-                                    {
-                                        formatMoney(
-                                            selectedVente.total_calcul
-                                        )
-                                    }
-                                </strong>
+                                    <span>
+                                        Total brut
+                                    </span>
+
+                                    <span>
+                                        Rabais
+                                    </span>
+
+                                    <strong>
+                                        Total
+                                    </strong>
+
+                                </div>
+
+
+                                <div
+                                    style={{
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        gap: "5px",
+                                        textAlign: "right"
+                                    }}
+                                >
+
+                                    <span>
+
+                                        {
+                                            formatMoney(
+                                                selectedVente.total_calcul
+                                                    ? (
+                                                        Number(
+                                                            selectedVente.total_calcul
+                                                        ) +
+                                                        (
+                                                            selectedVente.type_rabais ===
+                                                            "POURCENTAGE"
+
+                                                                ? Number(
+                                                                    selectedVente.total_calcul
+                                                                ) /
+                                                                (
+                                                                    1 -
+                                                                    Number(
+                                                                        selectedVente.rabais ||
+                                                                        0
+                                                                    ) /
+                                                                    100
+                                                                ) -
+                                                                Number(
+                                                                    selectedVente.total_calcul
+                                                                )
+
+                                                                : Number(
+                                                                    selectedVente.rabais ||
+                                                                    0
+                                                                )
+                                                        )
+                                                    )
+                                                    : selectedVente.total
+                                            )
+                                        }
+
+                                    </span>
+
+
+                                    <span>
+
+                                        -{" "}
+
+                                        {
+                                            selectedVente.type_rabais ===
+                                            "POURCENTAGE"
+
+                                                ? `${Number(
+                                                    selectedVente.rabais ||
+                                                    0
+                                                ).toFixed(2)} %`
+
+                                                : formatMoney(
+                                                    selectedVente.rabais ||
+                                                    0
+                                                )
+                                        }
+
+                                    </span>
+
+
+                                    <strong>
+
+                                        {
+                                            formatMoney(
+                                                selectedVente.total
+                                            )
+                                        }
+
+                                    </strong>
+
+                                </div>
 
                             </div>
 
@@ -2438,7 +3091,6 @@ function Ventes() {
                                         </button>
 
                                     </>
-
                                 )}
 
 
@@ -2458,7 +3110,6 @@ function Ventes() {
                         </div>
 
                     </div>
-
                 )}
 
 
@@ -2503,6 +3154,7 @@ function Ventes() {
                     if (
                         confirmLoading
                     ) {
+
                         return;
                     }
 
@@ -2521,17 +3173,66 @@ function Ventes() {
                             "Confirmer",
 
                         action: null
-
                     });
-
                 }}
 
             />
 
+
+            {/* =================================================
+                MODAL DE PAIEMENT
+            ================================================= */}
+
+            <PaymentModal
+
+                open={
+                    paymentModal.open
+                }
+
+                onClose={
+                    closePaymentModal
+                }
+
+                title={
+                    `Règlement — Vente #${paymentModal.vente?.id_vente || ""}`
+                }
+
+                clientName={
+                    paymentModal.vente
+
+                        ? getClientName(
+                            paymentModal
+                                .vente
+                                .id_client
+                        )
+
+                        : ""
+                }
+
+                reference={
+                    `Vente #${paymentModal.vente?.id_vente || ""}`
+                }
+
+                totalAmount={
+                    paymentModal.vente?.total || 0
+                }
+
+                items={
+                    paymentModal.vente?.details || []
+                }
+
+                onConfirmPayment={
+                    handleConfirmPaymentVente
+                }
+
+                loading={
+                    paymentModal.loading
+                }
+
+            />
+
         </div>
-
     );
-
 }
 
 

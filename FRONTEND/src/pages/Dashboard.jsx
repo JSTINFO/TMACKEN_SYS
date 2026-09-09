@@ -1,229 +1,433 @@
+import { useEffect, useState } from "react";
+import { getDashboard } from "../services/dashboardService";
+
+
 function Dashboard() {
+
+    const [dashboard, setDashboard] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+
+    // =========================================================
+    // CHARGEMENT DU DASHBOARD
+    // =========================================================
+
+    useEffect(() => {
+
+        const chargerDashboard = async () => {
+
+            try {
+
+                setLoading(true);
+
+                const data = await getDashboard();
+
+                setDashboard(data);
+
+                setError(null);
+
+            } catch (err) {
+
+                console.error(
+                    "Erreur chargement dashboard :",
+                    err
+                );
+
+                setError(
+                    "Impossible de charger les données du dashboard."
+                );
+
+            } finally {
+
+                setLoading(false);
+
+            }
+        };
+
+
+        chargerDashboard();
+
+    }, []);
+
+
+    // =========================================================
+    // CHARGEMENT
+    // =========================================================
+
+    if (loading) {
+
+        return (
+            <div className="dashboard-loading">
+                Chargement du dashboard...
+            </div>
+        );
+
+    }
+
+
+    // =========================================================
+    // ERREUR
+    // =========================================================
+
+    if (error) {
+
+        return (
+            <div className="dashboard-error">
+                {error}
+            </div>
+        );
+
+    }
+
+
+    if (!dashboard) {
+        return null;
+    }
+
+
+    // =========================================================
+    // DONNÉES
+    // =========================================================
+
+    const clients = dashboard.clients || {};
+
+    const produits = dashboard.produits || {};
+
+    const stock = dashboard.stock || {};
+
+    const ventes = dashboard.ventes || {};
+
+    const activites = dashboard.activites_recentes || [];
+
+    const produitsFaibles = stock.produits_faibles || [];
+
+
+    // =========================================================
+    // FORMATAGE MONNAIE
+    // =========================================================
+
+    const formaterMontant = (montant) => {
+
+        return new Intl.NumberFormat(
+            "fr-FR",
+            {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }
+        ).format(montant || 0);
+
+    };
+
+
+    // =========================================================
+    // FORMATAGE DATE
+    // =========================================================
+
+    const formaterDate = (date) => {
+
+        if (!date) {
+            return "";
+        }
+
+        const maintenant = new Date();
+
+        const dateActivite = new Date(date);
+
+        const difference =
+            maintenant.getTime()
+            - dateActivite.getTime();
+
+        const minutes =
+            Math.floor(
+                difference / (1000 * 60)
+            );
+
+        if (minutes < 1) {
+            return "À l'instant";
+        }
+
+        if (minutes < 60) {
+            return `Il y a ${minutes} min`;
+        }
+
+        const heures =
+            Math.floor(minutes / 60);
+
+        if (heures < 24) {
+            return `Il y a ${heures} h`;
+        }
+
+        const jours =
+            Math.floor(heures / 24);
+
+        if (jours === 1) {
+            return "Hier";
+        }
+
+        return `Il y a ${jours} jours`;
+
+    };
+
+
+    // =========================================================
+    // ICÔNE ACTIVITÉ
+    // =========================================================
+
+    const getActivityIcon = (type) => {
+
+        if (type === "vente") {
+            return "V";
+        }
+
+        if (type === "reservation") {
+            return "R";
+        }
+
+        return "•";
+
+    };
+
+
     return (
+
         <div>
 
-            {/* En-tête de page */}
+            {/* =================================================
+                EN-TÊTE
+            ================================================= */}
+
             <div className="page-header">
 
                 <div>
-                    <h1 className="page-title">
-                        Bonjour, Steven 👋
-                    </h1>
 
-                    {/* <p className="page-description">
-                        Voici un aperçu de l'activité de TMACKEN.
-                    </p> */}
+                    {/* <h1 className="page-title">
+                        Bonjour, Steven 👋
+                    </h1> */}
+
                 </div>
 
+{/* 
                 <button className="btn btn-primary">
                     + Nouvelle vente
-                </button>
+                </button> */}
 
             </div>
 
 
-            {/* Statistiques */}
+            {/* =================================================
+                STATISTIQUES
+            ================================================= */}
+
             <div className="stats-grid">
 
+
+                {/* CLIENTS */}
+
                 <div className="stat-card">
+
                     <div className="stat-label">
                         Clients
                     </div>
 
                     <div className="stat-value">
-                        248
+                        {clients.total}
                     </div>
 
                     <div className="stat-change success">
-                        +12% ce mois
+                        Clients enregistrés
                     </div>
+
                 </div>
 
 
+                {/* PRODUITS */}
+
                 <div className="stat-card">
+
                     <div className="stat-label">
                         Produits
                     </div>
 
                     <div className="stat-value">
-                        126
+                        {produits.total}
                     </div>
 
                     <div className="stat-change success">
-                        +8 nouveaux
+                        Produits enregistrés
                     </div>
+
                 </div>
 
 
+                {/* STOCK */}
+
                 <div className="stat-card">
+
                     <div className="stat-label">
                         Stock disponible
                     </div>
 
                     <div className="stat-value">
-                        843
+                        {stock.disponible}
                     </div>
 
-                    <div className="stat-change warning">
-                        7 stocks faibles
+                    <div
+                        className={
+                            stock.stocks_faibles > 0
+                                ? "stat-change warning"
+                                : "stat-change success"
+                        }
+                    >
+                        {stock.stocks_faibles} stock
+                        {stock.stocks_faibles > 1 ? "s" : ""} faible
+                        {stock.stocks_faibles > 1 ? "s" : ""}
                     </div>
+
                 </div>
 
 
+                {/* VENTES */}
+
                 <div className="stat-card">
+
                     <div className="stat-label">
                         Ventes du mois
                     </div>
 
                     <div className="stat-value">
-                        $12,480
+                        ${formaterMontant(ventes.du_mois)}
                     </div>
 
                     <div className="stat-change success">
-                        +18.5%
+                        Total du mois
                     </div>
+
                 </div>
 
             </div>
 
 
-            {/* Contenu principal */}
+            {/* =================================================
+                CONTENU PRINCIPAL
+            ================================================= */}
+
             <div className="dashboard-grid">
 
-                {/* Activité récente */}
+
+                {/* =================================================
+                    ACTIVITÉ RÉCENTE
+                ================================================= */}
+
                 <div className="card">
 
                     <div className="section-header">
 
                         <div>
+
                             <h2>
                                 Activité récente
                             </h2>
 
                             <p>
-                                Dernières opérations effectuées
+                                Dernières ventes et réservations
                             </p>
+
                         </div>
 
-                        <button className="btn btn-secondary">
+
+                        {/* <button className="btn btn-secondary">
                             Voir tout
-                        </button>
+                        </button> */}
 
                     </div>
 
 
                     <div className="activity-list">
 
-                        <div className="activity-item">
+                        {activites.length === 0 ? (
 
-                            <div className="activity-icon">
-                                V
+                            <div className="empty-state">
+                                Aucune activité récente.
                             </div>
 
-                            <div className="activity-content">
+                        ) : (
 
-                                <strong>
-                                    Nouvelle vente
-                                </strong>
+                            activites.map(
+                                (activite, index) => (
 
-                                <span>
-                                    Vente #V-00125
-                                </span>
+                                    <div
+                                        className="activity-item"
+                                        key={`${activite.type}-${activite.description}-${index}`}
+                                    >
 
-                            </div>
+                                        <div className="activity-icon">
 
-                            <div className="activity-value">
-                                $350
-                            </div>
+                                            {getActivityIcon(
+                                                activite.type
+                                            )}
 
-                        </div>
-
-
-                        <div className="activity-item">
-
-                            <div className="activity-icon">
-                                C
-                            </div>
-
-                            <div className="activity-content">
-
-                                <strong>
-                                    Nouveau client
-                                </strong>
-
-                                <span>
-                                    Jean Pierre
-                                </span>
-
-                            </div>
-
-                            <div className="activity-time">
-                                Il y a 20 min
-                            </div>
-
-                        </div>
+                                        </div>
 
 
-                        <div className="activity-item">
+                                        <div className="activity-content">
 
-                            <div className="activity-icon">
-                                P
-                            </div>
+                                            <strong>
+                                                {activite.titre}
+                                            </strong>
 
-                            <div className="activity-content">
+                                            <span>
+                                                {activite.description}
+                                            </span>
 
-                                <strong>
-                                    Nouveau produit
-                                </strong>
-
-                                <span>
-                                    iPhone 17 Pro
-                                </span>
-
-                            </div>
-
-                            <div className="activity-time">
-                                Il y a 1 h
-                            </div>
-
-                        </div>
+                                        </div>
 
 
-                        <div className="activity-item">
+                                        {activite.type === "vente" ? (
 
-                            <div className="activity-icon">
-                                S
-                            </div>
+                                            <div className="activity-value">
 
-                            <div className="activity-content">
+                                                $
+                                                {formaterMontant(
+                                                    activite.valeur
+                                                )}
 
-                                <strong>
-                                    Stock mis à jour
-                                </strong>
+                                            </div>
 
-                                <span>
-                                    Samsung Galaxy S26
-                                </span>
+                                        ) : (
 
-                            </div>
+                                            <div className="activity-time">
 
-                            <div className="activity-time">
-                                Il y a 2 h
-                            </div>
+                                                {formaterDate(
+                                                    activite.date
+                                                )}
 
-                        </div>
+                                            </div>
+
+                                        )}
+
+                                    </div>
+
+                                )
+                            )
+
+                        )}
 
                     </div>
 
                 </div>
 
 
-                {/* Stock faible */}
+                {/* =================================================
+                    STOCK FAIBLE
+                ================================================= */}
+
                 <div className="card">
 
                     <div className="section-header">
 
                         <div>
+
                             <h2>
                                 Stock faible
                             </h2>
@@ -231,6 +435,7 @@ function Dashboard() {
                             <p>
                                 Produits nécessitant une attention
                             </p>
+
                         </div>
 
                     </div>
@@ -238,61 +443,53 @@ function Dashboard() {
 
                     <div className="low-stock-list">
 
-                        <div className="stock-item">
+                        {produitsFaibles.length === 0 ? (
 
-                            <div>
-                                <strong>
-                                    iPhone 17 Pro
-                                </strong>
-
-                                <span>
-                                    Smartphone
-                                </span>
+                            <div className="empty-state">
+                                Aucun produit en stock faible.
                             </div>
 
-                            <span className="badge badge-danger">
-                                2 unités
-                            </span>
+                        ) : (
 
-                        </div>
+                            produitsFaibles.map(
+                                (produit) => (
 
+                                    <div
+                                        className="stock-item"
+                                        key={produit.id_produit}
+                                    >
 
-                        <div className="stock-item">
+                                        <div>
 
-                            <div>
-                                <strong>
-                                    Samsung S26 Ultra
-                                </strong>
+                                            <strong>
+                                                {produit.nom}
+                                            </strong>
 
-                                <span>
-                                    Smartphone
-                                </span>
-                            </div>
+                                            <span>
+                                                {produit.description ||
+                                                    "Produit"}
+                                            </span>
 
-                            <span className="badge badge-warning">
-                                5 unités
-                            </span>
-
-                        </div>
+                                        </div>
 
 
-                        <div className="stock-item">
+                                        <span
+                                            className={
+                                                produit.quantite <= 
+                                                produit.seuil_alerte /2
+                                                    ? "badge badge-danger"
+                                                    : "badge badge-warning"
+                                            }
+                                        >
+                                            {produit.quantite} unités
+                                        </span>
 
-                            <div>
-                                <strong>
-                                    AirPods Pro
-                                </strong>
+                                    </div>
 
-                                <span>
-                                    Accessoire
-                                </span>
-                            </div>
+                                )
+                            )
 
-                            <span className="badge badge-warning">
-                                6 unités
-                            </span>
-
-                        </div>
+                        )}
 
                     </div>
 
@@ -301,7 +498,10 @@ function Dashboard() {
             </div>
 
         </div>
+
     );
+
 }
+
 
 export default Dashboard;

@@ -17,6 +17,7 @@ from app.routers.rapports import router as rapports_router
 from app.routers.auth import router as auth_router
 from app.routers.parametres import router as parametres_router
 from fastapi.middleware.cors import CORSMiddleware
+from app.routers.dashboard import router as dashboard_router
 
 app = FastAPI(
     title=settings.app_name,
@@ -54,6 +55,7 @@ app.include_router(paiements_router)
 app.include_router(rapports_router)
 app.include_router(auth_router)
 app.include_router(parametres_router)
+app.include_router(dashboard_router)
 
 @app.get("/")
 def accueil():
