@@ -1113,107 +1113,122 @@ function Reservations() {
     // PAYER RESERVATION
     // =====================================================
 
-    const handleConfirmPaymentReservation =
-        async ({
+   // =====================================================
+// PAYER RESERVATION
+// =====================================================
+
+const handleConfirmPaymentReservation = async ({
+    mode_paiement,
+    montant
+}) => {
+    if (!paymentModal.reservation) {
+        return;
+    }
+
+    const idReservation =
+        paymentModal.reservation.id_reservation;
+
+    setPaymentModal(previous => ({
+        ...previous,
+        loading: true
+    }));
+
+    try {
+        // ================================================
+        // 1. EFFECTUER LE PAIEMENT
+        // ================================================
+
+        await payerReservation(
+        idReservation,
+        {
             mode_paiement,
-            montant
-        }) => {
+            montant,
+            id_utilisateur: paymentModal.reservation?.id_utilisateur
+        }
+    );
+        // ================================================
+        // 2. RECHARGER LA RESERVATION
+        // ================================================
 
-            if (
-                !paymentModal.reservation
-            ) {
-                return;
-            }
-
-
-            setPaymentModal(
-                previous => ({
-                    ...previous,
-                    loading: true
-                })
+        const updatedReservation =
+            await getReservation(
+                idReservation
             );
 
+        // ================================================
+        // 3. METTRE A JOUR LA LISTE
+        // ================================================
 
-            try {
+        setReservations(previous =>
+            previous.map(item =>
+                item.id_reservation === idReservation
+                    ? updatedReservation
+                    : item
+            )
+        );
 
-                const res =
-                    await payerReservation(
+        // ================================================
+        // 4. METTRE A JOUR LE DETAIL SI OUVERT
+        // ================================================
 
-                        paymentModal
-                            .reservation
-                            .id_reservation,
+        if (
+            selectedReservation &&
+            selectedReservation.id_reservation ===
+                idReservation
+        ) {
+            setSelectedReservation(
+                updatedReservation
+            );
+        }
 
-                        {
-                            mode_paiement,
-                            montant
-                        }
+        // ================================================
+        // 5. FERMER LE MODAL
+        // ================================================
 
-                    );
+        setPaymentModal({
+            open: false,
+            reservation: null,
+            loading: false
+        });
 
+        // ================================================
+        // 6. RAFRAICHIR LES DONNEES
+        // ================================================
 
-                const updatedReservation =
-                    res.reservation;
+        await loadData();
 
+    } catch (err) {
 
-                setReservations(
-                    previous =>
-                        previous.map(
-                            item =>
+        console.error(
+            "Erreur paiement réservation :",
+            err
+        );
 
-                                item.id_reservation ===
-                                paymentModal
-                                    .reservation
-                                    .id_reservation
+        setPaymentModal(previous => ({
+            ...previous,
+            loading: false
+        }));
 
-                                    ? updatedReservation
+        const detail = err.response?.data?.detail;
 
-                                    : item
-                        )
-                );
+        let message =
+            "Impossible d'effectuer le paiement de la réservation.";
 
+        if (typeof detail === "string") {
+            message = detail;
+        } else if (Array.isArray(detail)) {
+            message = detail
+                .map(item => item?.msg || "Erreur de validation.")
+                .join(" | ");
+        } else if (detail) {
+            message = String(detail);
+        } else if (err.message) {
+            message = err.message;
+        }
 
-                if (
-                    selectedReservation
-                    &&
-                    selectedReservation
-                        .id_reservation ===
-                    paymentModal
-                        .reservation
-                        .id_reservation
-                ) {
-
-                    setSelectedReservation(
-                        updatedReservation
-                    );
-
-                }
-
-
-                setPaymentModal({
-
-                    open: false,
-
-                    reservation: null,
-
-                    loading: false
-
-                });
-
-
-            } catch (err) {
-
-                setPaymentModal(
-                    previous => ({
-                        ...previous,
-                        loading: false
-                    })
-                );
-
-                throw err;
-
-            }
-
-        };
+        setError(message);
+    }
+};
 
 
     // =====================================================

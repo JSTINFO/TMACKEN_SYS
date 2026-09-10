@@ -57,7 +57,17 @@ export const updateReservation = async (
 
 
 // ==========================================
-// CONFIRMER ET PAYER UNE RÉSERVATION
+// PAYER UNE RÉSERVATION
+// ==========================================
+// Le paiement passe par le routeur central
+// /paiements/ afin de gérer dans une seule
+// transaction :
+// - Paiement
+// - Vente
+// - Détails de vente
+// - Stock
+// - Mouvement de stock
+// - Confirmation de la réservation
 // ==========================================
 
 export const payerReservation = async (
@@ -65,9 +75,13 @@ export const payerReservation = async (
     paiementData
 ) => {
     const response = await api.post(
-        `/reservations/${idReservation}/payer`,
-        paiementData
+        "/paiements/",
+        {
+            ...paiementData,
+            id_reservation: idReservation,
+            id_vente: null,
+        }
     );
 
     return response.data;
-};
+};

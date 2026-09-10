@@ -680,35 +680,76 @@ def create_paiement(
     # PAIEMENT COMPLET
     # =====================================================
 
-    # IMPORTANT :
-    #
-    # Le stock a déjà été diminué lorsque la réservation
-    # est passée de EN_ATTENTE à CONFIRMEE.
-    #
-    # On ne doit donc PAS diminuer le stock ici.
-    #
+    # Le paiement complet confirme la réservation.
+    # Le stock est diminué uniquement après validation du paiement.
+
+    # -----------------------------------------------------
+    # VERIFIER LE STOCK AVANT TOUTE MUTATION
+    # -----------------------------------------------------
+
+    stocks_a_modifier = []
+
+    for detail_reservation in details_reservation:
+
+        stock = (
+            db.query(Stock)
+            .filter(
+                Stock.id_produit == detail_reservation.id_produit
+            )
+            .first()
+        )
+
+        produit = (
+            db.query(Produit)
+            .filter(
+                Produit.id_produit == detail_reservation.id_produit
+            )
+            .first()
+        )
+
+        if stock is None:
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    f"Aucun stock disponible pour le produit "
+                    f"#{detail_reservation.id_produit}."
+                )
+            )
+
+        if stock.quantite < detail_reservation.quantite:
+            nom_produit = (
+                produit.nom
+                if produit
+                else f"#{detail_reservation.id_produit}"
+            )
+
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    f"Stock insuffisant pour « {nom_produit} ». "
+                    f"Disponible : {stock.quantite}, "
+                    f"demandé : {detail_reservation.quantite}."
+                )
+            )
+
+        stocks_a_modifier.append(
+            (detail_reservation, stock)
+        )
 
     # -----------------------------------------------------
     # CREER LA VENTE
     # -----------------------------------------------------
 
     vente = Vente(
-
         id_client=reservation.id_client,
-
         id_utilisateur=user_id,
-
         statut="PAYEE",
-
         rabais=reservation.rabais,
-
         type_rabais=reservation.type_rabais,
-
         total=total_final
     )
 
     db.add(vente)
-
     db.flush()
 
     # -----------------------------------------------------
@@ -718,50 +759,56 @@ def create_paiement(
     for detail_reservation in details_reservation:
 
         detail_vente = DetailVente(
-
             id_vente=vente.id_vente,
-
             id_produit=detail_reservation.id_produit,
-
-            prix_unitaire=(
-                detail_reservation.prix_unitaire
-            ),
-
-            quantite=(
-                detail_reservation.quantite
-            )
+            prix_unitaire=detail_reservation.prix_unitaire,
+            quantite=detail_reservation.quantite
         )
 
         db.add(detail_vente)
 
     # -----------------------------------------------------
-    # CREER PAIEMENT
+    # CREER LE PAIEMENT
     # -----------------------------------------------------
+    # Le paiement reste lié à la réservation.
+    # Il ne doit PAS contenir id_vente et id_reservation à la fois.
 
     paiement = Paiement(
-
         montant=montant_paiement,
-
-        mode_paiement=
-            paiement_data.mode_paiement,
-
-        id_vente=
-            vente.id_vente,
-
-        id_reservation=
-            reservation.id_reservation,
-
-        id_utilisateur=
-            user_id
+        mode_paiement=paiement_data.mode_paiement,
+        id_vente=None,
+        id_reservation=reservation.id_reservation,
+        id_utilisateur=user_id
     )
 
     db.add(paiement)
 
     # -----------------------------------------------------
-    # RESERVATION TERMINEE
+    # DIMINUER LE STOCK + CREER LES MOUVEMENTS
     # -----------------------------------------------------
 
-    reservation.statut = "TERMINEE"
+    for detail_reservation, stock in stocks_a_modifier:
+
+        stock.quantite -= detail_reservation.quantite
+
+        mouvement = MouvementStock(
+            type_mouvement="SORTIE",
+            quantite=detail_reservation.quantite,
+            motif=(
+                f"Paiement Réservation "
+                f"#{reservation.id_reservation}"
+            ),
+            id_produit=detail_reservation.id_produit,
+            id_utilisateur=user_id
+        )
+
+        db.add(mouvement)
+
+    # -----------------------------------------------------
+    # RESERVATION CONFIRMEE
+    # -----------------------------------------------------
+
+    reservation.statut = "CONFIRMEE"
 
     # -----------------------------------------------------
     # ENREGISTREMENT ATOMIQUE
