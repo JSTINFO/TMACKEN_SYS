@@ -1953,7 +1953,7 @@ function Reservations() {
 
                                                 {/* PAYER */}
 
-                                                {reservation.statut ===
+                                                {/* {reservation.statut ===
                                                     "CONFIRMEE" && (
 
                                                     <button
@@ -1976,7 +1976,7 @@ function Reservations() {
 
                                                     </button>
 
-                                                )}
+                                                )} */}
 
 
                                                 {/* ANNULER */}
@@ -2959,13 +2959,13 @@ function Reservations() {
                                     )}
 
 
-                                    {selectedReservation
+                                    {/* {selectedReservation
                                         .statut ===
                                         "CONFIRMEE" && (
 
-                                        <>
+                                        <> */}
 
-                                            <button
+                                            {/* <button
                                                 className="btn btn-primary"
                                                 onClick={() =>
                                                     openPaymentModal(
@@ -2980,10 +2980,10 @@ function Reservations() {
 
                                                 Encaisser
 
-                                            </button>
+                                            </button> */}
 
 
-                                            <button
+                                            {/* <button
                                                 className="btn btn-secondary"
                                                 onClick={() =>
                                                     changeStatus(
@@ -3001,9 +3001,9 @@ function Reservations() {
 
                                             </button>
 
-                                        </>
+                                        </> */}
 
-                                    )}
+                                    {/* )} */}
 
 
                                     <button

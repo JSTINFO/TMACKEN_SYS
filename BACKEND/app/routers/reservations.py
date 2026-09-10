@@ -562,129 +562,17 @@ def update_reservation(
         )
 
     # =====================================================
-    # EN_ATTENTE -> CONFIRMEE
+    # CONFIRMATION UNIQUEMENT VIA PAIEMENT
     # =====================================================
 
-    if (
-        old_status == "EN_ATTENTE"
-        and new_status == "CONFIRMEE"
-    ):
-
-        details = (
-            db.query(DetailReservation)
-            .filter(
-                DetailReservation.id_reservation
-                == reservation.id_reservation
-            )
-            .all()
+    if new_status == "CONFIRMEE":
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "Une réservation est confirmée uniquement après "
+                "un paiement validé. Utilisez l'action de paiement."
+            ),
         )
-
-        if not details:
-            raise HTTPException(
-                status_code=400,
-                detail=(
-                    "Impossible de confirmer "
-                    "une réservation sans produit."
-                ),
-            )
-
-        # -------------------------------------------------
-        # VERIFIER STOCK
-        # -------------------------------------------------
-
-        stocks_a_modifier = []
-
-        for detail in details:
-
-            stock = (
-                db.query(Stock)
-                .filter(
-                    Stock.id_produit
-                    == detail.id_produit
-                )
-                .first()
-            )
-
-            produit = (
-                db.query(Produit)
-                .filter(
-                    Produit.id_produit
-                    == detail.id_produit
-                )
-                .first()
-            )
-
-            if stock is None:
-                raise HTTPException(
-                    status_code=400,
-                    detail=(
-                        f"Aucun stock disponible "
-                        f"pour le produit "
-                        f"#{detail.id_produit}."
-                    ),
-                )
-
-            if produit is None:
-                raise HTTPException(
-                    status_code=404,
-                    detail=(
-                        f"Produit "
-                        f"#{detail.id_produit} "
-                        "introuvable."
-                    ),
-                )
-
-            if not produit.statut:
-                raise HTTPException(
-                    status_code=400,
-                    detail=(
-                        f"Le produit "
-                        f"« {produit.nom} » "
-                        "est désactivé."
-                    ),
-                )
-
-            if stock.quantite < detail.quantite:
-                raise HTTPException(
-                    status_code=400,
-                    detail=(
-                        f"Stock insuffisant pour "
-                        f"« {produit.nom} ». "
-                        f"Disponible : "
-                        f"{stock.quantite}, "
-                        f"demandé : "
-                        f"{detail.quantite}"
-                    ),
-                )
-
-            stocks_a_modifier.append(
-                (detail, stock)
-            )
-
-        # -------------------------------------------------
-        # DIMINUER STOCK
-        # -------------------------------------------------
-
-        for detail, stock in stocks_a_modifier:
-
-            stock.quantite -= detail.quantite
-
-            mouvement = MouvementStock(
-                type_mouvement="SORTIE",
-                quantite=detail.quantite,
-                motif=(
-                    f"Confirmation "
-                    f"Réservation "
-                    f"#{reservation.id_reservation}"
-                ),
-                id_produit=detail.id_produit,
-                id_utilisateur=
-                    current_user.id_utilisateur,
-            )
-
-            db.add(mouvement)
-
-        reservation.statut = "CONFIRMEE"
 
     # =====================================================
     # AUTRES TRANSITIONS
@@ -766,8 +654,7 @@ def payer_reservation(
     reservation = (
         db.query(Reservation)
         .filter(
-            Reservation.id_reservation
-            == id_reservation
+            Reservation.id_reservation == id_reservation
         )
         .first()
     )
@@ -779,35 +666,28 @@ def payer_reservation(
         )
 
     # =====================================================
-    # STATUT
+    # REGLE METIER
     # =====================================================
-
-    # IMPORTANT :
-    # Une réservation EN_ATTENTE peut maintenant être payée.
-    # Le paiement est justement l'action qui confirme la
-    # réservation.
 
     if reservation.statut == "ANNULEE":
         raise HTTPException(
             status_code=400,
-            detail=(
-                "Une réservation annulée "
-                "ne peut pas être payée."
-            ),
+            detail="Une réservation annulée ne peut pas être payée.",
         )
 
     if reservation.statut == "TERMINEE":
         raise HTTPException(
             status_code=400,
-            detail=(
-                "Cette réservation est déjà terminée."
-            ),
+            detail="Cette réservation est déjà terminée.",
         )
 
-    if reservation.statut not in (
-        "EN_ATTENTE",
-        "CONFIRMEE",
-    ):
+    if reservation.statut == "CONFIRMEE":
+        raise HTTPException(
+            status_code=400,
+            detail="Cette réservation est déjà confirmée et son paiement a déjà été traité.",
+        )
+
+    if reservation.statut != "EN_ATTENTE":
         raise HTTPException(
             status_code=400,
             detail=(
@@ -823,8 +703,7 @@ def payer_reservation(
     details = (
         db.query(DetailReservation)
         .filter(
-            DetailReservation.id_reservation
-            == id_reservation
+            DetailReservation.id_reservation == id_reservation
         )
         .all()
     )
@@ -833,8 +712,7 @@ def payer_reservation(
         raise HTTPException(
             status_code=400,
             detail=(
-                "Impossible de payer une réservation "
-                "sans produit."
+                "Impossible de payer une réservation sans produit."
             ),
         )
 
@@ -853,11 +731,13 @@ def payer_reservation(
 
     montant_paiement = Decimal(
         str(paiement_data.montant)
-    )
+    ).quantize(Decimal("0.01"))
 
-    # -----------------------------------------------------
-    # COMPARAISON EXACTE
-    # -----------------------------------------------------
+    total_final = total_final.quantize(Decimal("0.01"))
+
+    # =====================================================
+    # MONTANT EXACT
+    # =====================================================
 
     if montant_paiement != total_final:
         raise HTTPException(
@@ -871,12 +751,8 @@ def payer_reservation(
         )
 
     # =====================================================
-    # VERIFIER LE STOCK AVANT LE PAIEMENT
+    # VERIFIER LE STOCK AVANT TOUTE MODIFICATION
     # =====================================================
-
-    # Le stock ne doit PAS diminuer lors de la création
-    # de la réservation.
-    # Il diminue uniquement lorsque le paiement est validé.
 
     stocks_a_modifier = []
 
@@ -885,17 +761,16 @@ def payer_reservation(
         stock = (
             db.query(Stock)
             .filter(
-                Stock.id_produit
-                == detail.id_produit
+                Stock.id_produit == detail.id_produit
             )
+            .with_for_update()
             .first()
         )
 
         produit = (
             db.query(Produit)
             .filter(
-                Produit.id_produit
-                == detail.id_produit
+                Produit.id_produit == detail.id_produit
             )
             .first()
         )
@@ -904,8 +779,7 @@ def payer_reservation(
             raise HTTPException(
                 status_code=404,
                 detail=(
-                    f"Produit #{detail.id_produit} "
-                    "introuvable."
+                    f"Produit #{detail.id_produit} introuvable."
                 ),
             )
 
@@ -913,8 +787,7 @@ def payer_reservation(
             raise HTTPException(
                 status_code=400,
                 detail=(
-                    f"Le produit « {produit.nom} » "
-                    "est désactivé."
+                    f"Le produit « {produit.nom} » est désactivé."
                 ),
             )
 
@@ -922,8 +795,7 @@ def payer_reservation(
             raise HTTPException(
                 status_code=400,
                 detail=(
-                    f"Aucun stock disponible "
-                    f"pour « {produit.nom} »."
+                    f"Aucun stock disponible pour « {produit.nom} »."
                 ),
             )
 
@@ -931,40 +803,37 @@ def payer_reservation(
             raise HTTPException(
                 status_code=400,
                 detail=(
-                    f"Stock insuffisant pour "
-                    f"« {produit.nom} ». "
+                    f"Stock insuffisant pour « {produit.nom} ». "
                     f"Disponible : {stock.quantite}, "
                     f"demandé : {detail.quantite}"
                 ),
             )
 
-        stocks_a_modifier.append(
-            (detail, stock)
-        )
+        stocks_a_modifier.append((detail, stock, produit))
 
     # =====================================================
-    # CREER PAIEMENT + DIMINUER STOCK
+    # TRANSACTION UNIQUE
+    #
+    # Paiement + stock + mouvement + confirmation
+    # sont validés ensemble.
     # =====================================================
 
     try:
 
         paiement = Paiement(
             montant=montant_paiement,
-            mode_paiement=
-                paiement_data.mode_paiement,
-            id_reservation=
-                reservation.id_reservation,
-            id_utilisateur=
-                current_user.id_utilisateur,
+            mode_paiement=paiement_data.mode_paiement,
+            id_reservation=reservation.id_reservation,
+            id_utilisateur=current_user.id_utilisateur,
         )
 
         db.add(paiement)
 
         # -------------------------------------------------
-        # DIMINUER LE STOCK APRES VALIDATION DU PAIEMENT
+        # DIMINUER LE STOCK UNE SEULE FOIS
         # -------------------------------------------------
 
-        for detail, stock in stocks_a_modifier:
+        for detail, stock, produit in stocks_a_modifier:
 
             stock.quantite -= detail.quantite
 
@@ -976,8 +845,7 @@ def payer_reservation(
                     f"#{reservation.id_reservation}"
                 ),
                 id_produit=detail.id_produit,
-                id_utilisateur=
-                    current_user.id_utilisateur,
+                id_utilisateur=current_user.id_utilisateur,
             )
 
             db.add(mouvement)
@@ -998,15 +866,11 @@ def payer_reservation(
         raise
 
     except Exception as e:
-
         db.rollback()
 
         raise HTTPException(
             status_code=500,
-            detail=(
-                "Impossible d'enregistrer "
-                "le paiement."
-            ),
+            detail="Impossible d'enregistrer le paiement de la réservation.",
         ) from e
 
     # =====================================================
@@ -1015,34 +879,21 @@ def payer_reservation(
 
     return {
         "message": (
-            "Paiement enregistré avec succès. "
-            "La réservation est maintenant confirmée."
+            "Paiement enregistré, stock diminué et réservation "
+            "confirmée avec succès."
         ),
 
-        "reservation":
-            build_reservation_complete(
-                reservation,
-                db,
-            ),
+        "reservation": build_reservation_complete(
+            reservation,
+            db,
+        ),
 
-        "id_reservation":
-            reservation.id_reservation,
-
-        "id_paiement":
-            paiement.id_paiement,
-
-        "mode_paiement":
-            paiement.mode_paiement,
-
-        "montant":
-            float(paiement.montant),
-
-        "total_brut":
-            float(total_brut),
-
-        "rabais":
-            float(montant_rabais),
-
-        "total_final":
-            float(total_final),
+        "id_reservation": reservation.id_reservation,
+        "id_paiement": paiement.id_paiement,
+        "mode_paiement": paiement.mode_paiement,
+        "montant": float(paiement.montant),
+        "total_brut": float(total_brut),
+        "rabais": float(montant_rabais),
+        "total_final": float(total_final),
     }
+
