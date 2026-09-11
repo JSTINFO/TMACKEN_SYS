@@ -288,7 +288,7 @@ function Dashboard() {
 
 
                 {/* VENTES */}
-
+{/* 
                 <div className="stat-card">
 
                     <div className="stat-label">
@@ -303,7 +303,7 @@ function Dashboard() {
                         Total du mois
                     </div>
 
-                </div>
+                </div> */}
 
             </div>
 

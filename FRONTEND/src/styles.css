@@ -4830,3 +4830,130 @@ ol {
 
 
 
+/* =====================================================
+   RÉSUMÉ FINANCIER
+   Utilisé par Ventes et Réservations
+===================================================== */
+
+.reservation-total-preview.vente-summary {
+    display: flex;
+    flex-direction: column;
+
+    width: 100%;
+
+    margin-top: 20px;
+    padding: 18px 0;
+
+    border-top: 1px solid #344650;
+    border-bottom: 1px solid #344650;
+
+    gap: 0;
+}
+
+
+/* =====================================================
+   LIGNE NORMALE
+===================================================== */
+
+.reservation-total-preview .vente-summary-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    width: 100%;
+
+    min-height: 38px;
+
+    gap: 20px;
+}
+
+.reservation-total-preview .vente-summary-row span {
+    color: #c1cdd3;
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.reservation-total-preview .vente-summary-row strong {
+    color: #ffffff;
+
+    font-size: 15px;
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+
+/* =====================================================
+   RABAIS
+===================================================== */
+
+.reservation-total-preview .vente-discount-section {
+    width: 100%;
+
+    padding: 4px 0;
+}
+
+.reservation-total-preview .vente-discount-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    width: 100%;
+
+    min-height: 38px;
+
+    gap: 20px;
+}
+
+.reservation-total-preview .vente-discount-header > span:first-child {
+    color: #c1cdd3;
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.reservation-total-preview .vente-discount-value {
+    color: #ff7373 !important;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+
+/* =====================================================
+   TOTAL À PAYER
+===================================================== */
+
+.reservation-total-preview .vente-summary-total {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    width: 100%;
+
+    margin-top: 10px;
+    padding-top: 14px;
+
+    border-top: 1px solid #344650;
+
+    gap: 20px;
+}
+
+.reservation-total-preview .vente-summary-total span {
+    color: #ffffff;
+
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.reservation-total-preview .vente-summary-total strong {
+    color: #19d36b;
+
+    font-size: 21px;
+    font-weight: 800;
+
+    white-space: nowrap;
+}

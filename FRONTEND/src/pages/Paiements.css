@@ -1,0 +1,477 @@
+/* =========================================================
+   PAGE PAIEMENTS
+========================================================= */
+
+.paiements-page {
+    width: 100%;
+    padding: 24px;
+    box-sizing: border-box;
+    color: var(--text-color, #2d2d2d);
+}
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.paiements-page .page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+.paiements-page .page-header h1 {
+    margin: 0 0 6px;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.paiements-page .page-header p {
+    margin: 0;
+    color: #777;
+    font-size: 14px;
+}
+
+.btn-refresh,
+.btn-primary,
+.btn-secondary {
+    border: 0;
+    border-radius: 8px;
+    padding: 11px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.btn-refresh,
+.btn-secondary {
+    background: #f1f1f1;
+    color: #333;
+}
+
+.btn-refresh:hover,
+.btn-secondary:hover {
+    background: #e5e5e5;
+}
+
+.btn-primary {
+    width: 100%;
+    background: var(--main-color, #7a5230);
+    color: #fff;
+    margin-top: 8px;
+}
+
+.btn-primary:hover {
+    opacity: 0.92;
+}
+
+.btn-primary:disabled,
+.btn-refresh:disabled,
+.btn-secondary:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+/* =========================================================
+   ALERTES
+========================================================= */
+
+.alert {
+    padding: 13px 16px;
+    border-radius: 8px;
+    margin-bottom: 18px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.alert-success {
+    background: #e9f8ef;
+    color: #16723d;
+    border: 1px solid #bfe8cf;
+}
+
+.alert-error {
+    background: #fff0f0;
+    color: #a51f1f;
+    border: 1px solid #f2c3c3;
+}
+
+/* =========================================================
+   CARDS
+========================================================= */
+
+.paiement-form-card,
+.paiements-table-card {
+    background: #fff;
+    border: 1px solid #e7e7e7;
+    border-radius: 12px;
+    padding: 22px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+}
+
+.card-title,
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.card-title h2,
+.table-header h2 {
+    margin: 0 0 5px;
+    font-size: 19px;
+}
+
+.card-title p,
+.table-header p {
+    margin: 0;
+    color: #777;
+    font-size: 13px;
+}
+
+/* =========================================================
+   FORMULAIRE
+========================================================= */
+
+.payment-form {
+    width: 100%;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.form-group label,
+.filter-group label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #444;
+}
+
+.form-group input,
+.form-group select,
+.filter-group input,
+.filter-group select {
+    width: 100%;
+    min-height: 42px;
+    box-sizing: border-box;
+    border: 1px solid #d8d8d8;
+    border-radius: 8px;
+    padding: 9px 11px;
+    background: #fff;
+    color: #333;
+    outline: none;
+    font-size: 14px;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.filter-group input:focus,
+.filter-group select:focus {
+    border-color: var(--main-color, #7a5230);
+    box-shadow: 0 0 0 3px rgba(122, 82, 48, 0.09);
+}
+
+.form-group small {
+    color: #888;
+    font-size: 12px;
+}
+
+/* =========================================================
+   RESUME PAIEMENT
+========================================================= */
+
+.paiement-summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 20px;
+    margin-bottom: 12px;
+}
+
+.summary-item {
+    padding: 15px;
+    border-radius: 9px;
+    background: #f7f7f7;
+    border: 1px solid #ededed;
+}
+
+.summary-item span {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 12px;
+    color: #777;
+}
+
+.summary-item strong {
+    font-size: 17px;
+}
+
+.summary-item.highlight {
+    border-color: rgba(122, 82, 48, 0.25);
+    background: rgba(122, 82, 48, 0.06);
+}
+
+/* =========================================================
+   FILTRES
+========================================================= */
+
+.payment-filters {
+    display: grid;
+    grid-template-columns: minmax(180px, 2fr) repeat(4, minmax(130px, 1fr)) auto;
+    gap: 12px;
+    align-items: end;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #f8f8f8;
+    border: 1px solid #ededed;
+    border-radius: 10px;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.search-filter {
+    min-width: 180px;
+}
+
+.payment-filters .btn-secondary {
+    min-height: 42px;
+    white-space: nowrap;
+}
+
+.filtered-total {
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.paiements-table {
+    width: 100%;
+    min-width: 950px;
+    border-collapse: collapse;
+}
+
+.paiements-table th {
+    padding: 13px 12px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 700;
+    color: #666;
+    background: #f8f8f8;
+    border-bottom: 1px solid #e5e5e5;
+    white-space: nowrap;
+}
+
+.paiements-table td {
+    padding: 13px 12px;
+    border-bottom: 1px solid #eeeeee;
+    font-size: 13px;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.paiements-table tbody tr:hover {
+    background: #fafafa;
+}
+
+/* =========================================================
+   BADGES
+========================================================= */
+
+.badge,
+.status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 9px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.badge-sale {
+    background: #eef4ff;
+    color: #2d5aa7;
+}
+
+.badge-reservation {
+    background: #fff3df;
+    color: #96601c;
+}
+
+.status-payee,
+.status-confirmee {
+    background: #e9f8ef;
+    color: #16723d;
+}
+
+.status-en-cours,
+.status-en_attente,
+.status-en-attente {
+    background: #fff5df;
+    color: #99621c;
+}
+
+.status-annulee {
+    background: #fff0f0;
+    color: #a51f1f;
+}
+
+.status-terminee {
+    background: #eeeeee;
+    color: #666;
+}
+
+/* =========================================================
+   ETAT VIDE
+========================================================= */
+
+.empty-state {
+    padding: 45px 20px;
+    text-align: center;
+    color: #888;
+    font-size: 14px;
+    border: 1px dashed #ddd;
+    border-radius: 10px;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1100px) {
+    .payment-filters {
+        grid-template-columns: repeat(3, minmax(140px, 1fr));
+    }
+
+    .search-filter {
+        grid-column: span 2;
+    }
+}
+
+@media (max-width: 800px) {
+    .paiements-page {
+        padding: 16px;
+    }
+
+    .paiements-page .page-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .paiement-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .payment-filters {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .search-filter {
+        grid-column: span 2;
+    }
+
+    .filtered-total {
+        white-space: normal;
+    }
+
+    .table-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 520px) {
+    .payment-filters {
+        grid-template-columns: 1fr;
+    }
+
+    .search-filter {
+        grid-column: span 1;
+    }
+
+    .paiement-form-card,
+    .paiements-table-card {
+        padding: 16px;
+    }
+}
+
+/* =========================================================
+   ACTIONS TRANSACTION / IMPRESSION
+========================================================= */
+.transaction-actions { display:flex; align-items:center; gap:6px; white-space:nowrap; }
+.btn-icon { border:1px solid #ddd; background:#fff; border-radius:7px; padding:7px 9px; cursor:pointer; font-size:14px; }
+.btn-icon:hover { background:#f5f5f5; }
+.print-menu-wrap { position:relative; display:inline-block; }
+.print-main-button { white-space:nowrap; }
+.print-menu { display:none; position:absolute; right:0; top:calc(100% + 5px); z-index:1000; min-width:190px; background:#fff; border:1px solid #ddd; border-radius:8px; box-shadow:0 8px 25px rgba(0,0,0,.12); overflow:hidden; }
+.print-menu-wrap:hover .print-menu { display:block; }
+.print-menu button { display:block; width:100%; border:0; background:#fff; padding:10px 13px; text-align:left; cursor:pointer; }
+.print-menu button:hover { background:#f3f4f6; }
+
+/* =========================================================
+   DETAIL TRANSACTION
+========================================================= */
+.transaction-modal-overlay { position:fixed; inset:0; z-index:2000; background:rgba(0,0,0,.55); display:flex; align-items:center; justify-content:center; padding:20px; }
+.transaction-modal { width:min(1000px, 96vw); max-height:92vh; overflow:auto; background:#fff; border-radius:14px; padding:24px; box-shadow:0 20px 60px rgba(0,0,0,.25); }
+.transaction-modal-header { display:flex; justify-content:space-between; align-items:flex-start; border-bottom:1px solid #eee; padding-bottom:15px; margin-bottom:18px; }
+.transaction-modal-header h2 { margin:0 0 4px; }
+.transaction-modal-header p { margin:0; color:#777; }
+.modal-close { border:0; background:transparent; font-size:28px; cursor:pointer; line-height:1; }
+.transaction-detail-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:22px; }
+.transaction-detail-grid > div { background:#f8f8f8; border-radius:8px; padding:12px; }
+.transaction-detail-grid span, .transaction-totals span { display:block; color:#777; font-size:12px; margin-bottom:4px; }
+.transaction-detail-grid strong { display:block; overflow-wrap:anywhere; }
+.transaction-items h3 { margin-bottom:10px; }
+.transaction-items table { width:100%; border-collapse:collapse; }
+.transaction-items th, .transaction-items td { padding:10px; border-bottom:1px solid #eee; text-align:left; }
+.transaction-items th:nth-child(n+2), .transaction-items td:nth-child(n+2) { text-align:right; }
+.transaction-totals { margin:18px 0 0 auto; width:min(380px,100%); }
+.transaction-totals > div { display:flex; justify-content:space-between; gap:20px; padding:6px 0; }
+.transaction-totals .remaining { border-top:1px solid #ddd; margin-top:5px; padding-top:10px; }
+.transaction-modal-actions { display:flex; justify-content:flex-end; align-items:center; gap:10px; margin-top:22px; }
+
+@media (max-width: 800px) {
+    .transaction-detail-grid { grid-template-columns:repeat(2,1fr); }
+    .transaction-actions { flex-wrap:wrap; }
+    .print-main-button span { display:none; }
+}
+
+@media print {
+    body * { visibility:hidden !important; }
+    .transaction-modal-overlay, .transaction-modal, .transaction-modal * { visibility:visible !important; }
+    .transaction-modal-overlay { position:absolute !important; inset:0 !important; background:#fff !important; padding:0 !important; display:block !important; }
+    .transaction-modal { width:100% !important; max-height:none !important; overflow:visible !important; box-shadow:none !important; border-radius:0 !important; padding:10mm !important; }
+    .transaction-modal-actions, .modal-close { display:none !important; }
+    @page { size:A4; margin:10mm; }
+}

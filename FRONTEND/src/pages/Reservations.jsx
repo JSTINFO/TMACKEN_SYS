@@ -2410,94 +2410,50 @@ const handleConfirmPaymentReservation = async ({
                             </div>
 
 
-                            {/* =================================================
-                                TOTAL
-                            ================================================= */}
+                         {/* =================================================
+    SOUS-TOTAL / RABAIS / TOTAL
+================================================= */}
 
-                            <div className="reservation-total-preview">
+<div className="reservation-total-preview vente-summary">
 
-                                <div
-                                    style={{
-                                        display: "flex",
-                                        justifyContent:
-                                            "space-between",
-                                        marginBottom:
-                                            "8px"
-                                    }}
-                                >
+    {/* SOUS-TOTAL */}
+    <div className="vente-summary-row">
+        <span>Total brut</span>
 
-                                    <span>
-                                        Total brut
-                                    </span>
-
-                                    <strong>
-                                        {
-                                            formatPrice(
-                                                calculateGrossTotal()
-                                            )
-                                        } $
-                                    </strong>
-
-                                </div>
+        <strong>
+            {formatPrice(calculateGrossTotal())} $
+        </strong>
+    </div>
 
 
-                                <div
-                                    style={{
-                                        display: "flex",
-                                        justifyContent:
-                                            "space-between",
-                                        marginBottom:
-                                            "8px"
-                                    }}
-                                >
+    {/* RABAIS */}
+    <div className="vente-discount-section">
 
-                                    <span>
-                                        Rabais
-                                    </span>
+        <div className="vente-discount-header">
 
-                                    <strong>
+            <span>Rabais</span>
 
-                                        -{" "}
+            <span className="vente-discount-value">
+                - {formatPrice(calculateDiscountAmount())} $
+            </span>
 
-                                        {
-                                            formatPrice(
-                                                calculateDiscountAmount()
-                                            )
-                                        }
+        </div>
 
-                                        {" $"}
-
-                                    </strong>
-
-                                </div>
+    </div>
 
 
-                                <div
-                                    style={{
-                                        display: "flex",
-                                        justifyContent:
-                                            "space-between",
-                                        fontSize:
-                                            "18px"
-                                    }}
-                                >
+    {/* TOTAL FINAL */}
+    <div className="vente-summary-total">
 
-                                    <strong>
-                                        Total à payer
-                                    </strong>
+        <span>Total à payer</span>
 
-                                    <strong>
-                                        {
-                                            formatPrice(
-                                                calculateFinalTotal()
-                                            )
-                                        } $
-                                    </strong>
+        <strong>
+            {formatPrice(calculateFinalTotal())} $
+        </strong>
 
-                                </div>
+    </div>
 
-                            </div>
-
+</div>
 
                             {/* =================================================
                                 ACTIONS
