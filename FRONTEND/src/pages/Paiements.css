@@ -434,8 +434,7 @@
 .btn-icon:hover { background:#f5f5f5; }
 .print-menu-wrap { position:relative; display:inline-block; }
 .print-main-button { white-space:nowrap; }
-.print-menu { display:none; position:absolute; right:0; top:calc(100% + 5px); z-index:1000; min-width:190px; background:#fff; border:1px solid #ddd; border-radius:8px; box-shadow:0 8px 25px rgba(0,0,0,.12); overflow:hidden; }
-.print-menu-wrap:hover .print-menu { display:block; }
+.print-menu { display:block; position:absolute; right:0; top:calc(100% + 5px); z-index:1000; min-width:190px; background:#fff; border:1px solid #ddd; border-radius:8px; box-shadow:0 8px 25px rgba(0,0,0,.12); overflow:hidden; }
 .print-menu button { display:block; width:100%; border:0; background:#fff; padding:10px 13px; text-align:left; cursor:pointer; }
 .print-menu button:hover { background:#f3f4f6; }
 
@@ -468,10 +467,952 @@
 }
 
 @media print {
-    body * { visibility:hidden !important; }
-    .transaction-modal-overlay, .transaction-modal, .transaction-modal * { visibility:visible !important; }
-    .transaction-modal-overlay { position:absolute !important; inset:0 !important; background:#fff !important; padding:0 !important; display:block !important; }
-    .transaction-modal { width:100% !important; max-height:none !important; overflow:visible !important; box-shadow:none !important; border-radius:0 !important; padding:10mm !important; }
-    .transaction-modal-actions, .modal-close { display:none !important; }
-    @page { size:A4; margin:10mm; }
+    /*
+     * IMPORTANT:
+     * L'ancien "inset: 0" forçait l'overlay à prendre toute la hauteur
+     * de la page. Le navigateur pouvait alors créer plusieurs pages
+     * presque vides. Pour l'impression, l'overlay doit suivre uniquement
+     * la hauteur réelle du reçu.
+     */
+    html,
+    body {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    body * {
+        visibility: hidden !important;
+    }
+
+    .transaction-modal-overlay,
+    .transaction-modal,
+    .transaction-modal * {
+        visibility: visible !important;
+    }
+
+    .transaction-modal-overlay {
+        position: static !important;
+        inset: auto !important;
+        width: auto !important;
+        min-width: 0 !important;
+        height: auto !important;
+        min-height: 0 !important;
+        max-height: none !important;
+        overflow: visible !important;
+        background: #fff !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        display: block !important;
+    }
+
+    .transaction-modal {
+        width: auto !important;
+        max-width: none !important;
+        height: auto !important;
+        min-height: 0 !important;
+        max-height: none !important;
+        overflow: visible !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .transaction-modal-actions,
+    .modal-close {
+        display: none !important;
+    }
+
+    /* =========================
+       DOCUMENT A4
+       ========================= */
+    .printing-a4 .transaction-modal {
+        width: 100% !important;
+        padding: 0 !important;
+        font-size: 12px !important;
+    }
+
+    /* =========================
+       TICKET THERMIQUE 80 MM
+       ========================= */
+    .printing-thermal .transaction-modal-overlay {
+        width: 80mm !important;
+        height: auto !important;
+        min-height: 0 !important;
+    }
+
+    .printing-thermal .transaction-modal {
+        width: 72mm !important;
+        min-width: 72mm !important;
+        height: auto !important;
+        min-height: 0 !important;
+        margin: 0 auto !important;
+        padding: 3mm 0 !important;
+        font-size: 10px !important;
+        color: #000 !important;
+        box-sizing: border-box !important;
+    }
+
+    .printing-thermal .transaction-modal-header {
+        display: block !important;
+        text-align: center !important;
+        padding-bottom: 8px !important;
+        margin-bottom: 10px !important;
+    }
+
+    .printing-thermal .transaction-modal-header h2 {
+        font-size: 17px !important;
+        margin-bottom: 3px !important;
+    }
+
+    .printing-thermal .transaction-modal-header p {
+        font-size: 10px !important;
+    }
+
+    .printing-thermal .transaction-detail-grid {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 6px !important;
+        margin-bottom: 12px !important;
+    }
+
+    .printing-thermal .transaction-detail-grid > div {
+        background: transparent !important;
+        padding: 0 !important;
+        border-radius: 0 !important;
+    }
+
+    .printing-thermal .transaction-detail-grid span {
+        font-size: 8px !important;
+        margin-bottom: 1px !important;
+    }
+
+    .printing-thermal .transaction-detail-grid strong {
+        font-size: 9px !important;
+    }
+
+    .printing-thermal .transaction-items h3 {
+        font-size: 12px !important;
+        margin: 8px 0 5px !important;
+    }
+
+    .printing-thermal .transaction-items table {
+        width: 100% !important;
+        table-layout: fixed !important;
+        font-size: 9px !important;
+        page-break-inside: auto !important;
+    }
+
+    .printing-thermal .transaction-items thead {
+        display: table-header-group !important;
+    }
+
+    .printing-thermal .transaction-items tr {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+    }
+
+    .printing-thermal .transaction-items th,
+    .printing-thermal .transaction-items td {
+        padding: 4px 2px !important;
+        border-bottom: 1px dashed #999 !important;
+        overflow-wrap: anywhere !important;
+    }
+
+    .printing-thermal .transaction-items th:first-child,
+    .printing-thermal .transaction-items td:first-child {
+        width: 42% !important;
+        text-align: left !important;
+    }
+
+    .printing-thermal .transaction-items th:nth-child(2),
+    .printing-thermal .transaction-items td:nth-child(2) {
+        width: 12% !important;
+    }
+
+    .printing-thermal .transaction-items th:nth-child(3),
+    .printing-thermal .transaction-items td:nth-child(3) {
+        width: 23% !important;
+    }
+
+    .printing-thermal .transaction-items th:nth-child(4),
+    .printing-thermal .transaction-items td:nth-child(4) {
+        width: 23% !important;
+    }
+
+    .printing-thermal .transaction-totals {
+        width: 100% !important;
+        margin-top: 10px !important;/* =========================================================
+   PAGE PAIEMENTS
+========================================================= */
+
+.paiements-page {
+    width: 100%;
+    padding: 24px;
+    box-sizing: border-box;
+    color: var(--text-color, #2d2d2d);
+}
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.paiements-page .page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+.paiements-page .page-header h1 {
+    margin: 0 0 6px;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.paiements-page .page-header p {
+    margin: 0;
+    color: #777;
+    font-size: 14px;
+}
+
+.btn-refresh,
+.btn-primary,
+.btn-secondary {
+    border: 0;
+    border-radius: 8px;
+    padding: 11px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.btn-refresh,
+.btn-secondary {
+    background: #f1f1f1;
+    color: #333;
+}
+
+.btn-refresh:hover,
+.btn-secondary:hover {
+    background: #e5e5e5;
+}
+
+.btn-primary {
+    width: 100%;
+    background: var(--main-color, #7a5230);
+    color: #fff;
+    margin-top: 8px;
+}
+
+.btn-primary:hover {
+    opacity: 0.92;
+}
+
+.btn-primary:disabled,
+.btn-refresh:disabled,
+.btn-secondary:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+/* =========================================================
+   ALERTES
+========================================================= */
+
+.alert {
+    padding: 13px 16px;
+    border-radius: 8px;
+    margin-bottom: 18px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.alert-success {
+    background: #e9f8ef;
+    color: #16723d;
+    border: 1px solid #bfe8cf;
+}
+
+.alert-error {
+    background: #fff0f0;
+    color: #a51f1f;
+    border: 1px solid #f2c3c3;
+}
+
+/* =========================================================
+   CARDS
+========================================================= */
+
+.paiement-form-card,
+.paiements-table-card {
+    background: #fff;
+    border: 1px solid #e7e7e7;
+    border-radius: 12px;
+    padding: 22px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+}
+
+.card-title,
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.card-title h2,
+.table-header h2 {
+    margin: 0 0 5px;
+    font-size: 19px;
+}
+
+.card-title p,
+.table-header p {
+    margin: 0;
+    color: #777;
+    font-size: 13px;
+}
+
+/* =========================================================
+   FORMULAIRE
+========================================================= */
+
+.payment-form {
+    width: 100%;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.form-group label,
+.filter-group label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #444;
+}
+
+.form-group input,
+.form-group select,
+.filter-group input,
+.filter-group select {
+    width: 100%;
+    min-height: 42px;
+    box-sizing: border-box;
+    border: 1px solid #d8d8d8;
+    border-radius: 8px;
+    padding: 9px 11px;
+    background: #fff;
+    color: #333;
+    outline: none;
+    font-size: 14px;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.filter-group input:focus,
+.filter-group select:focus {
+    border-color: var(--main-color, #7a5230);
+    box-shadow: 0 0 0 3px rgba(122, 82, 48, 0.09);
+}
+
+.form-group small {
+    color: #888;
+    font-size: 12px;
+}
+
+/* =========================================================
+   RESUME PAIEMENT
+========================================================= */
+
+.paiement-summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 20px;
+    margin-bottom: 12px;
+}
+
+.summary-item {
+    padding: 15px;
+    border-radius: 9px;
+    background: #f7f7f7;
+    border: 1px solid #ededed;
+}
+
+.summary-item span {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 12px;
+    color: #777;
+}
+
+.summary-item strong {
+    font-size: 17px;
+}
+
+.summary-item.highlight {
+    border-color: rgba(122, 82, 48, 0.25);
+    background: rgba(122, 82, 48, 0.06);
+}
+
+/* =========================================================
+   FILTRES
+========================================================= */
+
+.payment-filters {
+    display: grid;
+    grid-template-columns: minmax(180px, 2fr) repeat(4, minmax(130px, 1fr)) auto;
+    gap: 12px;
+    align-items: end;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #f8f8f8;
+    border: 1px solid #ededed;
+    border-radius: 10px;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.search-filter {
+    min-width: 180px;
+}
+
+.payment-filters .btn-secondary {
+    min-height: 42px;
+    white-space: nowrap;
+}
+
+.filtered-total {
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.paiements-table {
+    width: 100%;
+    min-width: 950px;
+    border-collapse: collapse;
+}
+
+.paiements-table th {
+    padding: 13px 12px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 700;
+    color: #666;
+    background: #f8f8f8;
+    border-bottom: 1px solid #e5e5e5;
+    white-space: nowrap;
+}
+
+.paiements-table td {
+    padding: 13px 12px;
+    border-bottom: 1px solid #eeeeee;
+    font-size: 13px;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.paiements-table tbody tr:hover {
+    background: #fafafa;
+}
+
+/* =========================================================
+   BADGES
+========================================================= */
+
+.badge,
+.status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 9px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.badge-sale {
+    background: #eef4ff;
+    color: #2d5aa7;
+}
+
+.badge-reservation {
+    background: #fff3df;
+    color: #96601c;
+}
+
+.status-payee,
+.status-confirmee {
+    background: #e9f8ef;
+    color: #16723d;
+}
+
+.status-en-cours,
+.status-en_attente,
+.status-en-attente {
+    background: #fff5df;
+    color: #99621c;
+}
+
+.status-annulee {
+    background: #fff0f0;
+    color: #a51f1f;
+}
+
+.status-terminee {
+    background: #eeeeee;
+    color: #666;
+}
+
+/* =========================================================
+   ETAT VIDE
+========================================================= */
+
+.empty-state {
+    padding: 45px 20px;
+    text-align: center;
+    color: #888;
+    font-size: 14px;
+    border: 1px dashed #ddd;
+    border-radius: 10px;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1100px) {
+    .payment-filters {
+        grid-template-columns: repeat(3, minmax(140px, 1fr));
+    }
+
+    .search-filter {
+        grid-column: span 2;
+    }
+}
+
+@media (max-width: 800px) {
+    .paiements-page {
+        padding: 16px;
+    }
+
+    .paiements-page .page-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .paiement-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .payment-filters {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .search-filter {
+        grid-column: span 2;
+    }
+
+    .filtered-total {
+        white-space: normal;
+    }
+
+    .table-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 520px) {
+    .payment-filters {
+        grid-template-columns: 1fr;
+    }
+
+    .search-filter {
+        grid-column: span 1;
+    }
+
+    .paiement-form-card,
+    .paiements-table-card {
+        padding: 16px;
+    }
+}
+
+/* =========================================================
+   ACTIONS TRANSACTION / IMPRESSION
+========================================================= */
+.transaction-actions { display:flex; align-items:center; gap:6px; white-space:nowrap; }
+.btn-icon { border:1px solid #ddd; background:#fff; border-radius:7px; padding:7px 9px; cursor:pointer; font-size:14px; }
+.btn-icon:hover { background:#f5f5f5; }
+.print-menu-wrap { position:relative; display:inline-block; }
+.print-main-button { white-space:nowrap; }
+.print-menu { display:block; position:absolute; right:0; top:calc(100% + 5px); z-index:1000; min-width:190px; background:#fff; border:1px solid #ddd; border-radius:8px; box-shadow:0 8px 25px rgba(0,0,0,.12); overflow:hidden; }
+.print-menu button { display:block; width:100%; border:0; background:#fff; padding:10px 13px; text-align:left; cursor:pointer; }
+.print-menu button:hover { background:#f3f4f6; }
+
+/* =========================================================
+   DETAIL TRANSACTION
+========================================================= */
+.transaction-modal-overlay { position:fixed; inset:0; z-index:2000; background:rgba(0,0,0,.55); display:flex; align-items:center; justify-content:center; padding:20px; }
+.transaction-modal { width:min(1000px, 96vw); max-height:92vh; overflow:auto; background:#fff; border-radius:14px; padding:24px; box-shadow:0 20px 60px rgba(0,0,0,.25); }
+.transaction-modal-header { display:flex; justify-content:space-between; align-items:flex-start; border-bottom:1px solid #eee; padding-bottom:15px; margin-bottom:18px; }
+.transaction-modal-header h2 { margin:0 0 4px; }
+.transaction-modal-header p { margin:0; color:#777; }
+.modal-close { border:0; background:transparent; font-size:28px; cursor:pointer; line-height:1; }
+.transaction-detail-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:22px; }
+.transaction-detail-grid > div { background:#f8f8f8; border-radius:8px; padding:12px; }
+.transaction-detail-grid span, .transaction-totals span { display:block; color:#777; font-size:12px; margin-bottom:4px; }
+.transaction-detail-grid strong { display:block; overflow-wrap:anywhere; }
+.transaction-items h3 { margin-bottom:10px; }
+.transaction-items table { width:100%; border-collapse:collapse; }
+.transaction-items th, .transaction-items td { padding:10px; border-bottom:1px solid #eee; text-align:left; }
+.transaction-items th:nth-child(n+2), .transaction-items td:nth-child(n+2) { text-align:right; }
+.transaction-totals { margin:18px 0 0 auto; width:min(380px,100%); }
+.transaction-totals > div { display:flex; justify-content:space-between; gap:20px; padding:6px 0; }
+.transaction-totals .remaining { border-top:1px solid #ddd; margin-top:5px; padding-top:10px; }
+.transaction-modal-actions { display:flex; justify-content:flex-end; align-items:center; gap:10px; margin-top:22px; }
+
+@media (max-width: 800px) {
+    .transaction-detail-grid { grid-template-columns:repeat(2,1fr); }
+    .transaction-actions { flex-wrap:wrap; }
+    .print-main-button span { display:none; }
+}
+
+
+/* =========================================================
+   ZONE DE RECU DEDIEE A L'IMPRESSION
+   Invisible dans l'application, visible uniquement à
+   l'impression. Cela évite d'imprimer la hauteur de la modal.
+========================================================= */
+.transaction-print-document {
+    display: none;
+}
+
+@media print {
+    /* Ne jamais imprimer la fenêtre modale ou le reste de l'application */
+    body * {
+        visibility: hidden !important;
+    }
+
+    .transaction-print-document,
+    .transaction-print-document * {
+        visibility: visible !important;
+    }
+
+    .transaction-modal-overlay {
+        display: none !important;
+    }
+
+    .transaction-print-document {
+        display: block !important;
+        position: static !important;
+        width: 100% !important;
+        height: auto !important;
+        min-height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #fff !important;
+        color: #000 !important;
+        overflow: visible !important;
+        box-sizing: border-box !important;
+    }
+
+    /* =====================================================
+       DOCUMENT A4
+    ===================================================== */
+    .printing-a4 .transaction-print-document {
+        width: 100% !important;
+        max-width: 180mm !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+        font-size: 11pt !important;
+    }
+
+    .printing-a4 .print-receipt-header {
+        text-align: center !important;
+        margin-bottom: 12mm !important;
+    }
+
+    .printing-a4 .print-receipt-header h1 {
+        font-size: 20pt !important;
+        margin: 0 0 4mm !important;
+    }
+
+    .printing-a4 .print-receipt-header p {
+        margin: 1mm 0 !important;
+    }
+
+    .printing-a4 .print-receipt-info {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 5mm !important;
+        margin-bottom: 8mm !important;
+    }
+
+    .printing-a4 .print-receipt-info div {
+        display: flex !important;
+        flex-direction: column !important;
+    }
+
+    .printing-a4 .print-receipt-info span {
+        font-size: 9pt !important;
+        margin-bottom: 1mm !important;
+    }
+
+    .printing-a4 .print-receipt-items h2 {
+        font-size: 13pt !important;
+        margin: 0 0 4mm !important;
+    }
+
+    .printing-a4 .print-receipt-items table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+    }
+
+    .printing-a4 .print-receipt-items th,
+    .printing-a4 .print-receipt-items td {
+        padding: 3mm 2mm !important;
+        border-bottom: 1px solid #ccc !important;
+    }
+
+    .printing-a4 .print-receipt-items th:nth-child(n+2),
+    .printing-a4 .print-receipt-items td:nth-child(n+2) {
+        text-align: right !important;
+    }
+
+    .printing-a4 .print-receipt-totals {
+        width: 80mm !important;
+        margin: 10mm 0 0 auto !important;
+    }
+
+    .printing-a4 .print-receipt-totals > div {
+        display: flex !important;
+        justify-content: space-between !important;
+        padding: 2mm 0 !important;
+    }
+
+    .printing-a4 .print-total {
+        border-top: 2px solid #000 !important;
+        font-size: 13pt !important;
+        font-weight: bold !important;
+        margin-top: 2mm !important;
+        padding-top: 3mm !important;
+    }
+
+    .printing-a4 .print-remaining {
+        border-top: 1px solid #ccc !important;
+        margin-top: 2mm !important;
+        padding-top: 3mm !important;
+    }
+
+    .printing-a4 .print-receipt-footer {
+        text-align: center !important;
+        margin-top: 15mm !important;
+    }
+
+    /* =====================================================
+       TICKET THERMIQUE 80 MM
+       IMPORTANT : hauteur AUTO, jamais une hauteur d'écran.
+    ===================================================== */
+    @page {
+        margin: 0;
+    }
+
+    .printing-thermal .transaction-print-document {
+        width: 72mm !important;
+        max-width: 72mm !important;
+        height: auto !important;
+        min-height: 0 !important;
+        margin: 0 auto !important;
+        padding: 3mm 0 !important;
+        font-family: Arial, sans-serif !important;
+        font-size: 9px !important;
+        line-height: 1.25 !important;
+        box-sizing: border-box !important;
+    }
+
+    .printing-thermal .print-receipt-header {
+        text-align: center !important;
+        margin: 0 0 3mm !important;
+        padding: 0 0 3mm !important;
+        border-bottom: 1px dashed #000 !important;
+    }
+
+    .printing-thermal .print-receipt-header h1 {
+        font-size: 15px !important;
+        margin: 0 0 2mm !important;
+        font-weight: 700 !important;
+    }
+
+    .printing-thermal .print-receipt-header p {
+        margin: 1mm 0 !important;
+        font-size: 9px !important;
+    }
+
+    .printing-thermal .print-receipt-info {
+        display: block !important;
+        margin-bottom: 3mm !important;
+    }
+
+    .printing-thermal .print-receipt-info div {
+        display: flex !important;
+        justify-content: space-between !important;
+        gap: 3mm !important;
+        margin: 1mm 0 !important;
+    }
+
+    .printing-thermal .print-receipt-info span {
+        font-weight: normal !important;
+    }
+
+    .printing-thermal .print-receipt-info strong {
+        text-align: right !important;
+        overflow-wrap: anywhere !important;
+    }
+
+    .printing-thermal .print-receipt-items h2 {
+        font-size: 10px !important;
+        margin: 3mm 0 2mm !important;
+        padding-bottom: 2mm !important;
+        border-bottom: 1px dashed #000 !important;
+    }
+
+    .printing-thermal .print-receipt-items table {
+        width: 100% !important;
+        table-layout: fixed !important;
+        border-collapse: collapse !important;
+    }
+
+    .printing-thermal .print-receipt-items th,
+    .printing-thermal .print-receipt-items td {
+        padding: 1.4mm 0.6mm !important;
+        border-bottom: 1px dashed #aaa !important;
+        overflow-wrap: anywhere !important;
+        vertical-align: top !important;
+    }
+
+    .printing-thermal .print-receipt-items th:first-child,
+    .printing-thermal .print-receipt-items td:first-child {
+        width: 43% !important;
+        text-align: left !important;
+    }
+
+    .printing-thermal .print-receipt-items th:nth-child(2),
+    .printing-thermal .print-receipt-items td:nth-child(2) {
+        width: 12% !important;
+        text-align: center !important;
+    }
+
+    .printing-thermal .print-receipt-items th:nth-child(3),
+    .printing-thermal .print-receipt-items td:nth-child(3) {
+        width: 22.5% !important;
+        text-align: right !important;
+    }
+
+    .printing-thermal .print-receipt-items th:nth-child(4),
+    .printing-thermal .print-receipt-items td:nth-child(4) {
+        width: 22.5% !important;
+        text-align: right !important;
+    }
+
+    .printing-thermal .print-receipt-totals {
+        width: 100% !important;
+        margin: 3mm 0 0 !important;
+    }
+
+    .printing-thermal .print-receipt-totals > div {
+        display: flex !important;
+        justify-content: space-between !important;
+        gap: 3mm !important;
+        padding: 1.3mm 0 !important;
+    }
+
+    .printing-thermal .print-total {
+        border-top: 1px solid #000 !important;
+        border-bottom: 1px solid #000 !important;
+        margin: 1mm 0 !important;
+        padding: 2mm 0 !important;
+        font-size: 11px !important;
+        font-weight: 700 !important;
+    }
+
+    .printing-thermal .print-remaining {
+        border-top: 1px dashed #000 !important;
+        margin-top: 1mm !important;
+        padding-top: 2mm !important;
+    }
+
+    .printing-thermal .print-receipt-footer {
+        text-align: center !important;
+        margin-top: 4mm !important;
+        padding-top: 3mm !important;
+        border-top: 1px dashed #000 !important;
+        font-size: 8px !important;
+    }
+
+    .printing-thermal .print-receipt-footer p {
+        margin: 1mm 0 !important;
+    }
+
+    .printing-thermal .print-receipt-header,
+    .printing-thermal .print-receipt-info,
+    .printing-thermal .print-receipt-items,
+    .printing-thermal .print-receipt-totals,
+    .printing-thermal .print-receipt-footer,
+    .printing-thermal tr {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+    }
+}
+
+        font-size: 10px !important;
+    }
+
+    .printing-thermal .transaction-totals > div {
+        padding: 3px 0 !important;
+    }
+
+    .printing-thermal .transaction-totals .remaining {
+        border-top: 1px dashed #777 !important;
+        margin-top: 4px !important;
+        padding-top: 6px !important;
+    }
+
+    .printing-thermal .transaction-modal-header,
+    .printing-thermal .transaction-items,
+    .printing-thermal .transaction-totals {
+        break-inside: avoid !important;
+    }
 }

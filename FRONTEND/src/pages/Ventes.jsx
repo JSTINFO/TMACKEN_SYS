@@ -1234,18 +1234,15 @@ function Ventes() {
 
 
                 // =================================================
-                // FERMER PAIEMENT
+                // GARDER LE MODAL OUVERT POUR PROPOSER L'IMPRESSION
                 // =================================================
 
-                setPaymentModal({
-
-                    open: false,
-
-                    vente: null,
-
+                setPaymentModal(prev => ({
+                    ...prev,
                     loading: false
-                });
+                }));
 
+                return updated;
 
             } catch (err) {
 
@@ -3227,6 +3224,13 @@ function Ventes() {
 
                 loading={
                     paymentModal.loading
+                }
+
+                companyName="LAZARE"
+                userName={
+                    currentUser
+                        ? `${currentUser.prenom || ""} ${currentUser.nom || ""}`.trim() || currentUser.nom_utilisateur || currentUser.username || "Utilisateur connecté"
+                        : "Utilisateur connecté"
                 }
 
             />

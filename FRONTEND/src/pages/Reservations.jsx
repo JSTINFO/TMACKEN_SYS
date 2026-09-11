@@ -25,6 +25,7 @@ import {
 
 import { getClients } from "../services/clientService";
 import { getProduits } from "../services/produitService";
+import { getCurrentUser } from "../services/authService";
 
 import ConfirmModal from "../components/ConfirmModal";
 import PaymentModal from "../components/PaymentModal";
@@ -39,6 +40,7 @@ function Reservations() {
     const [reservations, setReservations] = useState([]);
     const [clients, setClients] = useState([]);
     const [produits, setProduits] = useState([]);
+    const [currentUser, setCurrentUser] = useState(null);
 
     // =====================================================
     // ETATS
@@ -109,6 +111,23 @@ function Reservations() {
         loading: false
     });
 
+
+    // =====================================================
+    // UTILISATEUR CONNECTÉ
+    // =====================================================
+
+    useEffect(() => {
+        const loadCurrentUser = async () => {
+            try {
+                const user = await getCurrentUser();
+                setCurrentUser(user || null);
+            } catch (err) {
+                console.error("Impossible de récupérer l'utilisateur connecté:", err);
+            }
+        };
+
+        loadCurrentUser();
+    }, []);
 
     // =====================================================
     // CHARGEMENT
@@ -1182,20 +1201,21 @@ const handleConfirmPaymentReservation = async ({
         }
 
         // ================================================
-        // 5. FERMER LE MODAL
+        // 5. GARDER LE MODAL OUVERT POUR PROPOSER L'IMPRESSION
         // ================================================
 
-        setPaymentModal({
-            open: false,
-            reservation: null,
+        setPaymentModal(previous => ({
+            ...previous,
             loading: false
-        });
+        }));
 
         // ================================================
         // 6. RAFRAICHIR LES DONNEES
         // ================================================
 
         await loadData();
+
+        return updatedReservation;
 
     } catch (err) {
 
@@ -1227,6 +1247,7 @@ const handleConfirmPaymentReservation = async ({
         }
 
         setError(message);
+        throw err;
     }
 };
 
@@ -3083,6 +3104,13 @@ const handleConfirmPaymentReservation = async ({
     }
 
     loading={paymentModal.loading}
+
+    companyName="LAZARE"
+    userName={
+        currentUser
+            ? `${currentUser.prenom || ""} ${currentUser.nom || ""}`.trim() || currentUser.nom_utilisateur || currentUser.username || "Utilisateur connecté"
+            : "Utilisateur connecté"
+    }
 />
 
         </div>

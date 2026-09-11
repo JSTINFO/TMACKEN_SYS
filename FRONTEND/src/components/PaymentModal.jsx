@@ -14,7 +14,9 @@ import {
     Coins,
     AlertCircle,
     Percent,
-    Tag
+    Tag,
+    CheckCircle2,
+    Printer
 } from "lucide-react";
 
 import "./PaymentModal.css";
@@ -102,7 +104,14 @@ function PaymentModal({
 
     onConfirmWithoutPayment,
 
-    loading = false
+    loading = false,
+
+    // Informations entreprise / utilisateur pour le reçu
+    companyName = "LAZARE",
+    companyAddress = "",
+    companyPhone = "",
+    companyEmail = "",
+    userName = "Utilisateur connecté"
 }) {
 
     // ==========================================
@@ -137,6 +146,9 @@ function PaymentModal({
 
     const [error, setError] =
         useState("");
+
+    const [paymentSuccess, setPaymentSuccess] =
+        useState(null);
 
 
     // ==========================================
@@ -223,6 +235,7 @@ function PaymentModal({
         );
 
         setError("");
+        setPaymentSuccess(null);
 
 
         // =================================================
@@ -968,7 +981,7 @@ function PaymentModal({
 
             if (isReservation) {
 
-                await onConfirmPayment({
+                const result = await onConfirmPayment({
 
                     mode_paiement:
                         modePaiement,
@@ -996,6 +1009,19 @@ function PaymentModal({
 
                 });
 
+                setPaymentSuccess({
+                    result,
+                    montant: roundMoney(totalApresRabais),
+                    modePaiement,
+                    reference,
+                    clientName,
+                    date: new Date(),
+                    montantRecu: modePaiement === "ESPECES" ? montantRecuNumber : totalApresRabais,
+                    monnaie: monnaieARendre,
+                    rabais: roundMoney(Math.max(0, totalBrut - totalApresRabais)),
+                    typeRabais
+                });
+
                 return;
             }
 
@@ -1004,7 +1030,7 @@ function PaymentModal({
             // VENTE
             // ==================================
 
-            await onConfirmPayment({
+            const result = await onConfirmPayment({
 
                 mode_paiement:
                     modePaiement,
@@ -1031,6 +1057,19 @@ function PaymentModal({
 
             });
 
+            setPaymentSuccess({
+                result,
+                montant: montantNumber,
+                modePaiement,
+                reference,
+                clientName,
+                date: new Date(),
+                montantRecu: modePaiement === "ESPECES" ? montantRecuNumber : montantNumber,
+                monnaie: monnaieARendre,
+                rabais: roundMoney(montantRabais),
+                typeRabais
+            });
+
         } catch (err) {
 
             console.error(
@@ -1051,11 +1090,281 @@ function PaymentModal({
 
 
     // ==========================================
+    // IMPRESSION APRÈS PAIEMENT
+    // ==========================================
+
+    const formatPrintMoney = (value) =>
+        `${roundMoney(value).toLocaleString("fr-FR", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        })} $`;
+
+    const escapeHtml = (value) =>
+        String(value ?? "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+
+    const printPayment = (format) => {
+        if (!paymentSuccess) return;
+
+        const thermal = format === "THERMAL";
+        const printWindow = window.open(
+            "",
+            "_blank",
+            "width=800,height=900,scrollbars=yes"
+        );
+
+        if (!printWindow) {
+            setError(
+                "Impossible d'ouvrir la fenêtre d'impression. Autorisez les fenêtres pop-up pour LAZARE."
+            );
+            return;
+        }
+
+        const dateText = paymentSuccess.date.toLocaleString("fr-FR", {
+            dateStyle: "short",
+            timeStyle: "short"
+        });
+
+        const brut = roundMoney(totalBrut);
+        const finalTotal = roundMoney(paymentSuccess.montant);
+        const rabaisMontant = roundMoney(Math.max(0, brut - finalTotal));
+        const montantRecu = roundMoney(paymentSuccess.montantRecu || finalTotal);
+        const monnaie = roundMoney(Math.max(0, montantRecu - finalTotal));
+
+        const itemsHtml = (items || []).map((item, index) => {
+            const qty = Number(item.quantite || 0);
+            const price = Number(item.prix_unitaire ?? item.prix ?? 0);
+            const subtotal = roundMoney(
+                item.sous_total != null
+                    ? Number(item.sous_total)
+                    : qty * price
+            );
+            const name =
+                item.nom_produit ||
+                item.produit?.nom ||
+                item.nom ||
+                `Produit #${item.id_produit || index + 1}`;
+
+            return `
+                <tr>
+                    <td class="product">${escapeHtml(name)}</td>
+                    <td class="qty">${qty}</td>
+                    <td class="price">${formatPrintMoney(price)}</td>
+                    <td class="amount">${formatPrintMoney(subtotal)}</td>
+                </tr>`;
+        }).join("");
+
+        const companyContact = [companyAddress, companyPhone, companyEmail]
+            .filter(Boolean)
+            .map(value => `<div>${escapeHtml(value)}</div>`)
+            .join("");
+
+        const html = `<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>${escapeHtml(reference || "Reçu")}</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:#fff;color:#111;font-family:Arial,Helvetica,sans-serif}
+body{font-size:${thermal ? "9px" : "12px"}}
+.receipt{width:${thermal ? "72mm" : "190mm"};max-width:${thermal ? "72mm" : "190mm"};margin:0 auto;padding:${thermal ? "4mm 0" : "12mm"};line-height:1.35}
+.company{text-align:center;margin-bottom:7px}
+.company-name{font-size:${thermal ? "17px" : "25px"};font-weight:800;letter-spacing:.4px;text-transform:uppercase}
+.company-contact{font-size:${thermal ? "8px" : "10px"};line-height:1.35;margin-top:3px}
+.document-title{text-align:center;font-size:${thermal ? "12px" : "18px"};font-weight:800;margin:8px 0 2px;text-transform:uppercase}
+.document-ref{text-align:center;font-size:${thermal ? "9px" : "12px"};margin-bottom:8px}
+.line{border-top:1px dashed #333;margin:7px 0}
+.info{width:100%;margin:5px 0}
+.info-row{display:flex;justify-content:space-between;gap:8px;margin:3px 0}
+.info-row span:first-child{font-weight:600}
+.info-row span:last-child{text-align:right;overflow-wrap:anywhere}
+table{width:100%;border-collapse:collapse;margin:7px 0;font-size:${thermal ? "8px" : "11px"}}
+th{font-weight:800;border-bottom:1px solid #111;padding:4px 1px;text-align:left}
+td{padding:4px 1px;border-bottom:1px dotted #aaa;vertical-align:top}
+.qty{text-align:center;width:12%}.price{text-align:right;width:22%}.amount{text-align:right;width:24%;font-weight:600}.product{width:42%;overflow-wrap:anywhere}
+.total-block{margin-top:7px}
+.total-row{display:flex;justify-content:space-between;gap:10px;margin:4px 0}
+.total-row.grand{font-size:${thermal ? "12px" : "16px"};font-weight:800;border-top:1px solid #111;border-bottom:1px double #111;padding:6px 0;margin-top:6px}
+.payment-block{margin-top:6px}
+.footer{text-align:center;margin-top:15px;font-size:${thermal ? "8px" : "10px"};line-height:1.5}
+.thanks{font-weight:800;font-size:${thermal ? "10px" : "13px"};margin-bottom:3px}
+.small{font-size:${thermal ? "7px" : "9px"};color:#555}
+@page{size:${thermal ? "80mm 120mm" : "A4"};margin:${thermal ? "0" : "10mm"}}
+@media print{
+    html,body{width:${thermal ? "80mm" : "210mm"};min-width:${thermal ? "80mm" : "210mm"};margin:0;padding:0}
+    .receipt{width:${thermal ? "72mm" : "190mm"};max-width:${thermal ? "72mm" : "190mm"};margin:0 auto}
+}
+</style>
+</head>
+<body>
+<div class="receipt">
+    <div class="company">
+        <div class="company-name">${escapeHtml(companyName)}</div>
+        ${companyContact ? `<div class="company-contact">${companyContact}</div>` : ""}
+    </div>
+
+    <div class="document-title">Reçu de paiement</div>
+    <div class="document-ref">${escapeHtml(reference || "-")}</div>
+
+    <div class="line"></div>
+
+    <div class="info">
+        <div class="info-row"><span>Date</span><span>${escapeHtml(dateText)}</span></div>
+        <div class="info-row"><span>Caissier / Utilisateur</span><span>${escapeHtml(userName || "Utilisateur connecté")}</span></div>
+        <div class="info-row"><span>Client</span><span>${escapeHtml(clientName || "Client comptant")}</span></div>
+        <div class="info-row"><span>Mode de paiement</span><span>${escapeHtml(paymentSuccess.modePaiement || "-")}</span></div>
+    </div>
+
+    <div class="line"></div>
+
+    ${itemsHtml ? `
+    <table>
+        <thead>
+            <tr><th>Produit</th><th>Qté</th><th>Prix</th><th>Total</th></tr>
+        </thead>
+        <tbody>${itemsHtml}</tbody>
+    </table>` : `<div class="small">Aucun produit renseigné.</div>`}
+
+    <div class="line"></div>
+
+    <div class="total-block">
+        <div class="total-row"><span>Prix brut</span><strong>${formatPrintMoney(brut)}</strong></div>
+        <div class="total-row"><span>Rabais${paymentSuccess.typeRabais === "POURCENTAGE" ? ` (${escapeHtml(paymentSuccess.rabais || 0)}%)` : ""}</span><strong>- ${formatPrintMoney(rabaisMontant)}</strong></div>
+        <div class="total-row grand"><span>TOTAL À PAYER</span><span>${formatPrintMoney(finalTotal)}</span></div>
+    </div>
+
+    <div class="payment-block">
+        <div class="total-row"><span>Montant payé</span><strong>${formatPrintMoney(finalTotal)}</strong></div>
+        ${paymentSuccess.modePaiement === "ESPECES" ? `
+            <div class="total-row"><span>Montant reçu</span><span>${formatPrintMoney(montantRecu)}</span></div>
+            <div class="total-row"><span>Monnaie rendue</span><span>${formatPrintMoney(monnaie)}</span></div>
+        ` : ""}
+    </div>
+
+    <div class="line"></div>
+
+    <div class="footer">
+        <div class="thanks">Merci pour votre confiance !</div>
+        <div>Nous vous remercions pour votre achat.</div>
+        <div class="small">Conservez ce reçu comme preuve de paiement.</div>
+    </div>
+</div>
+<script>
+<\/script>
+</body>
+</html>`;
+
+        printWindow.document.open();
+        printWindow.document.write(html);
+        printWindow.document.close();
+
+        if (thermal) {
+            // Chrome n'interprète pas correctement « 80mm auto » dans @page.
+            // On mesure donc la hauteur réelle du reçu après son rendu,
+            // puis on applique une taille de page exacte : 80mm x hauteur.
+            setTimeout(() => {
+                try {
+                    const receipt = printWindow.document.querySelector(".receipt");
+                    const style = printWindow.document.querySelector("style");
+
+                    if (receipt && style) {
+                        const heightPx = Math.ceil(
+                            receipt.scrollHeight ||
+                            receipt.getBoundingClientRect().height ||
+                            0
+                        );
+
+                        // 96 CSS px = 25.4 mm.
+                        // + 2 mm de sécurité pour éviter une coupure du dernier élément.
+                        const heightMm = Math.max(45, Math.ceil((heightPx * 25.4) / 96 + 2));
+
+                        style.textContent += `
+                            @media print {
+                                @page {
+                                    size: 80mm ${heightMm}mm !important;
+                                    margin: 0 !important;
+                                }
+                                html, body {
+                                    width: 80mm !important;
+                                    min-width: 80mm !important;
+                                    max-width: 80mm !important;
+                                    margin: 0 !important;
+                                    padding: 0 !important;
+                                    overflow: visible !important;
+                                }
+                                .receipt {
+                                    width: 72mm !important;
+                                    max-width: 72mm !important;
+                                    margin: 0 auto !important;
+                                    padding: 4mm 0 !important;
+                                }
+                            }`;
+                    }
+                } catch (error) {
+                    console.error("Erreur préparation ticket 80 mm :", error);
+                }
+
+                printWindow.focus();
+                printWindow.print();
+            }, 450);
+        } else {
+            setTimeout(() => {
+                printWindow.focus();
+                printWindow.print();
+            }, 300);
+        }
+
+        // Le choix du client est terminé : on ferme automatiquement
+        // le modal dans l'application. La fenêtre d'impression reste ouverte.
+        setPaymentSuccess(null);
+        onClose();
+    };
+
+    const finishPayment = () => {
+        setPaymentSuccess(null);
+        onClose();
+    };
+
+    // ==========================================
     // MODAL FERME
     // ==========================================
 
     if (!open) {
         return null;
+    }
+
+    if (paymentSuccess) {
+        return (
+            <div className="payment-overlay">
+                <div className="payment-success-modal" role="dialog" aria-modal="true">
+                    <div className="payment-success-icon"><CheckCircle2 size={42} /></div>
+                    <h2>Paiement enregistré</h2>
+                    <p className="payment-success-message">La transaction a été enregistrée avec succès.</p>
+                    <div className="payment-success-summary">
+                        <div><span>Référence</span><strong>{reference || "—"}</strong></div>
+                        <div><span>Montant</span><strong>{formatMoney(paymentSuccess.montant)}</strong></div>
+                        <div><span>Mode</span><strong>{paymentSuccess.modePaiement}</strong></div>
+                    </div>
+                    <p className="payment-success-question">Souhaitez-vous imprimer le reçu ?</p>
+                    <div className="payment-print-actions">
+                        <button type="button" className="payment-print-btn primary" onClick={() => printPayment("THERMAL")}>
+                            <Printer size={18} /><span>Ticket thermique 80 mm</span>
+                        </button>
+                        <button type="button" className="payment-print-btn" onClick={() => printPayment("A4")}>
+                            <FileText size={18} /><span>Document A4</span>
+                        </button>
+                    </div>
+                    <button type="button" className="payment-finish-btn" onClick={finishPayment}>
+                        <Check size={17} /><span>Terminer sans imprimer</span>
+                    </button>
+                </div>
+            </div>
+        );
     }
 
 
