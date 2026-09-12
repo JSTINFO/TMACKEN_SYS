@@ -4,6 +4,8 @@ import { getPaiementsDetails } from "../services/paiementService";
 import { getVentes } from "../services/venteService";
 import { getReservations } from "../services/reservationService";
 import { getClients } from "../services/clientService";
+import { getCurrentUser } from "../services/authService";
+import api from "../services/api";
 import "./Rapports.css";
 
 function Rapport() {
@@ -18,6 +20,8 @@ function Rapport() {
     const [ventes, setVentes] = useState([]);
     const [reservations, setReservations] = useState([]);
     const [clients, setClients] = useState([]);
+    const [utilisateurs, setUtilisateurs] = useState([]);
+    const [currentUser, setCurrentUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
@@ -36,16 +40,20 @@ function Rapport() {
         try {
             setLoading(true);
             setError("");
-            const [p, v, r, c] = await Promise.all([
+            const [p, v, r, c, u, me] = await Promise.all([
                 getPaiementsDetails(),
                 getVentes(),
                 getReservations(),
-                getClients()
+                getClients(),
+                api.get("/utilisateurs/").then(response => response.data).catch(() => []),
+                getCurrentUser().catch(() => null)
             ]);
             setPaiements(Array.isArray(p) ? p : []);
             setVentes(Array.isArray(v) ? v : []);
             setReservations(Array.isArray(r) ? r : []);
             setClients(Array.isArray(c) ? c : []);
+            setUtilisateurs(Array.isArray(u) ? u : []);
+            setCurrentUser(me || null);
         } catch (err) {
             console.error(err);
             setError(err.response?.data?.detail || err.message || "Impossible de charger les données.");
@@ -59,6 +67,7 @@ function Rapport() {
     const clientsMap = useMemo(() => Object.fromEntries(clients.map(c => [c.id_client, c])), [clients]);
     const ventesMap = useMemo(() => Object.fromEntries(ventes.map(v => [v.id_vente, v])), [ventes]);
     const reservationsMap = useMemo(() => Object.fromEntries(reservations.map(r => [r.id_reservation, r])), [reservations]);
+    const utilisateursMap = useMemo(() => Object.fromEntries(utilisateurs.map(u => [u.id_utilisateur, u])), [utilisateurs]);
 
     const money = (v) => `${Number(v || 0).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} $`;
     const dateText = (v) => v ? new Date(v).toLocaleString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "—";
@@ -70,10 +79,100 @@ function Rapport() {
         return `${c.nom || ""} ${c.prenom || ""}`.trim() || `Client #${id}`;
     };
 
+    const utilisateurName = (item, id) => {
+        const utilisateur =
+            item?.utilisateur ||
+            item?.user ||
+            item?.utilisateur_info ||
+            item?.user_info ||
+            (id != null ? utilisateursMap[id] : null);
+
+        if (utilisateur && typeof utilisateur === "object") {
+            const nomComplet = `${utilisateur.prenom || utilisateur.first_name || ""} ${utilisateur.nom || utilisateur.last_name || ""}`.trim();
+            if (nomComplet) return nomComplet;
+
+            const identifiant =
+                utilisateur.nom_utilisateur ||
+                utilisateur.username ||
+                utilisateur.login ||
+                utilisateur.email;
+
+            if (identifiant) return identifiant;
+        }
+
+        const nomDirect =
+            item?.nom_utilisateur ||
+            item?.username ||
+            item?.user_name ||
+            item?.utilisateur_nom ||
+            item?.nom_utilisateur_complet;
+
+        if (nomDirect) return nomDirect;
+
+        if (currentUser && id != null && Number(currentUser.id_utilisateur) === Number(id)) {
+            const nomComplet = `${currentUser.prenom || ""} ${currentUser.nom || ""}`.trim();
+            if (nomComplet) return nomComplet;
+            return currentUser.nom_utilisateur || currentUser.username || "Utilisateur connecté";
+        }
+
+        return id ? `Utilisateur #${id}` : "Utilisateur non renseigné";
+    };
+
     const txType = (p) => p.id_vente != null ? "VENTE" : p.id_reservation != null ? "RESERVATION" : "AUTRE";
     const txData = (p) => txType(p) === "VENTE" ? ventesMap[p.id_vente] || {} : txType(p) === "RESERVATION" ? reservationsMap[p.id_reservation] || {} : {};
     const txRef = (p) => txType(p) === "VENTE" ? `Vente #${p.id_vente}` : txType(p) === "RESERVATION" ? `Réservation #${p.id_reservation}` : `Paiement #${p.id_paiement || "—"}`;
     const txStatus = (p) => txData(p).statut || (txType(p) === "VENTE" ? "PAYEE" : txType(p) === "RESERVATION" ? "CONFIRMEE" : "ENREGISTRE");
+
+    // Tous les statuts réellement présents dans les données sont proposés dans le filtre.
+    // Les statuts connus gardent leur libellé actuel ; les nouveaux statuts du backend sont ajoutés automatiquement.
+    const statutLabels = {
+        PAYEE: "Payée",
+        CONFIRMEE: "Confirmée",
+        EN_ATTENTE: "En attente",
+        EN_COURS: "En cours",
+        ANNULEE: "Annulée",
+        TERMINEE: "Terminée",
+        ENREGISTRE: "Enregistré",
+    };
+
+    const formatStatut = (value) => {
+        const key = String(value || "").trim().toUpperCase();
+        if (statutLabels[key]) return statutLabels[key];
+        return key
+            ? key
+                .toLowerCase()
+                .split("_")
+                .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+                .join(" ")
+            : "—";
+    };
+
+    const statutsDisponibles = useMemo(() => {
+        const found = new Set(["PAYEE", "CONFIRMEE", "EN_ATTENTE", "ANNULEE"]);
+
+        [...ventes, ...reservations, ...paiements].forEach(item => {
+            if (item?.statut) found.add(String(item.statut).trim().toUpperCase());
+        });
+
+        const ordre = [
+            "PAYEE",
+            "CONFIRMEE",
+            "EN_ATTENTE",
+            "EN_COURS",
+            "TERMINEE",
+            "ANNULEE",
+            "ENREGISTRE",
+        ];
+
+        return Array.from(found).sort((a, b) => {
+            const ia = ordre.indexOf(a);
+            const ib = ordre.indexOf(b);
+            if (ia !== -1 && ib !== -1) return ia - ib;
+            if (ia !== -1) return -1;
+            if (ib !== -1) return 1;
+            return a.localeCompare(b, "fr");
+        });
+    }, [ventes, reservations, paiements]);
 
     const preset = (value) => {
         const now = new Date();
@@ -103,19 +202,89 @@ function Rapport() {
         const end = new Date(`${dateFin}T23:59:59.999`);
         const q = recherche.trim().toLowerCase();
 
-        return paiements.map(p => {
+        // Les paiements restent la source principale des encaissements.
+        // On ajoute ensuite les ventes/réservations qui n'ont encore aucun paiement
+        // afin que leurs statuts (EN_ATTENTE, ANNULEE, EN_COURS, etc.) ne disparaissent jamais.
+        const paymentTransactions = paiements.map(p => {
             const d = txData(p);
             const date = p.date_paiement ? new Date(p.date_paiement) : null;
-            return { ...p, date, typeTransaction: txType(p), reference: txRef(p), statutTransaction: txStatus(p), data: d, client: clientName(d.id_client ?? p.id_client) };
-        }).filter(t => {
-            if (!t.date || Number.isNaN(t.date.getTime()) || t.date < start || t.date > end) return false;
-            if (type !== "TOUS" && t.typeTransaction !== type) return false;
-            if (mode !== "TOUS" && t.mode_paiement !== mode) return false;
-            if (statut !== "TOUS" && t.statutTransaction !== statut) return false;
-            if (q && ![t.reference, t.client, t.mode_paiement, t.statutTransaction, t.id_utilisateur].join(" ").toLowerCase().includes(q)) return false;
-            return true;
-        }).sort((a, b) => b.date - a.date);
-    }, [paiements, ventesMap, reservationsMap, clientsMap, dateDebut, dateFin, type, mode, statut, recherche]);
+            return {
+                ...p,
+                _source: "PAIEMENT",
+                date,
+                typeTransaction: txType(p),
+                reference: txRef(p),
+                statutTransaction: txStatus(p),
+                data: d,
+                client: clientName(d.id_client ?? p.id_client)
+            };
+        });
+
+        const paymentSaleIds = new Set(
+            paiements
+                .filter(p => p.id_vente != null)
+                .map(p => Number(p.id_vente))
+        );
+
+        const paymentReservationIds = new Set(
+            paiements
+                .filter(p => p.id_reservation != null)
+                .map(p => Number(p.id_reservation))
+        );
+
+        const extractDate = (item, typeItem) => {
+            const value = typeItem === "VENTE"
+                ? (item.date_vente || item.created_at || item.date_creation || item.date)
+                : (item.date_reservation || item.created_at || item.date_creation || item.date);
+            return value ? new Date(value) : null;
+        };
+
+        const noPaymentTransactions = [
+            ...ventes
+                .filter(v => !paymentSaleIds.has(Number(v.id_vente)))
+                .map(v => ({
+                    ...v,
+                    id_paiement: `VENTE-${v.id_vente}`,
+                    _source: "TRANSACTION",
+                    date: extractDate(v, "VENTE"),
+                    typeTransaction: "VENTE",
+                    reference: `Vente #${v.id_vente}`,
+                    statutTransaction: v.statut || "EN_ATTENTE",
+                    data: v,
+                    client: clientName(v.id_client),
+                    mode_paiement: "—",
+                    montant: 0,
+                    id_utilisateur: v.id_utilisateur ?? null
+                })),
+            ...reservations
+                .filter(r => !paymentReservationIds.has(Number(r.id_reservation)))
+                .map(r => ({
+                    ...r,
+                    id_paiement: `RESERVATION-${r.id_reservation}`,
+                    _source: "TRANSACTION",
+                    date: extractDate(r, "RESERVATION"),
+                    typeTransaction: "RESERVATION",
+                    reference: `Réservation #${r.id_reservation}`,
+                    statutTransaction: r.statut || "EN_ATTENTE",
+                    data: r,
+                    client: clientName(r.id_client),
+                    mode_paiement: "—",
+                    montant: 0,
+                    id_utilisateur: r.id_utilisateur ?? null
+                }))
+        ];
+
+        return [...paymentTransactions, ...noPaymentTransactions]
+            .filter(t => {
+                if (!t.date || Number.isNaN(t.date.getTime()) || t.date < start || t.date > end) return false;
+                if (type !== "TOUS" && t.typeTransaction !== type) return false;
+                if (mode !== "TOUS" && t.mode_paiement !== mode) return false;
+                if (statut !== "TOUS" && t.statutTransaction !== statut) return false;
+                if (q && ![t.reference, t.client, t.mode_paiement, t.statutTransaction, t.id_utilisateur].join(" ").toLowerCase().includes(q)) return false;
+                return true;
+            })
+            .sort((a, b) => b.date - a.date);
+    }, [paiements, ventes, reservations, ventesMap, reservationsMap, clientsMap, utilisateursMap, currentUser, dateDebut, dateFin, type, mode, statut, recherche]);
 
     const stats = useMemo(() => {
         const sum = (arr) => arr.reduce((s, x) => s + Number(x.montant || 0), 0);
@@ -159,14 +328,14 @@ function Rapport() {
             <div className="filter-field"><label>Date fin</label><div className="date-input"><CalendarDays size={15}/><input type="date" value={dateFin} onChange={e=>{setPeriode("PERSONNALISEE");setDateFin(e.target.value)}}/></div></div>
             <div className="filter-field"><label>Type</label><select value={type} onChange={e=>setType(e.target.value)}><option value="TOUS">Toutes</option><option value="VENTE">Ventes</option><option value="RESERVATION">Réservations</option><option value="AUTRE">Autres</option></select></div>
             <div className="filter-field"><label>Mode de paiement</label><select value={mode} onChange={e=>setMode(e.target.value)}><option value="TOUS">Tous</option><option value="ESPECES">Espèces</option><option value="CARTE">Carte</option><option value="VIREMENT">Virement</option><option value="CHEQUE">Chèque</option><option value="AUTRE">Autre</option></select></div>
-            <div className="filter-field"><label>Statut</label><select value={statut} onChange={e=>setStatut(e.target.value)}><option value="TOUS">Tous</option><option value="PAYEE">Payée</option><option value="CONFIRMEE">Confirmée</option><option value="EN_ATTENTE">En attente</option><option value="ANNULEE">Annulée</option></select></div>
+            <div className="filter-field"><label>Statut</label><select value={statut} onChange={e=>setStatut(e.target.value)}><option value="TOUS">Tous</option>{statutsDisponibles.map(value => <option key={value} value={value}>{formatStatut(value)}</option>)}</select></div>
             <div className="filter-field search-field"><label>Recherche</label><div className="date-input"><Search size={15}/><input value={recherche} onChange={e=>setRecherche(e.target.value)} placeholder="Référence, client, mode..."/></div></div><div className="filter-field"><label>&nbsp;</label><button className="rapport-btn secondary full" onClick={reset}>Réinitialiser</button></div>
         </div></section>
         <section className="rapport-stats"><div className="rapport-stat-card"><div className="stat-icon blue"><FileText size={19}/></div><div><span>Transactions</span><strong>{stats.count}</strong></div></div><div className="rapport-stat-card"><div className="stat-icon green"><DollarSign size={19}/></div><div><span>Total encaissé</span><strong>{money(stats.total)}</strong></div></div><div className="rapport-stat-card"><div className="stat-icon orange"><ShoppingCart size={19}/></div><div><span>Ventes</span><strong>{stats.ventes}</strong></div></div><div className="rapport-stat-card"><div className="stat-icon purple"><CreditCard size={19}/></div><div><span>Réservations</span><strong>{stats.reservations}</strong></div></div></section>
         <section className="payment-breakdown"><div><span>Espèces</span><strong>{money(stats.especes)}</strong></div><div><span>Carte</span><strong>{money(stats.carte)}</strong></div><div><span>Virement</span><strong>{money(stats.virement)}</strong></div><div><span>Chèque</span><strong>{money(stats.cheque)}</strong></div></section>
-        <section className="rapport-table-card"><div className="rapport-table-header"><div><h2>Inventaire des transactions</h2><p>{dateDebut} → {dateFin} · {transactions.length} transaction(s)</p></div><button className="rapport-btn primary" onClick={()=>setPrintOpen(true)}><Printer size={16}/> Imprimer</button></div><div className="table-wrapper"><table className="rapport-table"><thead><tr><th>Date</th><th>Type</th><th>Référence</th><th>Client</th><th>Caissier</th><th>Mode</th><th>Montant</th><th>Statut</th><th>Action</th></tr></thead><tbody>{loading?<tr><td colSpan="9" className="empty-row">Chargement...</td></tr>:transactions.length===0?<tr><td colSpan="9" className="empty-row">Aucune transaction pour les critères sélectionnés.</td></tr>:transactions.map(t=><tr key={t.id_paiement}><td>{dateText(t.date)}</td><td><span className={`type-badge ${t.typeTransaction.toLowerCase()}`}>{t.typeTransaction}</span></td><td className="reference-cell">{t.reference}</td><td>{t.client}</td><td>{t.id_utilisateur ? `#${t.id_utilisateur}` : "—"}</td><td>{t.mode_paiement||"—"}</td><td className="amount-cell">{money(t.montant)}</td><td><span className={`status-badge ${t.statutTransaction.toLowerCase()}`}>{t.statutTransaction}</span></td><td><button className="table-view-btn" onClick={()=>setDetail(t)}><Eye size={15}/></button></td></tr>)}</tbody></table></div></section>
+        <section className="rapport-table-card"><div className="rapport-table-header"><div><h2>Inventaire des transactions</h2><p>{dateDebut} → {dateFin} · {transactions.length} transaction(s)</p></div><button className="rapport-btn primary" onClick={()=>setPrintOpen(true)}><Printer size={16}/> Imprimer</button></div><div className="table-wrapper"><table className="rapport-table"><thead><tr><th>Date</th><th>Type</th><th>Référence</th><th>Client</th><th>Caissier</th><th>Mode</th><th>Montant</th><th>Statut</th><th>Action</th></tr></thead><tbody>{loading?<tr><td colSpan="9" className="empty-row">Chargement...</td></tr>:transactions.length===0?<tr><td colSpan="9" className="empty-row">Aucune transaction pour les critères sélectionnés.</td></tr>:transactions.map(t=><tr key={t.id_paiement}><td>{dateText(t.date)}</td><td><span className={`type-badge ${t.typeTransaction.toLowerCase()}`}>{t.typeTransaction}</span></td><td className="reference-cell">{t.reference}</td><td>{t.client}</td><td>{t.utilisateur || utilisateurName(t, t.id_utilisateur)}</td><td>{t.mode_paiement||"—"}</td><td className="amount-cell">{money(t.montant)}</td><td><span className={`status-badge ${t.statutTransaction.toLowerCase()}`}>{t.statutTransaction}</span></td><td><button className="table-view-btn" onClick={()=>setDetail(t)}><Eye size={15}/></button></td></tr>)}</tbody></table></div></section>
         {printOpen && <div className="rapport-modal-overlay" onMouseDown={()=>setPrintOpen(false)}><div className="rapport-print-modal" onMouseDown={e=>e.stopPropagation()}><div className="rapport-modal-header"><div><h2>Imprimer l'inventaire</h2><p>Choisissez le format.</p></div><button onClick={()=>setPrintOpen(false)}><X size={20}/></button></div><div className="print-options"><button className={`print-option ${printFormat==="A4"?"active":""}`} onClick={()=>setPrintFormat("A4")}><FileText size={24}/><div><strong>Document A4</strong><span>Rapport complet</span></div></button><button className={`print-option ${printFormat==="THERMIQUE"?"active":""}`} onClick={()=>setPrintFormat("THERMIQUE")}><Printer size={24}/><div><strong>Ticket thermique 80 mm</strong><span>Format compact POS</span></div></button></div><div className="rapport-modal-actions"><button className="rapport-btn secondary" onClick={()=>setPrintOpen(false)}>Annuler</button><button className="rapport-btn primary" onClick={()=>imprimer(printFormat)}><Printer size={16}/> Imprimer</button></div></div></div>}
-        {detail && <div className="rapport-modal-overlay" onMouseDown={()=>setDetail(null)}><div className="rapport-detail-modal" onMouseDown={e=>e.stopPropagation()}><div className="rapport-modal-header"><div><h2>{detail.reference}</h2><p>{dateText(detail.date)}</p></div><button onClick={()=>setDetail(null)}><X size={20}/></button></div><div className="detail-grid"><div><span>Type</span><strong>{detail.typeTransaction}</strong></div><div><span>Client</span><strong>{detail.client}</strong></div><div><span>Mode</span><strong>{detail.mode_paiement||"—"}</strong></div><div><span>Utilisateur</span><strong>{detail.id_utilisateur?`#${detail.id_utilisateur}`:"—"}</strong></div><div><span>Montant</span><strong>{money(detail.montant)}</strong></div><div><span>Statut</span><strong>{detail.statutTransaction}</strong></div></div><div className="rapport-modal-actions"><button className="rapport-btn secondary" onClick={()=>setDetail(null)}>Fermer</button></div></div></div>}
+        {detail && <div className="rapport-modal-overlay" onMouseDown={()=>setDetail(null)}><div className="rapport-detail-modal" onMouseDown={e=>e.stopPropagation()}><div className="rapport-modal-header"><div><h2>{detail.reference}</h2><p>{dateText(detail.date)}</p></div><button onClick={()=>setDetail(null)}><X size={20}/></button></div><div className="detail-grid"><div><span>Type</span><strong>{detail.typeTransaction}</strong></div><div><span>Client</span><strong>{detail.client}</strong></div><div><span>Mode</span><strong>{detail.mode_paiement||"—"}</strong></div><div><span>Utilisateur</span><strong>{detail.utilisateur || utilisateurName(detail, detail.id_utilisateur)}</strong></div><div><span>Montant</span><strong>{money(detail.montant)}</strong></div><div><span>Statut</span><strong>{detail.statutTransaction}</strong></div></div><div className="rapport-modal-actions"><button className="rapport-btn secondary" onClick={()=>setDetail(null)}>Fermer</button></div></div></div>}
     </div>;
 }
 
