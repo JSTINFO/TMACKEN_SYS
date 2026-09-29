@@ -19,6 +19,7 @@ import Ventes from "../pages/Ventes";
 import Paiements from "../pages/Paiements";
 import Rapports from "../pages/Rapports";
 import Parametres from "../pages/Parametres";
+import Proforma from "../pages/Proforma";
 
 
 
@@ -89,10 +90,17 @@ function AppRoutes() {
                             element={<Rapports />}
                         />
 
+
+                        <Route
+                            path="/proforma"
+                            element={<Proforma />}
+                        />
+
                         <Route
                             path="/parametres"
                             element={<Parametres />}
                         />
+                        
 
                     </Route>
 

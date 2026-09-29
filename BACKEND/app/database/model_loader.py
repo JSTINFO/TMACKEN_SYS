@@ -8,4 +8,6 @@ from app.models import (
     DetailReservation,
     Vente,
     DetailVente,
+    Proforma,
+    DetailProforma,
 )

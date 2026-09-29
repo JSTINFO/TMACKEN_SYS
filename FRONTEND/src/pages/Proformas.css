@@ -1,0 +1,1202 @@
+/* =========================================================
+   PAGE PROFORMAS
+========================================================= */
+
+.proformas-page {
+    width: 100%;
+    min-height: 100%;
+    padding: 24px;
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.proformas-page .page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+.proformas-page .page-title {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.proformas-page .page-description {
+    margin: 6px 0 0;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   BOUTONS
+========================================================= */
+
+.proformas-page .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    border: none;
+    border-radius: 8px;
+
+    padding: 10px 15px;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        transform 0.2s ease,
+        opacity 0.2s ease;
+}
+
+.proformas-page .btn:hover {
+    transform: translateY(-1px);
+}
+
+.proformas-page .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.proformas-page .btn-primary {
+    background: #2563eb;
+    color: #ffffff;
+}
+
+.proformas-page .btn-primary:hover {
+    background: #1d4ed8;
+}
+
+.proformas-page .btn-secondary {
+    background: #e5e7eb;
+    color: #1f2937;
+}
+
+.proformas-page .btn-secondary:hover {
+    background: #d1d5db;
+}
+
+.proformas-page .btn-danger {
+    background: #dc2626;
+    color: #ffffff;
+}
+
+.proformas-page .btn-danger:hover {
+    background: #b91c1c;
+}
+
+
+/* =========================================================
+   ERREUR
+========================================================= */
+
+.proformas-page .proforma-error {
+    margin-bottom: 20px;
+
+    padding: 12px 15px;
+
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+
+    background: #fef2f2;
+    color: #b91c1c;
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   STATISTIQUES
+========================================================= */
+
+.proformas-page .stats-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 16px;
+
+    margin-bottom: 24px;
+}
+
+.proformas-page .stat-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    min-height: 100px;
+
+    padding: 18px;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.proformas-page .stat-label {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: #6b7280;
+
+    font-size: 13px;
+}
+
+.proformas-page .stat-value {
+    display: block;
+
+    color: #111827;
+
+    font-size: 22px;
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   TOOLBAR
+========================================================= */
+
+.proformas-page .toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 16px;
+}
+
+.proformas-page .proforma-search-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    width: 100%;
+    max-width: 420px;
+
+    padding: 10px 13px;
+
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+
+    background: #ffffff;
+
+    color: #6b7280;
+}
+
+.proformas-page .proforma-search-wrapper:focus-within {
+    border-color: #2563eb;
+
+    box-shadow:
+        0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.proformas-page .proforma-search-wrapper input {
+    width: 100%;
+
+    border: none;
+    outline: none;
+
+    background: transparent;
+
+    color: #111827;
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   TABLEAU
+========================================================= */
+
+.proformas-page .table-container {
+    width: 100%;
+
+    overflow-x: auto;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.proformas-page .table {
+    width: 100%;
+
+    border-collapse: collapse;
+
+    min-width: 900px;
+}
+
+.proformas-page .table thead {
+    background: #f9fafb;
+}
+
+.proformas-page .table th {
+    padding: 13px 16px;
+
+    border-bottom: 1px solid #e5e7eb;
+
+    color: #6b7280;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    text-align: left;
+
+    white-space: nowrap;
+}
+
+.proformas-page .table td {
+    padding: 14px 16px;
+
+    border-bottom: 1px solid #f1f5f9;
+
+    color: #374151;
+
+    font-size: 14px;
+
+    vertical-align: middle;
+}
+
+.proformas-page .table tbody tr {
+    transition:
+        background-color 0.15s ease;
+}
+
+.proformas-page .table tbody tr:hover {
+    background: #f9fafb;
+}
+
+.proformas-page .table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+
+/* =========================================================
+   CLIENT
+========================================================= */
+
+.proformas-page .proforma-client {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    font-weight: 500;
+}
+
+.proformas-page .proforma-client svg {
+    color: #6b7280;
+}
+
+
+/* =========================================================
+   ACTIONS TABLE
+========================================================= */
+
+.proformas-page .proforma-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.proformas-page .table-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 34px;
+    height: 34px;
+
+    padding: 0;
+
+    border: none;
+    border-radius: 7px;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.proformas-page .table-action:hover {
+    transform: translateY(-1px);
+}
+
+.proformas-page .table-action.view {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.proformas-page .table-action.view:hover {
+    background: #dbeafe;
+}
+
+.proformas-page .table-action.confirm {
+    background: #ecfdf5;
+    color: #059669;
+}
+
+.proformas-page .table-action.confirm:hover {
+    background: #d1fae5;
+}
+
+.proformas-page .table-action.delete {
+    background: #fef2f2;
+    color: #dc2626;
+}
+
+.proformas-page .table-action.delete:hover {
+    background: #fee2e2;
+}
+
+
+/* =========================================================
+   STATUTS
+========================================================= */
+
+.proformas-page .proforma-status {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 5px 10px;
+
+    border-radius: 999px;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+
+/* BROUILLON */
+
+.proformas-page .proforma-status.draft {
+    background: #f3f4f6;
+    color: #4b5563;
+}
+
+
+/* ENVOYEE */
+
+.proformas-page .proforma-status.sent {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+
+/* ACCEPTEE */
+
+.proformas-page .proforma-status.accepted {
+    background: #ecfdf5;
+    color: #047857;
+}
+
+
+/* REFUSEE */
+
+.proformas-page .proforma-status.rejected {
+    background: #fef2f2;
+    color: #b91c1c;
+}
+
+
+/* EXPIREE */
+
+.proformas-page .proforma-status.expired {
+    background: #fff7ed;
+    color: #c2410c;
+}
+
+
+/* ANNULEE */
+
+.proformas-page .proforma-status.cancelled {
+    background: #fef2f2;
+    color: #991b1b;
+}
+
+
+/* CONVERTIE */
+
+.proformas-page .proforma-status.converted {
+    background: #f5f3ff;
+    color: #6d28d9;
+}
+
+
+/* =========================================================
+   EMPTY
+========================================================= */
+
+.proformas-page .proforma-empty {
+    min-height: 220px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    padding: 30px;
+
+    text-align: center;
+
+    color: #6b7280;
+}
+
+.proformas-page .proforma-empty svg {
+    margin-bottom: 12px;
+    color: #9ca3af;
+}
+
+.proformas-page .proforma-empty h3 {
+    margin: 0 0 6px;
+
+    color: #374151;
+
+    font-size: 17px;
+}
+
+.proformas-page .proforma-empty p {
+    margin: 0;
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   LOADING
+========================================================= */
+
+.proformas-page .proforma-loading {
+    min-height: 300px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 10px;
+
+    color: #6b7280;
+
+    font-size: 14px;
+}
+
+.proformas-page .spin {
+    animation: proformaSpin 1s linear infinite;
+}
+
+@keyframes proformaSpin {
+
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+.proformas-page .modal-overlay {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 1000;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    background: rgba(15, 23, 42, 0.55);
+
+    overflow-y: auto;
+}
+
+.proformas-page .proforma-modal,
+.proformas-page .proforma-detail-modal {
+    width: 100%;
+    max-width: 760px;
+
+    max-height: calc(100vh - 40px);
+
+    overflow-y: auto;
+
+    padding: 24px;
+
+    border-radius: 14px;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 20px 50px rgba(0, 0, 0, 0.2);
+}
+
+
+/* =========================================================
+   MODAL HEADER
+========================================================= */
+
+.proformas-page .modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    margin-bottom: 24px;
+
+    padding-bottom: 18px;
+
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.proformas-page .modal-header h2 {
+    margin: 0;
+
+    color: #111827;
+
+    font-size: 21px;
+    font-weight: 700;
+}
+
+.proformas-page .modal-header p {
+    margin: 6px 0 0;
+
+    color: #6b7280;
+
+    font-size: 13px;
+}
+
+.proformas-page .modal-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 34px;
+    height: 34px;
+
+    flex-shrink: 0;
+
+    border: none;
+    border-radius: 7px;
+
+    background: #f3f4f6;
+
+    color: #4b5563;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease;
+}
+
+.proformas-page .modal-close:hover {
+    background: #e5e7eb;
+}
+
+
+/* =========================================================
+   FORMULAIRE
+========================================================= */
+
+.proformas-page .form-group {
+    display: flex;
+    flex-direction: column;
+
+    gap: 7px;
+
+    margin-bottom: 17px;
+}
+
+.proformas-page .form-label {
+    color: #374151;
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.proformas-page .form-input {
+    width: 100%;
+
+    min-height: 42px;
+
+    box-sizing: border-box;
+
+    padding: 9px 11px;
+
+    border: 1px solid #d1d5db;
+    border-radius: 7px;
+
+    outline: none;
+
+    background: #ffffff;
+
+    color: #111827;
+
+    font-size: 14px;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.proformas-page .form-input:focus {
+    border-color: #2563eb;
+
+    box-shadow:
+        0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.proformas-page .form-input:disabled {
+    background: #f9fafb;
+
+    color: #9ca3af;
+
+    cursor: not-allowed;
+}
+
+
+/* =========================================================
+   SECTION PRODUITS
+========================================================= */
+
+.proformas-page .reservation-form-section {
+    margin-top: 20px;
+    margin-bottom: 20px;
+
+    padding: 18px;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+
+    background: #fafafa;
+}
+
+.proformas-page .reservation-products-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    margin-bottom: 15px;
+}
+
+.proformas-page .reservation-products-header h3 {
+    margin: 0;
+
+    color: #111827;
+
+    font-size: 15px;
+}
+
+.proformas-page .reservation-products-header p {
+    margin: 4px 0 0;
+
+    color: #6b7280;
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   LIGNE PRODUIT
+========================================================= */
+
+.proformas-page .reservation-product-form-row {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        100px
+        120px
+        38px;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin-bottom: 10px;
+}
+
+.proformas-page .reservation-product-form-row:last-child {
+    margin-bottom: 0;
+}
+
+.proformas-page .quantity-input {
+    text-align: center;
+}
+
+.proformas-page .proforma-line-total {
+    display: block;
+
+    color: #111827;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    text-align: right;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   LISTE PRODUITS DETAIL
+========================================================= */
+
+.proformas-page .reservation-products-list {
+    display: flex;
+    flex-direction: column;
+
+    gap: 8px;
+
+    margin-top: 20px;
+}
+
+.proformas-page .reservation-product-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    padding: 12px 14px;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+
+    background: #ffffff;
+}
+
+.proformas-page .reservation-product-info {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+}
+
+.proformas-page .reservation-product-info > div:last-child {
+    display: flex;
+    flex-direction: column;
+
+    gap: 3px;
+}
+
+.proformas-page .reservation-product-info strong {
+    color: #111827;
+
+    font-size: 14px;
+}
+
+.proformas-page .reservation-product-info span {
+    color: #6b7280;
+
+    font-size: 12px;
+}
+
+.proformas-page .reservation-product-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 34px;
+    height: 34px;
+
+    border-radius: 8px;
+
+    background: #eff6ff;
+
+    color: #2563eb;
+}
+
+
+/* =========================================================
+   TOTAL PREVIEW
+========================================================= */
+
+.proformas-page .reservation-total-preview,
+.proformas-page .reservation-total-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    margin-top: 18px;
+
+    padding: 17px;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+
+    background: #f9fafb;
+
+    color: #4b5563;
+
+    font-size: 14px;
+}
+
+.proformas-page .reservation-total-preview strong,
+.proformas-page .reservation-total-row strong {
+    color: #111827;
+
+    font-size: 16px;
+}
+
+
+/* =========================================================
+   DETAIL TOP
+========================================================= */
+
+.proformas-page .proforma-detail-top {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 12px;
+
+    margin-bottom: 20px;
+}
+
+.proformas-page .proforma-detail-top > div {
+    display: flex;
+    flex-direction: column;
+
+    gap: 5px;
+
+    padding: 12px;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+
+    background: #f9fafb;
+}
+
+.proformas-page .detail-label {
+    color: #6b7280;
+
+    font-size: 11px;
+    font-weight: 600;
+
+    text-transform: uppercase;
+}
+
+.proformas-page .proforma-detail-top strong {
+    color: #111827;
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   ACTIONS MODAL
+========================================================= */
+
+.proformas-page .modal-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    flex-wrap: wrap;
+
+    gap: 10px;
+
+    margin-top: 22px;
+
+    padding-top: 18px;
+
+    border-top: 1px solid #e5e7eb;
+}
+
+
+/* =========================================================
+   RESPONSIVE TABLET
+========================================================= */
+
+@media (max-width: 1100px) {
+
+    .proformas-page .stats-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .proformas-page .proforma-detail-top {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+}
+
+
+/* =========================================================
+   RESPONSIVE MOBILE
+========================================================= */
+
+@media (max-width: 768px) {
+
+    .proformas-page {
+        padding: 16px;
+    }
+
+
+    .proformas-page .page-header {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+
+    .proformas-page .page-header .btn {
+        width: 100%;
+    }
+
+
+    .proformas-page .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    .proformas-page .proforma-search-wrapper {
+        max-width: none;
+    }
+
+
+    .proformas-page .proforma-modal,
+    .proformas-page .proforma-detail-modal {
+        max-height: calc(100vh - 20px);
+
+        padding: 18px;
+
+        border-radius: 10px;
+    }
+
+
+    .proformas-page .reservation-product-form-row {
+        grid-template-columns: 1fr 90px 38px;
+    }
+
+
+    .proformas-page .proforma-line-total {
+        display: none;
+    }
+
+
+    .proformas-page .proforma-detail-top {
+        grid-template-columns: 1fr;
+    }
+
+
+    .proformas-page .reservation-total-preview,
+    .proformas-page .reservation-total-row {
+        font-size: 13px;
+    }
+
+
+    .proformas-page .modal-actions {
+        justify-content: stretch;
+    }
+
+
+    .proformas-page .modal-actions .btn {
+        flex: 1;
+    }
+}
+
+
+/* =========================================================
+   PETIT ECRAN
+========================================================= */
+
+@media (max-width: 480px) {
+
+    .proformas-page {
+        padding: 12px;
+    }
+
+
+    .proformas-page .page-title {
+        font-size: 23px;
+    }
+
+
+    .proformas-page .proforma-modal,
+    .proformas-page .proforma-detail-modal {
+        padding: 14px;
+    }
+
+
+    .proformas-page .reservation-form-section {
+        padding: 13px;
+    }
+
+
+    .proformas-page .reservation-products-header {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+
+    .proformas-page .reservation-products-header .btn {
+        width: 100%;
+    }
+
+
+    .proformas-page .reservation-product-form-row {
+        grid-template-columns:
+            minmax(0, 1fr)
+            80px
+            36px;
+    }
+
+
+    .proformas-page .modal-actions {
+        flex-direction: column;
+    }
+
+
+    .proformas-page .modal-actions .btn {
+        width: 100%;
+    }
+}
+
+
+
+/* =========================================================
+   MODAL PROFORMA CRÉÉE
+========================================================= */
+
+.proformas-page .proforma-success-modal {
+    width: 100%;
+    max-width: 430px;
+
+    padding: 30px;
+
+    border-radius: 14px;
+
+    background: #ffffff;
+
+    text-align: center;
+
+    box-shadow:
+        0 20px 50px rgba(0, 0, 0, 0.2);
+}
+
+
+.proformas-page .proforma-success-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 64px;
+    height: 64px;
+
+    margin: 0 auto 18px;
+
+    border-radius: 50%;
+
+    background: #ecfdf5;
+
+    color: #059669;
+}
+
+
+.proformas-page .proforma-success-modal h2 {
+    margin: 0 0 8px;
+
+    color: #111827;
+
+    font-size: 21px;
+}
+
+
+.proformas-page .proforma-success-modal > p {
+    margin: 0;
+
+    color: #6b7280;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+}
+
+
+.proformas-page .proforma-success-modal > p strong {
+    color: #111827;
+}
+
+
+.proformas-page .proforma-success-total {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-top: 22px;
+
+    padding: 14px 16px;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 9px;
+
+    background: #f9fafb;
+}
+
+
+.proformas-page .proforma-success-total span {
+    color: #6b7280;
+
+    font-size: 13px;
+}
+
+
+.proformas-page .proforma-success-total strong {
+    color: #111827;
+
+    font-size: 18px;
+}
+
+
+.proformas-page .proforma-success-modal .modal-actions {
+    margin-top: 24px;
+
+    padding-top: 0;
+
+    border-top: none;
+}
+
+
+.proformas-page .proforma-success-modal .btn {
+    min-width: 120px;
+}

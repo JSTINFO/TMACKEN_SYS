@@ -8,6 +8,8 @@ import {
     CreditCard,
     BarChart3,
     Settings,
+    FileText,
+    LogOut,
 } from "lucide-react";
 
 import { NavLink } from "react-router-dom";
@@ -131,6 +133,17 @@ function Sidebar({ isOpen, onClose }) {
                 </NavLink>
 
 
+                
+                <NavLink
+                    to="/proforma"
+                    onClick={handleLinkClick}
+                >
+                 <FileText size={18} />
+                    <span>Proforma</span>
+                </NavLink>
+
+
+
                 {/* Système */}
 
                 <div className="sidebar-nav-title">
@@ -147,6 +160,16 @@ function Sidebar({ isOpen, onClose }) {
                 </NavLink>
 
             </nav>
+
+
+{/* 
+            <Button
+                    to="/login"
+                    onClick={handleLinkClick}
+                >
+                    <LogOut size={18} />
+                    <span>Logout</span>
+                </Button> */}
 
 
             {/* =========================

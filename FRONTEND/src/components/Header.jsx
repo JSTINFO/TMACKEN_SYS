@@ -26,6 +26,7 @@ function Header({ onMenuClick }) {
         "/paiements": "Paiements",
         "/rapports": "Rapports",
         "/parametres": "Paramètres",
+        "/proforma": "Proforma",
     };
 
 
@@ -68,7 +69,7 @@ function Header({ onMenuClick }) {
 
                 {/* Notifications */}
 
-                <button
+                {/* <button
                     className="header-icon-button"
                     type="button"
                     aria-label="Notifications"
@@ -80,7 +81,7 @@ function Header({ onMenuClick }) {
                         3
                     </span>
 
-                </button>
+                </button> */}
 
 
                 {/* Dark / Light Mode */}

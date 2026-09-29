@@ -110,7 +110,7 @@ function Login() {
                 <div className="login-logo">
 
                     <h1>
-                        LAZARE
+                        TAS AUTOPART
                     </h1>
 
                 </div>

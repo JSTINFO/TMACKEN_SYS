@@ -7,3 +7,5 @@ from app.models.reservation import Reservation
 from app.models.detail_reservation import DetailReservation
 from app.models.vente import Vente
 from app.models.detail_vente import DetailVente
+from app.models.proforma import Proforma
+from app.models.detail_proforma import DetailProforma
