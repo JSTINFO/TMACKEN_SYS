@@ -31,6 +31,9 @@ import ConfirmModal from "../components/ConfirmModal";
 import PaymentModal from "../components/PaymentModal";
 
 
+import "./Reservation.css";
+
+
 function Reservations() {
 
     // =====================================================

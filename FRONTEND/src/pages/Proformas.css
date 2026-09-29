@@ -1,12 +1,24 @@
 /* =========================================================
-   PAGE PROFORMAS
+   TMACKEN SYS — PAGE PROFORMA
+   LIGHT / DARK MODE
+========================================================= */
+
+
+/* =========================================================
+   PAGE
 ========================================================= */
 
 .proformas-page {
     width: 100%;
     min-height: 100%;
-    padding: 24px;
+
+    padding: 32px;
+
     box-sizing: border-box;
+
+    color: var(--text-primary);
+
+    overflow-x: hidden;
 }
 
 
@@ -16,21 +28,34 @@
 
 .proformas-page .page-header {
     display: flex;
+
     align-items: center;
     justify-content: space-between;
+
     gap: 20px;
-    margin-bottom: 24px;
+
+    margin-bottom: 28px;
 }
 
-.proformas-page .page-title {
-    margin: 0;
+
+.proformas-page .page-title,
+.proformas-page .page-header h1 {
+    margin: 0 0 6px;
+
+    color: var(--text-primary);
+
     font-size: 28px;
+
     font-weight: 700;
 }
 
-.proformas-page .page-description {
-    margin: 6px 0 0;
-    color: #6b7280;
+
+.proformas-page .page-description,
+.proformas-page .page-header p {
+    margin: 0;
+
+    color: var(--text-secondary);
+
     font-size: 14px;
 }
 
@@ -40,62 +65,95 @@
 ========================================================= */
 
 .proformas-page .btn {
+    min-height: 40px;
+
+    padding: 0 16px;
+
+    border: 1px solid transparent;
+
+    border-radius: 7px;
+
     display: inline-flex;
+
     align-items: center;
     justify-content: center;
+
     gap: 8px;
 
-    border: none;
-    border-radius: 8px;
-
-    padding: 10px 15px;
-
     font-size: 14px;
+
     font-weight: 600;
 
     cursor: pointer;
 
     transition:
-        background-color 0.2s ease,
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
         transform 0.2s ease,
         opacity 0.2s ease;
 }
+
 
 .proformas-page .btn:hover {
     transform: translateY(-1px);
 }
 
+
 .proformas-page .btn:disabled {
-    opacity: 0.6;
+    opacity: 0.55;
+
     cursor: not-allowed;
+
     transform: none;
 }
 
+
+/* PRIMARY */
+
 .proformas-page .btn-primary {
-    background: #2563eb;
+    width: auto;
+
+    background: var(--primary);
+
     color: #ffffff;
 }
+
 
 .proformas-page .btn-primary:hover {
-    background: #1d4ed8;
+    background: var(--primary-dark);
 }
+
+
+/* SECONDARY */
 
 .proformas-page .btn-secondary {
-    background: #e5e7eb;
-    color: #1f2937;
+    background: var(--bg-secondary);
+
+    color: var(--text-primary);
+
+    border-color: var(--border-color);
 }
+
 
 .proformas-page .btn-secondary:hover {
-    background: #d1d5db;
+    background: var(--bg-tertiary);
+
+    border-color: var(--primary);
 }
 
+
+/* DANGER */
+
 .proformas-page .btn-danger {
-    background: #dc2626;
+    background: var(--danger);
+
     color: #ffffff;
 }
 
+
 .proformas-page .btn-danger:hover {
-    background: #b91c1c;
+    opacity: 0.9;
 }
 
 
@@ -103,16 +161,19 @@
    ERREUR
 ========================================================= */
 
-.proformas-page .proforma-error {
+.proformas-page .proforma-error,
+.proformas-page .error-message {
+    padding: 13px 16px;
+
     margin-bottom: 20px;
 
-    padding: 12px 15px;
-
-    border: 1px solid #fecaca;
     border-radius: 8px;
 
-    background: #fef2f2;
-    color: #b91c1c;
+    background: rgba(234, 67, 53, 0.10);
+
+    color: var(--danger);
+
+    border: 1px solid rgba(234, 67, 53, 0.25);
 
     font-size: 14px;
 }
@@ -123,51 +184,88 @@
 ========================================================= */
 
 .proformas-page .stats-grid {
+    width: 100%;
+
     display: grid;
 
     grid-template-columns:
         repeat(4, minmax(0, 1fr));
 
-    gap: 16px;
+    gap: 18px;
 
-    margin-bottom: 24px;
+    margin-bottom: 28px;
 }
+
 
 .proformas-page .stat-card {
+    min-height: 105px;
+
+    padding: 22px;
+
+    box-sizing: border-box;
+
+    border: 1px solid var(--border-color);
+
+    border-radius: 10px;
+
+    background: var(--card-bg);
+
     display: flex;
+
     align-items: center;
+
     justify-content: space-between;
 
-    min-height: 100px;
+    gap: 15px;
 
-    padding: 18px;
+    color: var(--text-primary);
 
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
+    box-shadow: var(--shadow);
 
-    background: #ffffff;
-
-    box-shadow:
-        0 2px 8px rgba(0, 0, 0, 0.04);
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease;
 }
+
+
+.proformas-page .stat-card:hover {
+    transform: translateY(-1px);
+
+    border-color: rgba(37, 211, 102, 0.35);
+}
+
+
+.proformas-page .stat-card svg {
+    color: var(--text-muted);
+
+    flex-shrink: 0;
+}
+
 
 .proformas-page .stat-label {
     display: block;
 
     margin-bottom: 8px;
 
-    color: #6b7280;
+    color: var(--text-secondary);
 
     font-size: 13px;
 }
 
+
 .proformas-page .stat-value {
     display: block;
 
-    color: #111827;
+    color: var(--text-primary);
 
-    font-size: 22px;
+    font-size: 25px;
+
+    line-height: 1.1;
+
     font-weight: 700;
+
+    overflow-wrap: anywhere;
 }
 
 
@@ -176,120 +274,193 @@
 ========================================================= */
 
 .proformas-page .toolbar {
+    width: 100%;
+
     display: flex;
+
     align-items: center;
+
     justify-content: space-between;
 
-    margin-bottom: 16px;
+    gap: 15px;
+
+    margin-bottom: 18px;
 }
+
 
 .proformas-page .proforma-search-wrapper {
+    width: 360px;
+
+    max-width: 100%;
+
+    min-height: 42px;
+
+    padding: 0 13px;
+
+    box-sizing: border-box;
+
     display: flex;
+
     align-items: center;
+
     gap: 9px;
 
-    width: 100%;
-    max-width: 420px;
+    border: 1px solid var(--border-color);
 
-    padding: 10px 13px;
+    border-radius: 7px;
 
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
+    background: var(--card-bg);
 
-    background: #ffffff;
+    color: var(--text-muted);
 
-    color: #6b7280;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
 }
+
 
 .proformas-page .proforma-search-wrapper:focus-within {
-    border-color: #2563eb;
+    border-color: var(--primary);
 
     box-shadow:
-        0 0 0 3px rgba(37, 99, 235, 0.1);
+        0 0 0 3px rgba(37, 211, 102, 0.10);
 }
+
 
 .proformas-page .proforma-search-wrapper input {
     width: 100%;
 
-    border: none;
-    outline: none;
+    min-width: 0;
+
+    height: 40px;
+
+    padding: 0;
+
+    border: 0;
+
+    outline: 0;
 
     background: transparent;
 
-    color: #111827;
+    color: var(--text-primary);
 
-    font-size: 14px;
+    font-size: 13px;
+}
+
+
+.proformas-page .proforma-search-wrapper input::placeholder {
+    color: var(--text-muted);
 }
 
 
 /* =========================================================
-   TABLEAU
+   TABLE CONTAINER
 ========================================================= */
 
 .proformas-page .table-container {
     width: 100%;
 
+    max-width: 100%;
+
     overflow-x: auto;
 
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
+    box-sizing: border-box;
 
-    background: #ffffff;
+    border: 1px solid var(--border-color);
 
-    box-shadow:
-        0 2px 8px rgba(0, 0, 0, 0.04);
+    border-radius: 10px;
+
+    background: var(--card-bg);
+
+    box-shadow: var(--shadow);
+
+    scrollbar-width: thin;
 }
+
+
+/* =========================================================
+   TABLE
+========================================================= */
 
 .proformas-page .table {
     width: 100%;
 
-    border-collapse: collapse;
-
     min-width: 900px;
+
+    border-collapse: collapse;
 }
+
 
 .proformas-page .table thead {
-    background: #f9fafb;
+    background: var(--bg-tertiary);
 }
 
+
 .proformas-page .table th {
-    padding: 13px 16px;
+    height: 44px;
 
-    border-bottom: 1px solid #e5e7eb;
-
-    color: #6b7280;
-
-    font-size: 12px;
-    font-weight: 700;
+    padding: 0 16px;
 
     text-align: left;
 
+    color: var(--text-secondary);
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.04em;
+
     white-space: nowrap;
+
+    border-bottom: 1px solid var(--border-color);
 }
+
 
 .proformas-page .table td {
-    padding: 14px 16px;
+    height: 58px;
 
-    border-bottom: 1px solid #f1f5f9;
+    padding: 0 16px;
 
-    color: #374151;
+    color: var(--text-primary);
 
-    font-size: 14px;
+    font-size: 13px;
 
     vertical-align: middle;
+
+    border-bottom: 1px solid var(--border-color);
 }
+
 
 .proformas-page .table tbody tr {
     transition:
-        background-color 0.15s ease;
+        background 0.18s ease;
 }
 
+
 .proformas-page .table tbody tr:hover {
-    background: #f9fafb;
+    background: var(--bg-tertiary);
 }
+
 
 .proformas-page .table tbody tr:last-child td {
     border-bottom: none;
+}
+
+
+/* =========================================================
+   NUMÉRO PROFORMA
+========================================================= */
+
+.proformas-page .proforma-number {
+    color: var(--text-primary);
+
+    font-weight: 700;
+
+    white-space: nowrap;
 }
 
 
@@ -299,93 +470,68 @@
 
 .proformas-page .proforma-client {
     display: flex;
+
     align-items: center;
+
     gap: 8px;
 
     font-weight: 500;
 }
 
+
 .proformas-page .proforma-client svg {
-    color: #6b7280;
+    color: var(--text-muted);
+
+    flex-shrink: 0;
 }
 
 
 /* =========================================================
-   ACTIONS TABLE
+   DATES
 ========================================================= */
 
-.proformas-page .proforma-actions {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
+.proformas-page .proforma-date {
+    color: var(--text-secondary);
 
-.proformas-page .table-action {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    width: 34px;
-    height: 34px;
-
-    padding: 0;
-
-    border: none;
-    border-radius: 7px;
-
-    cursor: pointer;
-
-    transition:
-        background-color 0.2s ease,
-        transform 0.2s ease;
-}
-
-.proformas-page .table-action:hover {
-    transform: translateY(-1px);
-}
-
-.proformas-page .table-action.view {
-    background: #eff6ff;
-    color: #2563eb;
-}
-
-.proformas-page .table-action.view:hover {
-    background: #dbeafe;
-}
-
-.proformas-page .table-action.confirm {
-    background: #ecfdf5;
-    color: #059669;
-}
-
-.proformas-page .table-action.confirm:hover {
-    background: #d1fae5;
-}
-
-.proformas-page .table-action.delete {
-    background: #fef2f2;
-    color: #dc2626;
-}
-
-.proformas-page .table-action.delete:hover {
-    background: #fee2e2;
+    white-space: nowrap;
 }
 
 
 /* =========================================================
-   STATUTS
+   TOTAL
+========================================================= */
+
+.proformas-page .proforma-total {
+    color: var(--text-primary);
+
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   STATUT
 ========================================================= */
 
 .proformas-page .proforma-status {
     display: inline-flex;
+
     align-items: center;
 
-    padding: 5px 10px;
+    justify-content: center;
+
+    min-width: 65px;
+
+    padding: 6px 10px;
 
     border-radius: 999px;
 
     font-size: 12px;
-    font-weight: 700;
+
+    font-weight: 600;
+
+    line-height: 1;
 
     white-space: nowrap;
 }
@@ -393,57 +539,194 @@
 
 /* BROUILLON */
 
-.proformas-page .proforma-status.draft {
-    background: #f3f4f6;
-    color: #4b5563;
+.proformas-page .proforma-status.draft,
+.proformas-page .proforma-status.brouillon {
+    background: rgba(128, 128, 128, 0.11);
+
+    color: var(--text-secondary);
 }
 
 
-/* ENVOYEE */
+/* ENVOYÉE */
 
-.proformas-page .proforma-status.sent {
-    background: #eff6ff;
-    color: #2563eb;
+.proformas-page .proforma-status.sent,
+.proformas-page .proforma-status.envoyee {
+    background: rgba(66, 133, 244, 0.11);
+
+    color: #4285f4;
 }
 
 
-/* ACCEPTEE */
+/* ACCEPTÉE */
 
-.proformas-page .proforma-status.accepted {
-    background: #ecfdf5;
-    color: #047857;
+.proformas-page .proforma-status.accepted,
+.proformas-page .proforma-status.acceptee {
+    background: rgba(37, 211, 102, 0.12);
+
+    color: #16894a;
 }
 
 
-/* REFUSEE */
+/* REFUSÉE */
 
-.proformas-page .proforma-status.rejected {
-    background: #fef2f2;
-    color: #b91c1c;
+.proformas-page .proforma-status.refused,
+.proformas-page .proforma-status.refusee {
+    background: rgba(234, 67, 53, 0.12);
+
+    color: #d33c3c;
 }
 
 
-/* EXPIREE */
+/* ANNULÉE */
 
-.proformas-page .proforma-status.expired {
-    background: #fff7ed;
-    color: #c2410c;
+.proformas-page .proforma-status.cancelled,
+.proformas-page .proforma-status.annulee {
+    background: rgba(234, 67, 53, 0.12);
+
+    color: #d33c3c;
 }
 
 
-/* ANNULEE */
+/* =========================================================
+   DARK STATUS
+========================================================= */
 
-.proformas-page .proforma-status.cancelled {
-    background: #fef2f2;
-    color: #991b1b;
+[data-theme="dark"] .proformas-page .proforma-status.draft,
+[data-theme="dark"] .proformas-page .proforma-status.brouillon {
+    background: rgba(255, 255, 255, 0.08);
+
+    color: #aebcc5;
 }
 
 
-/* CONVERTIE */
+[data-theme="dark"] .proformas-page .proforma-status.sent,
+[data-theme="dark"] .proformas-page .proforma-status.envoyee {
+    background: rgba(66, 133, 244, 0.12);
 
-.proformas-page .proforma-status.converted {
-    background: #f5f3ff;
-    color: #6d28d9;
+    color: #78aaff;
+}
+
+
+[data-theme="dark"] .proformas-page .proforma-status.accepted,
+[data-theme="dark"] .proformas-page .proforma-status.acceptee {
+    background: rgba(37, 211, 102, 0.12);
+
+    color: #25d366;
+}
+
+
+[data-theme="dark"] .proformas-page .proforma-status.refused,
+[data-theme="dark"] .proformas-page .proforma-status.refusee,
+[data-theme="dark"] .proformas-page .proforma-status.cancelled,
+[data-theme="dark"] .proformas-page .proforma-status.annulee {
+    background: rgba(234, 67, 53, 0.12);
+
+    color: #ff6b6b;
+}
+
+
+/* =========================================================
+   ACTIONS
+========================================================= */
+
+.proformas-page .proforma-actions {
+    display: flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    white-space: nowrap;
+}
+
+
+.proformas-page .table-action {
+    width: 34px;
+
+    height: 34px;
+
+    padding: 0;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border: 1px solid var(--border-color);
+
+    border-radius: 7px;
+
+    background: var(--bg-secondary);
+
+    color: var(--text-secondary);
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.proformas-page .table-action:hover {
+    transform: translateY(-1px);
+
+    background: var(--bg-tertiary);
+
+    border-color: var(--primary);
+
+    color: var(--primary);
+}
+
+
+/* =========================================================
+   ACTION — VOIR
+========================================================= */
+
+.proformas-page .table-action.view {
+    color: #4285f4;
+}
+
+
+.proformas-page .table-action.view:hover {
+    border-color: #4285f4;
+
+    background: rgba(66, 133, 244, 0.08);
+}
+
+
+/* =========================================================
+   ACTION — ENVOYER
+========================================================= */
+
+.proformas-page .table-action.send {
+    color: var(--primary);
+}
+
+
+.proformas-page .table-action.send:hover {
+    background: rgba(37, 211, 102, 0.09);
+}
+
+
+/* =========================================================
+   ACTION — ANNULER
+========================================================= */
+
+.proformas-page .table-action.cancel {
+    color: var(--danger);
+}
+
+
+.proformas-page .table-action.cancel:hover {
+    background: rgba(234, 67, 53, 0.08);
+
+    border-color: var(--danger);
 }
 
 
@@ -454,35 +737,46 @@
 .proformas-page .proforma-empty {
     min-height: 220px;
 
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    padding: 40px 20px;
 
-    padding: 30px;
+    box-sizing: border-box;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
 
     text-align: center;
 
-    color: #6b7280;
+    color: var(--text-secondary);
 }
+
 
 .proformas-page .proforma-empty svg {
     margin-bottom: 12px;
-    color: #9ca3af;
+
+    color: var(--text-muted);
 }
+
 
 .proformas-page .proforma-empty h3 {
     margin: 0 0 6px;
 
-    color: #374151;
+    color: var(--text-primary);
 
-    font-size: 17px;
+    font-size: 16px;
 }
+
 
 .proformas-page .proforma-empty p {
     margin: 0;
 
-    font-size: 14px;
+    color: var(--text-secondary);
+
+    font-size: 13px;
 }
 
 
@@ -491,25 +785,26 @@
 ========================================================= */
 
 .proformas-page .proforma-loading {
-    min-height: 300px;
+    min-height: 220px;
 
     display: flex;
+
     align-items: center;
+
     justify-content: center;
 
     gap: 10px;
 
-    color: #6b7280;
-
-    font-size: 14px;
+    color: var(--text-secondary);
 }
+
 
 .proformas-page .spin {
-    animation: proformaSpin 1s linear infinite;
+    animation: proforma-spin 1s linear infinite;
 }
 
-@keyframes proformaSpin {
 
+@keyframes proforma-spin {
     from {
         transform: rotate(0deg);
     }
@@ -521,44 +816,57 @@
 
 
 /* =========================================================
-   MODAL
+   MODAL OVERLAY
 ========================================================= */
 
-.proformas-page .modal-overlay {
+.proformas-page .proforma-modal-overlay,
+.proforma-modal-overlay {
     position: fixed;
 
     inset: 0;
 
-    z-index: 1000;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    z-index: 2000;
 
     padding: 20px;
 
-    background: rgba(15, 23, 42, 0.55);
+    box-sizing: border-box;
 
-    overflow-y: auto;
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background: rgba(0, 0, 0, 0.55);
 }
 
-.proformas-page .proforma-modal,
-.proformas-page .proforma-detail-modal {
-    width: 100%;
-    max-width: 760px;
 
-    max-height: calc(100vh - 40px);
+/* =========================================================
+   MODAL
+========================================================= */
+
+.proformas-page .proforma-modal,
+.proforma-modal {
+    width: min(900px, 96vw);
+
+    max-height: 92vh;
 
     overflow-y: auto;
+
+    box-sizing: border-box;
 
     padding: 24px;
 
+    border: 1px solid var(--border-color);
+
     border-radius: 14px;
 
-    background: #ffffff;
+    background: var(--card-bg);
+
+    color: var(--text-primary);
 
     box-shadow:
-        0 20px 50px rgba(0, 0, 0, 0.2);
+        0 20px 60px rgba(0, 0, 0, 0.25);
 }
 
 
@@ -566,86 +874,112 @@
    MODAL HEADER
 ========================================================= */
 
-.proformas-page .modal-header {
+.proformas-page .proforma-modal-header,
+.proforma-modal-header {
     display: flex;
+
     align-items: flex-start;
+
     justify-content: space-between;
 
     gap: 20px;
 
-    margin-bottom: 24px;
+    padding-bottom: 15px;
 
-    padding-bottom: 18px;
+    margin-bottom: 20px;
 
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid var(--border-color);
 }
 
-.proformas-page .modal-header h2 {
+
+.proformas-page .proforma-modal-header h2,
+.proforma-modal-header h2 {
+    margin: 0 0 5px;
+
+    color: var(--text-primary);
+
+    font-size: 20px;
+}
+
+
+.proformas-page .proforma-modal-header p,
+.proforma-modal-header p {
     margin: 0;
 
-    color: #111827;
-
-    font-size: 21px;
-    font-weight: 700;
-}
-
-.proformas-page .modal-header p {
-    margin: 6px 0 0;
-
-    color: #6b7280;
+    color: var(--text-secondary);
 
     font-size: 13px;
 }
 
-.proformas-page .modal-close {
-    display: flex;
+
+.proformas-page .modal-close,
+.proforma-modal .modal-close {
+    width: 32px;
+
+    height: 32px;
+
+    padding: 0;
+
+    border: 1px solid var(--border-color);
+
+    border-radius: 50%;
+
+    background: var(--bg-tertiary);
+
+    color: var(--text-secondary);
+
+    display: inline-flex;
+
     align-items: center;
     justify-content: center;
 
-    width: 34px;
-    height: 34px;
-
-    flex-shrink: 0;
-
-    border: none;
-    border-radius: 7px;
-
-    background: #f3f4f6;
-
-    color: #4b5563;
-
     cursor: pointer;
-
-    transition:
-        background-color 0.2s ease;
 }
 
-.proformas-page .modal-close:hover {
-    background: #e5e7eb;
+
+.proformas-page .modal-close:hover,
+.proforma-modal .modal-close:hover {
+    color: var(--text-primary);
+
+    border-color: var(--primary);
 }
 
 
 /* =========================================================
-   FORMULAIRE
+   MODAL FORM
 ========================================================= */
+
+.proformas-page .form-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 18px;
+}
+
 
 .proformas-page .form-group {
     display: flex;
+
     flex-direction: column;
 
     gap: 7px;
-
-    margin-bottom: 17px;
 }
 
-.proformas-page .form-label {
-    color: #374151;
+
+.proformas-page .form-group label {
+    color: var(--text-primary);
 
     font-size: 13px;
+
     font-weight: 600;
 }
 
-.proformas-page .form-input {
+
+.proformas-page .form-group input,
+.proformas-page .form-group select,
+.proformas-page .form-group textarea {
     width: 100%;
 
     min-height: 42px;
@@ -654,295 +988,391 @@
 
     padding: 9px 11px;
 
-    border: 1px solid #d1d5db;
-    border-radius: 7px;
+    border: 1px solid var(--border-color);
+
+    border-radius: 8px;
 
     outline: none;
 
-    background: #ffffff;
+    background: var(--bg-secondary);
 
-    color: #111827;
+    color: var(--text-primary);
 
     font-size: 14px;
-
-    transition:
-        border-color 0.2s ease,
-        box-shadow 0.2s ease;
 }
 
-.proformas-page .form-input:focus {
-    border-color: #2563eb;
+
+.proformas-page .form-group textarea {
+    min-height: 100px;
+
+    resize: vertical;
+}
+
+
+.proformas-page .form-group input:focus,
+.proformas-page .form-group select:focus,
+.proformas-page .form-group textarea:focus {
+    border-color: var(--primary);
 
     box-shadow:
-        0 0 0 3px rgba(37, 99, 235, 0.1);
+        0 0 0 3px rgba(37, 211, 102, 0.10);
 }
 
-.proformas-page .form-input:disabled {
-    background: #f9fafb;
 
-    color: #9ca3af;
+.proformas-page .form-group input::placeholder,
+.proformas-page .form-group textarea::placeholder {
+    color: var(--text-muted);
+}
 
-    cursor: not-allowed;
+
+.proformas-page .form-group select option {
+    background: var(--bg-secondary);
+
+    color: var(--text-primary);
 }
 
 
 /* =========================================================
-   SECTION PRODUITS
+   PRODUITS PROFORMA
 ========================================================= */
 
-.proformas-page .reservation-form-section {
-    margin-top: 20px;
-    margin-bottom: 20px;
+.proformas-page .proforma-products {
+    margin-top: 22px;
 
-    padding: 18px;
+    padding-top: 20px;
 
-    border: 1px solid #e5e7eb;
-    border-radius: 10px;
-
-    background: #fafafa;
+    border-top: 1px solid var(--border-color);
 }
 
-.proformas-page .reservation-products-header {
+
+.proformas-page .proforma-products-header {
     display: flex;
+
     align-items: center;
+
     justify-content: space-between;
 
     gap: 15px;
 
-    margin-bottom: 15px;
+    margin-bottom: 14px;
 }
 
-.proformas-page .reservation-products-header h3 {
+
+.proformas-page .proforma-products-header h3 {
     margin: 0;
 
-    color: #111827;
+    color: var(--text-primary);
 
-    font-size: 15px;
-}
-
-.proformas-page .reservation-products-header p {
-    margin: 4px 0 0;
-
-    color: #6b7280;
-
-    font-size: 12px;
+    font-size: 17px;
 }
 
 
-/* =========================================================
-   LIGNE PRODUIT
-========================================================= */
-
-.proformas-page .reservation-product-form-row {
+.proformas-page .proforma-product-row {
     display: grid;
 
     grid-template-columns:
-        minmax(0, 1fr)
+        minmax(0, 2fr)
         100px
-        120px
-        38px;
-
-    align-items: center;
+        150px
+        150px
+        42px;
 
     gap: 10px;
+
+    align-items: center;
 
     margin-bottom: 10px;
 }
 
-.proformas-page .reservation-product-form-row:last-child {
-    margin-bottom: 0;
+
+.proformas-page .proforma-product-row input,
+.proformas-page .proforma-product-row select {
+    width: 100%;
+
+    min-height: 40px;
+
+    box-sizing: border-box;
+
+    border: 1px solid var(--border-color);
+
+    border-radius: 7px;
+
+    padding: 8px 10px;
+
+    outline: none;
+
+    background: var(--bg-secondary);
+
+    color: var(--text-primary);
 }
 
-.proformas-page .quantity-input {
-    text-align: center;
-}
 
-.proformas-page .proforma-line-total {
-    display: block;
-
-    color: #111827;
-
-    font-size: 13px;
-    font-weight: 600;
-
-    text-align: right;
-
-    white-space: nowrap;
+.proformas-page .proforma-product-row input:focus,
+.proformas-page .proforma-product-row select:focus {
+    border-color: var(--primary);
 }
 
 
-/* =========================================================
-   LISTE PRODUITS DETAIL
-========================================================= */
+.proformas-page .remove-product {
+    width: 36px;
 
-.proformas-page .reservation-products-list {
-    display: flex;
-    flex-direction: column;
+    height: 36px;
 
-    gap: 8px;
+    padding: 0;
 
-    margin-top: 20px;
-}
+    border: 1px solid var(--border-color);
 
-.proformas-page .reservation-product-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    border-radius: 7px;
 
-    gap: 15px;
+    background: var(--bg-secondary);
 
-    padding: 12px 14px;
+    color: var(--danger);
 
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
+    display: inline-flex;
 
-    background: #ffffff;
-}
-
-.proformas-page .reservation-product-info {
-    display: flex;
-    align-items: center;
-
-    gap: 10px;
-}
-
-.proformas-page .reservation-product-info > div:last-child {
-    display: flex;
-    flex-direction: column;
-
-    gap: 3px;
-}
-
-.proformas-page .reservation-product-info strong {
-    color: #111827;
-
-    font-size: 14px;
-}
-
-.proformas-page .reservation-product-info span {
-    color: #6b7280;
-
-    font-size: 12px;
-}
-
-.proformas-page .reservation-product-icon {
-    display: flex;
     align-items: center;
     justify-content: center;
 
-    width: 34px;
-    height: 34px;
+    cursor: pointer;
+}
 
-    border-radius: 8px;
 
-    background: #eff6ff;
+.proformas-page .remove-product:hover {
+    background: rgba(234, 67, 53, 0.08);
 
-    color: #2563eb;
+    border-color: var(--danger);
 }
 
 
 /* =========================================================
-   TOTAL PREVIEW
+   TOTAL PROFORMA
 ========================================================= */
 
-.proformas-page .reservation-total-preview,
-.proformas-page .reservation-total-row {
+.proformas-page .proforma-total-box {
+    width: min(420px, 100%);
+
+    margin: 22px 0 0 auto;
+
+    padding-top: 16px;
+
+    border-top: 1px solid var(--border-color);
+}
+
+
+.proformas-page .proforma-total-row {
     display: flex;
-    align-items: flex-start;
+
+    align-items: center;
+
     justify-content: space-between;
 
     gap: 20px;
 
-    margin-top: 18px;
+    padding: 6px 0;
 
-    padding: 17px;
-
-    border: 1px solid #e5e7eb;
-    border-radius: 10px;
-
-    background: #f9fafb;
-
-    color: #4b5563;
-
-    font-size: 14px;
-}
-
-.proformas-page .reservation-total-preview strong,
-.proformas-page .reservation-total-row strong {
-    color: #111827;
-
-    font-size: 16px;
+    color: var(--text-primary);
 }
 
 
-/* =========================================================
-   DETAIL TOP
-========================================================= */
-
-.proformas-page .proforma-detail-top {
-    display: grid;
-
-    grid-template-columns:
-        repeat(4, minmax(0, 1fr));
-
-    gap: 12px;
-
-    margin-bottom: 20px;
+.proformas-page .proforma-total-row span {
+    color: var(--text-secondary);
 }
 
-.proformas-page .proforma-detail-top > div {
-    display: flex;
-    flex-direction: column;
 
-    gap: 5px;
-
-    padding: 12px;
-
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-
-    background: #f9fafb;
+.proformas-page .proforma-total-row strong {
+    color: var(--text-primary);
 }
 
-.proformas-page .detail-label {
-    color: #6b7280;
 
-    font-size: 11px;
-    font-weight: 600;
+.proformas-page .proforma-total-row.final {
+    margin-top: 8px;
 
-    text-transform: uppercase;
+    padding-top: 12px;
+
+    border-top: 1px solid var(--border-color);
 }
 
-.proformas-page .proforma-detail-top strong {
-    color: #111827;
 
-    font-size: 13px;
+.proformas-page .proforma-total-row.final span,
+.proformas-page .proforma-total-row.final strong {
+    color: var(--primary);
+
+    font-size: 18px;
+
+    font-weight: 700;
 }
 
 
 /* =========================================================
-   ACTIONS MODAL
+   MODAL ACTIONS
 ========================================================= */
 
 .proformas-page .modal-actions {
     display: flex;
-    align-items: center;
-    justify-content: flex-end;
 
-    flex-wrap: wrap;
+    align-items: center;
+
+    justify-content: flex-end;
 
     gap: 10px;
 
-    margin-top: 22px;
+    margin-top: 24px;
 
     padding-top: 18px;
 
-    border-top: 1px solid #e5e7eb;
+    border-top: 1px solid var(--border-color);
 }
 
 
 /* =========================================================
-   RESPONSIVE TABLET
+   CONFIRMATION MODAL
+========================================================= */
+
+.proformas-page .confirm-overlay,
+.confirm-overlay {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 3000;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 20px;
+
+    background: rgba(0, 0, 0, 0.55);
+}
+
+
+.proformas-page .confirm-modal,
+.confirm-modal {
+    width: min(430px, 95vw);
+
+    padding: 28px;
+
+    box-sizing: border-box;
+
+    border: 1px solid var(--border-color);
+
+    border-radius: 12px;
+
+    background: var(--card-bg);
+
+    color: var(--text-primary);
+
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.25);
+}
+
+
+.proformas-page .confirm-close,
+.confirm-close {
+    position: absolute;
+
+    top: 15px;
+
+    right: 15px;
+
+    width: 32px;
+
+    height: 32px;
+
+    border: 1px solid var(--border-color);
+
+    border-radius: 50%;
+
+    background: var(--bg-tertiary);
+
+    color: var(--text-secondary);
+
+    cursor: pointer;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+}
+
+
+.proformas-page .confirm-icon,
+.confirm-icon {
+    width: 52px;
+
+    height: 52px;
+
+    margin-bottom: 16px;
+
+    border-radius: 50%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background: rgba(247, 201, 87, 0.12);
+
+    color: #d69f00;
+}
+
+
+.proformas-page .confirm-modal.danger .confirm-icon,
+.confirm-modal.danger .confirm-icon {
+    background: rgba(234, 67, 53, 0.12);
+
+    color: var(--danger);
+}
+
+
+.proformas-page .confirm-modal.success .confirm-icon,
+.confirm-modal.success .confirm-icon {
+    background: rgba(37, 211, 102, 0.12);
+
+    color: var(--primary);
+}
+
+
+.proformas-page .confirm-content h2,
+.confirm-content h2 {
+    margin: 0 0 8px;
+
+    color: var(--text-primary);
+
+    font-size: 19px;
+}
+
+
+.proformas-page .confirm-content p,
+.confirm-content p {
+    margin: 0;
+
+    color: var(--text-secondary);
+
+    font-size: 14px;
+
+    line-height: 1.6;
+}
+
+
+.proformas-page .confirm-actions,
+.confirm-actions {
+    display: flex;
+
+    justify-content: flex-end;
+
+    gap: 10px;
+
+    margin-top: 25px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
 ========================================================= */
 
 @media (max-width: 1100px) {
@@ -952,21 +1382,23 @@
             repeat(2, minmax(0, 1fr));
     }
 
-    .proformas-page .proforma-detail-top {
+
+    .proformas-page .proforma-product-row {
         grid-template-columns:
-            repeat(2, minmax(0, 1fr));
+            minmax(0, 2fr)
+            90px
+            130px
+            130px
+            42px;
     }
+
 }
 
 
-/* =========================================================
-   RESPONSIVE MOBILE
-========================================================= */
-
-@media (max-width: 768px) {
+@media (max-width: 800px) {
 
     .proformas-page {
-        padding: 16px;
+        padding: 20px;
     }
 
 
@@ -987,216 +1419,155 @@
     }
 
 
+    .proformas-page .toolbar {
+        flex-direction: column;
+
+        align-items: stretch;
+    }
+
+
     .proformas-page .proforma-search-wrapper {
-        max-width: none;
+        width: 100%;
     }
 
 
-    .proformas-page .proforma-modal,
-    .proformas-page .proforma-detail-modal {
-        max-height: calc(100vh - 20px);
-
-        padding: 18px;
-
-        border-radius: 10px;
-    }
-
-
-    .proformas-page .reservation-product-form-row {
-        grid-template-columns: 1fr 90px 38px;
-    }
-
-
-    .proformas-page .proforma-line-total {
-        display: none;
-    }
-
-
-    .proformas-page .proforma-detail-top {
+    .proformas-page .form-grid {
         grid-template-columns: 1fr;
     }
 
 
-    .proformas-page .reservation-total-preview,
-    .proformas-page .reservation-total-row {
-        font-size: 13px;
+    .proformas-page .proforma-product-row {
+        grid-template-columns:
+            minmax(0, 1fr)
+            85px
+            42px;
+    }
+
+
+    .proformas-page .proforma-product-row input:nth-child(3),
+    .proformas-page .proforma-product-row input:nth-child(4),
+    .proformas-page .proforma-product-row select:nth-child(3),
+    .proformas-page .proforma-product-row select:nth-child(4) {
+        grid-column: span 1;
+    }
+
+
+    .proformas-page .transaction-detail-grid {
+        grid-template-columns: 1fr 1fr;
     }
 
 
     .proformas-page .modal-actions {
-        justify-content: stretch;
+        flex-direction: column;
+
+        align-items: stretch;
     }
 
 
     .proformas-page .modal-actions .btn {
-        flex: 1;
+        width: 100%;
     }
+
 }
 
 
-/* =========================================================
-   PETIT ECRAN
-========================================================= */
-
-@media (max-width: 480px) {
+@media (max-width: 600px) {
 
     .proformas-page {
-        padding: 12px;
+        padding: 16px;
     }
 
 
-    .proformas-page .page-title {
+    .proformas-page .page-title,
+    .proformas-page .page-header h1 {
+        font-size: 24px;
+    }
+
+
+    .proformas-page .stat-card {
+        min-height: 95px;
+
+        padding: 18px;
+    }
+
+
+    .proformas-page .stat-value {
         font-size: 23px;
     }
 
 
     .proformas-page .proforma-modal,
-    .proformas-page .proforma-detail-modal {
-        padding: 14px;
+    .proforma-modal {
+        padding: 18px;
+
+        max-height: 95vh;
     }
 
 
-    .proformas-page .reservation-form-section {
-        padding: 13px;
-    }
-
-
-    .proformas-page .reservation-products-header {
+    .proformas-page .proforma-products-header {
         align-items: flex-start;
 
         flex-direction: column;
     }
 
 
-    .proformas-page .reservation-products-header .btn {
+    .proformas-page .proforma-products-header .btn {
         width: 100%;
     }
 
 
-    .proformas-page .reservation-product-form-row {
-        grid-template-columns:
-            minmax(0, 1fr)
-            80px
-            36px;
-    }
-
-
-    .proformas-page .modal-actions {
-        flex-direction: column;
-    }
-
-
-    .proformas-page .modal-actions .btn {
+    .proformas-page .proforma-total-box {
         width: 100%;
     }
+
+
+    .proformas-page .confirm-modal,
+    .confirm-modal {
+        padding: 22px;
+    }
+
 }
-
 
 
 /* =========================================================
-   MODAL PROFORMA CRÉÉE
+   MOBILE — EMPÊCHER LE GLOBAL .btn DE CASSER LE DESIGN
 ========================================================= */
 
-.proformas-page .proforma-success-modal {
-    width: 100%;
-    max-width: 430px;
+@media (max-width: 480px) {
 
-    padding: 30px;
+    .proformas-page .btn {
+        width: auto;
+    }
 
-    border-radius: 14px;
 
-    background: #ffffff;
+    .proformas-page .page-header .btn,
+    .proformas-page .proforma-products-header .btn,
+    .proformas-page .modal-actions .btn {
+        width: 100%;
+    }
 
-    text-align: center;
-
-    box-shadow:
-        0 20px 50px rgba(0, 0, 0, 0.2);
 }
 
 
-.proformas-page .proforma-success-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+/* =========================================================
+   TRANSITION THÈME
+========================================================= */
 
-    width: 64px;
-    height: 64px;
-
-    margin: 0 auto 18px;
-
-    border-radius: 50%;
-
-    background: #ecfdf5;
-
-    color: #059669;
-}
-
-
-.proformas-page .proforma-success-modal h2 {
-    margin: 0 0 8px;
-
-    color: #111827;
-
-    font-size: 21px;
-}
-
-
-.proformas-page .proforma-success-modal > p {
-    margin: 0;
-
-    color: #6b7280;
-
-    font-size: 14px;
-
-    line-height: 1.6;
-}
-
-
-.proformas-page .proforma-success-modal > p strong {
-    color: #111827;
-}
-
-
-.proformas-page .proforma-success-total {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    margin-top: 22px;
-
-    padding: 14px 16px;
-
-    border: 1px solid #e5e7eb;
-
-    border-radius: 9px;
-
-    background: #f9fafb;
-}
-
-
-.proformas-page .proforma-success-total span {
-    color: #6b7280;
-
-    font-size: 13px;
-}
-
-
-.proformas-page .proforma-success-total strong {
-    color: #111827;
-
-    font-size: 18px;
-}
-
-
-.proformas-page .proforma-success-modal .modal-actions {
-    margin-top: 24px;
-
-    padding-top: 0;
-
-    border-top: none;
-}
-
-
-.proformas-page .proforma-success-modal .btn {
-    min-width: 120px;
+.proformas-page,
+.proformas-page .stat-card,
+.proformas-page .table-container,
+.proformas-page .proforma-search-wrapper,
+.proformas-page .form-group input,
+.proformas-page .form-group select,
+.proformas-page .form-group textarea,
+.proformas-page .proforma-product-row input,
+.proformas-page .proforma-product-row select,
+.proformas-page .table-action,
+.proformas-page .proforma-modal,
+.proformas-page .confirm-modal {
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        box-shadow 0.2s ease;
 }

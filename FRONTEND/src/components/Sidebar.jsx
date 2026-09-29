@@ -12,33 +12,159 @@ import {
     LogOut,
 } from "lucide-react";
 
-import { NavLink } from "react-router-dom";
+import { useState } from "react";
+
+import {
+    NavLink,
+    useNavigate
+} from "react-router-dom";
+
+import { useAuth } from "../context/AuthContext";
+
+import ConfirmModal from "../components/ConfirmModal";
 
 
 function Sidebar({ isOpen, onClose }) {
 
+    const navigate = useNavigate();
+
+    const { logout } = useAuth();
+
+
+    // =====================================================
+    // MODAL CONFIRMATION
+    // =====================================================
+
+    const [confirmModal, setConfirmModal] = useState({
+        open: false,
+        type: "warning",
+        title: "",
+        message: "",
+        confirmText: "Confirmer",
+        action: null
+    });
+
+
+    // =====================================================
+    // FERMER LE SIDEBAR
+    // =====================================================
+
     const handleLinkClick = () => {
+
         onClose();
+
+    };
+
+
+    // =====================================================
+    // DEMANDER DÉCONNEXION
+    // =====================================================
+
+    const demanderLogout = () => {
+
+        setConfirmModal({
+
+            open: true,
+
+            type: "warning",
+
+            title: "Se déconnecter ?",
+
+            message:
+                "Voulez-vous vraiment vous déconnecter de votre compte ?",
+
+            confirmText: "Se déconnecter",
+
+            action: handleLogout
+
+        });
+
+    };
+
+
+    // =====================================================
+    // DÉCONNEXION
+    // =====================================================
+
+    const handleLogout = () => {
+
+        logout();
+
+        onClose();
+
+        setConfirmModal({
+
+            open: false,
+
+            type: "warning",
+
+            title: "",
+
+            message: "",
+
+            confirmText: "Confirmer",
+
+            action: null
+
+        });
+
+        navigate("/login");
+
+    };
+
+
+    // =====================================================
+    // ANNULER CONFIRMATION
+    // =====================================================
+
+    const cancelLogout = () => {
+
+        setConfirmModal({
+
+            open: false,
+
+            type: "warning",
+
+            title: "",
+
+            message: "",
+
+            confirmText: "Confirmer",
+
+            action: null
+
+        });
+
     };
 
 
     return (
-        <aside className={`sidebar ${isOpen ? "open" : ""}`}>
 
-            {/* =========================
+        <aside
+            className={`sidebar ${isOpen ? "open" : ""}`}
+        >
+
+
+            {/* =================================================
                 LOGO
-            ========================== */}
+            ================================================= */}
 
             <div className="sidebar-logo">
-                <h2>LAZARE</h2>
+
+                <h2>
+                    TMACKEN_SYS
+                </h2>
+
             </div>
 
 
-            {/* =========================
+
+            {/* =================================================
                 NAVIGATION
-            ========================== */}
+            ================================================= */}
 
             <nav className="sidebar-nav">
+
 
                 {/* Principal */}
 
@@ -51,9 +177,15 @@ function Sidebar({ isOpen, onClose }) {
                     to="/"
                     onClick={handleLinkClick}
                 >
+
                     <LayoutDashboard size={18} />
-                    <span>Dashboard</span>
+
+                    <span>
+                        Dashboard
+                    </span>
+
                 </NavLink>
+
 
 
                 {/* Gestion */}
@@ -67,8 +199,13 @@ function Sidebar({ isOpen, onClose }) {
                     to="/clients"
                     onClick={handleLinkClick}
                 >
+
                     <Users size={18} />
-                    <span>Clients</span>
+
+                    <span>
+                        Clients
+                    </span>
+
                 </NavLink>
 
 
@@ -76,8 +213,13 @@ function Sidebar({ isOpen, onClose }) {
                     to="/produits"
                     onClick={handleLinkClick}
                 >
+
                     <Package size={18} />
-                    <span>Produits</span>
+
+                    <span>
+                        Produits
+                    </span>
+
                 </NavLink>
 
 
@@ -85,8 +227,13 @@ function Sidebar({ isOpen, onClose }) {
                     to="/stock"
                     onClick={handleLinkClick}
                 >
+
                     <Boxes size={18} />
-                    <span>Stock</span>
+
+                    <span>
+                        Stock
+                    </span>
+
                 </NavLink>
 
 
@@ -94,8 +241,13 @@ function Sidebar({ isOpen, onClose }) {
                     to="/reservations"
                     onClick={handleLinkClick}
                 >
+
                     <CalendarDays size={18} />
-                    <span>Réservations</span>
+
+                    <span>
+                        Réservations
+                    </span>
+
                 </NavLink>
 
 
@@ -103,8 +255,13 @@ function Sidebar({ isOpen, onClose }) {
                     to="/ventes"
                     onClick={handleLinkClick}
                 >
+
                     <ShoppingCart size={18} />
-                    <span>Ventes</span>
+
+                    <span>
+                        Ventes
+                    </span>
+
                 </NavLink>
 
 
@@ -112,9 +269,15 @@ function Sidebar({ isOpen, onClose }) {
                     to="/paiements"
                     onClick={handleLinkClick}
                 >
+
                     <CreditCard size={18} />
-                    <span>Paiements</span>
+
+                    <span>
+                        Paiements
+                    </span>
+
                 </NavLink>
+
 
 
                 {/* Analyse */}
@@ -128,18 +291,27 @@ function Sidebar({ isOpen, onClose }) {
                     to="/rapports"
                     onClick={handleLinkClick}
                 >
+
                     <BarChart3 size={18} />
-                    <span>Rapports</span>
+
+                    <span>
+                        Rapports
+                    </span>
+
                 </NavLink>
 
 
-                
                 <NavLink
                     to="/proforma"
                     onClick={handleLinkClick}
                 >
-                 <FileText size={18} />
-                    <span>Proforma</span>
+
+                    <FileText size={18} />
+
+                    <span>
+                        Proforma
+                    </span>
+
                 </NavLink>
 
 
@@ -155,33 +327,101 @@ function Sidebar({ isOpen, onClose }) {
                     to="/parametres"
                     onClick={handleLinkClick}
                 >
+
                     <Settings size={18} />
-                    <span>Paramètres</span>
+
+                    <span>
+                        Paramètres
+                    </span>
+
                 </NavLink>
+
 
             </nav>
 
 
-{/* 
-            <Button
-                    to="/login"
-                    onClick={handleLinkClick}
+
+            {/* =================================================
+                DÉCONNEXION
+            ================================================= */}
+
+            <div className="sidebar-logout-container">
+
+                <button
+                    type="button"
+                    className="sidebar-logout"
+                    onClick={demanderLogout}
                 >
+
                     <LogOut size={18} />
-                    <span>Logout</span>
-                </Button> */}
 
+                    <span>
+                        Déconnexion
+                    </span>
 
-            {/* =========================
-                FOOTER
-            ========================== */}
+                </button>
 
-            <div className="sidebar-footer">
-                <span>Lazare v1.0</span>
             </div>
 
+
+
+            {/* =================================================
+                FOOTER
+            ================================================= */}
+
+            <div className="sidebar-footer">
+
+                <span>
+                    tmacken_sys v1.0
+                </span>
+
+            </div>
+
+
+
+            {/* =================================================
+                MODAL CONFIRMATION
+            ================================================= */}
+
+            <ConfirmModal
+
+                open={
+                    confirmModal.open
+                }
+
+                type={
+                    confirmModal.type
+                }
+
+                title={
+                    confirmModal.title
+                }
+
+                message={
+                    confirmModal.message
+                }
+
+                confirmText={
+                    confirmModal.confirmText
+                }
+
+                cancelText="Annuler"
+
+                onConfirm={
+                    confirmModal.action
+                }
+
+                onCancel={
+                    cancelLogout
+                }
+
+            />
+
+
         </aside>
+
     );
+
 }
 
 
