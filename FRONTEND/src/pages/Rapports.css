@@ -1,493 +1,610 @@
 /* =========================================================
-   RAPPORTS — BASE / DARK MODE
+   TMACKEN_SYS — PAGE RAPPORTS
+   Compatible Light / Dark Mode
    ========================================================= */
 
 .rapports-page {
-    padding: 26px;
-    color: #e7eef2;
+    width: 100%;
+    min-height: 100%;
+    padding: var(--space-xl);
+    color: var(--text-primary);
 }
 
-.rapports-header {
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.rapports-page .rapports-header {
     display: flex;
-    justify-content: space-between;
     align-items: flex-start;
-    gap: 20px;
-    margin-bottom: 24px;
+    justify-content: space-between;
+    gap: var(--space-lg);
+    margin-bottom: var(--space-xl);
 }
 
-.rapports-header h1 {
-    margin: 0 0 5px;
+.rapports-page .rapports-header h1 {
+    margin: 0 0 6px;
+    color: var(--text-primary);
     font-size: 28px;
-    color: #eef4f6;
+    font-weight: 700;
+    line-height: 1.2;
 }
 
-.rapports-header p {
+.rapports-page .rapports-header p {
     margin: 0;
-    color: #91a5b1;
-    font-size: 13px;
+    color: var(--text-secondary);
+    font-size: 14px;
 }
 
-.rapports-header-actions {
+.rapports-page .rapports-header-actions {
     display: flex;
-    gap: 9px;
+    align-items: center;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
 }
-
 
 /* =========================================================
    BOUTONS
    ========================================================= */
 
-.rapport-btn {
-    min-height: 38px;
-    border: 1px solid transparent;
-    border-radius: 7px;
-    padding: 0 14px;
-
+.rapports-page .rapport-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 7px;
+    gap: 8px;
 
+    min-height: 40px;
+    padding: 0 15px;
+
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+
+    font-family: inherit;
     font-size: 13px;
     font-weight: 600;
 
     cursor: pointer;
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.15s ease,
+        box-shadow 0.2s ease;
 }
 
-.rapport-btn:disabled {
-    opacity: 0.55;
+.rapports-page .rapport-btn:hover {
+    transform: translateY(-1px);
 }
 
-.rapport-btn.primary {
-    background: #25D366;
+.rapports-page .rapport-btn:active {
+    transform: translateY(0);
+}
+
+.rapports-page .rapport-btn.primary {
+    background: var(--primary);
     color: #ffffff;
+    border-color: var(--primary);
 }
 
-
-.rapport-btn.primary:hover{
-    background: #128C7E;
-    color: #ffffff;
+.rapports-page .rapport-btn.primary:hover {
+    background: var(--primary-dark);
+    border-color: var(--primary-dark);
 }
 
-
-.rapport-btn.secondary {
-    background: #22343e;
-    color: #d8e1e5;
-    border-color: #354952;
+.rapports-page .rapport-btn.secondary {
+    background: var(--card-bg);
+    color: var(--text-primary);
+    border-color: var(--border-color);
 }
 
-.rapport-btn.full {
+.rapports-page .rapport-btn.secondary:hover {
+    background: var(--bg-tertiary);
+}
+
+.rapports-page .rapport-btn.full {
     width: 100%;
 }
-
 
 /* =========================================================
    ERREUR
    ========================================================= */
 
-.rapport-error {
+.rapports-page .rapport-error {
+    display: flex;
+    align-items: center;
+
+    margin-bottom: var(--space-lg);
     padding: 12px 14px;
-    margin-bottom: 18px;
 
-    border: 1px solid #713f45;
-    border-radius: 8px;
+    border: 1px solid rgba(234, 67, 53, 0.3);
+    border-radius: var(--radius-md);
 
-    background: #38272b;
-    color: #ff9a9a;
+    background: rgba(234, 67, 53, 0.08);
+    color: var(--danger);
+
+    font-size: 13px;
+    font-weight: 500;
 }
-
 
 /* =========================================================
    FILTRES
    ========================================================= */
 
-.rapport-filter-card,
-.rapport-table-card {
-    background: #1d2d35;
-    border: 1px solid #2e414a;
-    border-radius: 10px;
+.rapports-page .rapport-filter-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+
+    padding: var(--space-lg);
+    margin-bottom: var(--space-lg);
 }
 
-.rapport-filter-card {
-    padding: 20px;
-    margin-bottom: 18px;
-}
-
-.filter-title {
+.rapports-page .filter-title {
     display: flex;
+    align-items: flex-start;
     gap: 10px;
-    margin-bottom: 18px;
-    color: #d8e2e7;
+
+    margin-bottom: var(--space-lg);
+    color: var(--primary);
 }
 
-.filter-title svg {
-    color: #b6864a;
-}
+.rapports-page .filter-title h2 {
+    margin: 0 0 4px;
 
-.filter-title h2 {
-    margin: 0 0 3px;
+    color: var(--text-primary);
     font-size: 16px;
+    font-weight: 700;
 }
 
-.filter-title span {
-    color: #8398a4;
+.rapports-page .filter-title span {
+    color: var(--text-secondary);
     font-size: 12px;
 }
 
-.rapport-filters {
+.rapports-page .rapport-filters {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 14px;
+    gap: 15px;
 }
 
-.filter-field label {
+.rapports-page .filter-field {
+    min-width: 0;
+}
+
+.rapports-page .filter-field label {
     display: block;
-    margin-bottom: 6px;
 
-    color: #91a5b1;
+    margin-bottom: 7px;
 
-    font-size: 11px;
+    color: var(--text-secondary);
+    font-size: 12px;
     font-weight: 600;
 }
 
-.filter-field select,
-.filter-field input {
+.rapports-page .filter-field select,
+.rapports-page .filter-field input {
     width: 100%;
-    height: 40px;
-
-    border: 1px solid #354952;
-    border-radius: 7px;
-
-    background: #22343e;
-    color: #e5edf2;
+    min-height: 40px;
 
     padding: 0 11px;
 
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+
+    font-family: inherit;
+    font-size: 13px;
+
     outline: none;
 
-    font-size: 13px;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background-color 0.2s ease;
 }
 
-.date-input {
-    height: 40px;
+.rapports-page .filter-field select:focus,
+.rapports-page .filter-field input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.12);
+}
 
+.rapports-page .filter-field select {
+    cursor: pointer;
+}
+
+.rapports-page .date-input {
     display: flex;
     align-items: center;
-    gap: 7px;
+    gap: 8px;
 
-    border: 1px solid #354952;
-    border-radius: 7px;
-
-    background: #22343e;
+    min-height: 40px;
 
     padding: 0 10px;
+
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
-.date-input svg {
-    color: #8ea1ab;
+.rapports-page .date-input:focus-within {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.12);
 }
 
-.date-input input {
-    border: 0;
+.rapports-page .date-input input {
+    min-height: 38px;
+
     padding: 0;
+
+    border: 0;
+    outline: 0;
+    box-shadow: none;
+
     background: transparent;
 }
 
-.search-field {
-    grid-column: span 2;
+.rapports-page .date-input input:focus {
+    box-shadow: none;
 }
 
+.rapports-page .search-field {
+    grid-column: span 2;
+}
 
 /* =========================================================
    STATISTIQUES
    ========================================================= */
 
-.rapport-stats {
+.rapports-page .rapport-stats {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 14px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-md);
 
-    margin-bottom: 14px;
+    margin-bottom: var(--space-lg);
 }
 
-.rapport-stat-card {
-    min-height: 88px;
-
-    padding: 16px;
-
+.rapports-page .rapport-stat-card {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 13px;
 
-    background: #1d2d35;
-    border: 1px solid #2e414a;
-    border-radius: 10px;
+    min-width: 0;
+    padding: 16px;
+
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
 }
 
-.stat-icon {
-    width: 40px;
-    height: 40px;
+.rapports-page .rapport-stat-card > div:last-child {
+    min-width: 0;
+}
 
+.rapports-page .rapport-stat-card span {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.rapports-page .rapport-stat-card strong {
+    display: block;
+
+    color: var(--text-primary);
+    font-size: 20px;
+    font-weight: 700;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.rapports-page .stat-icon {
     display: flex;
     align-items: center;
     justify-content: center;
 
-    border-radius: 8px;
+    flex: 0 0 42px;
+    width: 42px;
+    height: 42px;
+
+    border-radius: 12px;
 }
 
-.stat-icon.blue {
-    background: #243b4a;
-    color: #65b7e8;
+.rapports-page .stat-icon.blue {
+    background: rgba(52, 183, 241, 0.12);
+    color: var(--info);
 }
 
-.stat-icon.green {
-    background: #213d31;
-    color: #55d68a;
+.rapports-page .stat-icon.green {
+    background: rgba(37, 211, 102, 0.12);
+    color: var(--success);
 }
 
-.stat-icon.orange {
-    background: #453725;
-    color: #e0ad63;
+.rapports-page .stat-icon.orange {
+    background: rgba(247, 183, 49, 0.14);
+    color: var(--warning);
 }
 
-.stat-icon.purple {
-    background: #352d48;
-    color: #ad91e7;
+.rapports-page .stat-icon.purple {
+    background: rgba(142, 68, 173, 0.12);
+    color: #8E44AD;
 }
-
-.rapport-stat-card span,
-.payment-breakdown span {
-    display: block;
-
-    color: #8fa3ae;
-
-    font-size: 11px;
-
-    margin-bottom: 4px;
-}
-
-.rapport-stat-card strong {
-    display: block;
-
-    color: #eef4f6;
-
-    font-size: 18px;
-}
-
 
 /* =========================================================
-   RÉPARTITION PAIEMENTS
+   RÉPARTITION DES PAIEMENTS
    ========================================================= */
 
-.payment-breakdown {
+.rapports-page .payment-breakdown {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1px;
 
-    margin-bottom: 18px;
+    margin-bottom: var(--space-lg);
+
+    overflow: hidden;
+
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+
+    background: var(--border-color);
 }
 
-.payment-breakdown > div {
-    padding: 12px 14px;
+.rapports-page .payment-breakdown > div {
+    padding: 14px 16px;
 
-    background: #18272e;
-
-    border: 1px solid #2d4048;
-    border-radius: 8px;
+    background: var(--card-bg);
 }
 
-.payment-breakdown strong {
-    color: #e6edf0;
-    font-size: 14px;
+.rapports-page .payment-breakdown span {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: var(--text-secondary);
+    font-size: 12px;
 }
 
+.rapports-page .payment-breakdown strong {
+    color: var(--text-primary);
+    font-size: 15px;
+    font-weight: 700;
+}
 
 /* =========================================================
    TABLEAU
    ========================================================= */
 
-.rapport-table-card {
+.rapports-page .rapport-table-card {
     overflow: hidden;
+
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
 }
 
-.rapport-table-header {
-    min-height: 78px;
+.rapports-page .rapport-table-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
 
     padding: 18px 20px;
 
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    border-bottom: 1px solid #2e414a;
+    border-bottom: 1px solid var(--border-color);
 }
 
-.rapport-table-header h2 {
-    margin: 0 0 4px;
+.rapports-page .rapport-table-header h2 {
+    margin: 0 0 5px;
+
+    color: var(--text-primary);
     font-size: 16px;
+    font-weight: 700;
 }
 
-.rapport-table-header p {
+.rapports-page .rapport-table-header p {
     margin: 0;
 
-    color: #8398a4;
-
+    color: var(--text-secondary);
     font-size: 12px;
 }
 
-.table-wrapper {
+.rapports-page .table-wrapper {
     width: 100%;
     overflow-x: auto;
 }
 
-.rapport-table {
+.rapports-page .rapport-table {
     width: 100%;
+    min-width: 900px;
+
     border-collapse: collapse;
+
+    color: var(--text-primary);
+    font-size: 13px;
 }
 
-.rapport-table th {
-    height: 44px;
+.rapports-page .rapport-table th {
+    padding: 12px 14px;
 
-    padding: 0 13px;
+    background: var(--bg-tertiary);
+    border-bottom: 1px solid var(--border-color);
 
-    text-align: left;
+    color: var(--text-secondary);
 
-    color: #91a5b1;
-
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
-
+    text-align: left;
     text-transform: uppercase;
 
-    background: #1a2930;
-
-    border-bottom: 1px solid #354952;
-
     white-space: nowrap;
 }
 
-.rapport-table td {
-    height: 58px;
+.rapports-page .rapport-table td {
+    padding: 13px 14px;
 
-    padding: 0 13px;
+    border-bottom: 1px solid var(--border-color);
 
-    color: #dce5e9;
+    color: var(--text-primary);
 
-    font-size: 12px;
-
-    border-bottom: 1px solid #2b3d45;
-
-    white-space: nowrap;
+    vertical-align: middle;
 }
 
-.reference-cell {
+.rapports-page .rapport-table tbody tr {
+    transition: background-color 0.15s ease;
+}
+
+.rapports-page .rapport-table tbody tr:hover {
+    background: var(--bg-tertiary);
+}
+
+.rapports-page .rapport-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.rapports-page .reference-cell {
     font-weight: 600;
+    white-space: nowrap;
 }
 
-.amount-cell {
-    text-align: right;
+.rapports-page .amount-cell {
     font-weight: 700;
+    white-space: nowrap;
 }
 
+.rapports-page .empty-row {
+    padding: 40px 20px !important;
+
+    color: var(--text-secondary) !important;
+
+    text-align: center;
+}
 
 /* =========================================================
-   BADGES
+   BADGES TYPE
    ========================================================= */
 
-.type-badge,
-.status-badge {
-    display: inline-flex;
-    align-items: center;
-
-    min-height: 24px;
-
-    padding: 0 8px;
-
-    border-radius: 999px;
-
-    font-size: 10px;
-    font-weight: 700;
-}
-
-.type-badge.vente {
-    background: #203b50;
-    color: #75c5ee;
-}
-
-.type-badge.reservation {
-    background: #493b21;
-    color: #e4b65d;
-}
-
-.type-badge.autre {
-    background: #323b40;
-    color: #aab8be;
-}
-
-.status-badge.payee {
-    background: #1e4230;
-    color: #51db89;
-}
-
-.status-badge.confirmee {
-    background: #203e4c;
-    color: #64c1e8;
-}
-
-.status-badge.en_attente {
-    background: #493c22;
-    color: #e2b85e;
-}
-
-.status-badge.annulee {
-    background: #492c31;
-    color: #ff7e7e;
-}
-
-.status-badge.enregistre {
-    background: #323b40;
-    color: #b6c2c7;
-}
-
-
-/* =========================================================
-   BOUTON VOIR
-   ========================================================= */
-
-.table-view-btn {
-    width: 32px;
-    height: 32px;
-
+.rapports-page .type-badge,
+.rapports-page .status-badge {
     display: inline-flex;
     align-items: center;
     justify-content: center;
 
-    border: 1px solid #354952;
-    border-radius: 7px;
+    min-height: 26px;
+    padding: 3px 9px;
 
-    background: #22343e;
-    color: #9cafb9;
+    border-radius: 999px;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+.rapports-page .type-badge.vente {
+    background: rgba(52, 183, 241, 0.12);
+    color: var(--info);
+}
+
+.rapports-page .type-badge.reservation {
+    background: rgba(142, 68, 173, 0.12);
+    color: #8E44AD;
+}
+
+.rapports-page .type-badge.autre {
+    background: rgba(134, 150, 160, 0.14);
+    color: var(--text-secondary);
+}
+
+/* =========================================================
+   BADGES STATUT
+   ========================================================= */
+
+.rapports-page .status-badge.paye,
+.rapports-page .status-badge.paid,
+.rapports-page .status-badge.completed,
+.rapports-page .status-badge.confirme,
+.rapports-page .status-badge.confirmed {
+    background: rgba(37, 211, 102, 0.12);
+    color: var(--success);
+}
+
+.rapports-page .status-badge.en_attente,
+.rapports-page .status-badge.pending {
+    background: rgba(247, 183, 49, 0.14);
+    color: var(--warning);
+}
+
+.rapports-page .status-badge.annule,
+.rapports-page .status-badge.annulee,
+.rapports-page .status-badge.cancelled {
+    background: rgba(234, 67, 53, 0.10);
+    color: var(--danger);
+}
+
+.rapports-page .status-badge.rembourse,
+.rapports-page .status-badge.refunded {
+    background: rgba(52, 183, 241, 0.12);
+    color: var(--info);
+}
+
+/* =========================================================
+   ACTION TABLEAU
+   ========================================================= */
+
+.rapports-page .table-view-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 32px;
+    height: 32px;
+
+    padding: 0;
+
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
 
     cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease;
 }
 
-.empty-row {
-    height: 110px !important;
-
-    text-align: center;
-
-    color: #8296a1 !important;
+.rapports-page .table-view-btn:hover {
+    background: var(--primary-light);
+    border-color: var(--primary);
+    color: var(--primary-dark);
 }
-
 
 /* =========================================================
    MODALES
    ========================================================= */
 
-.rapport-modal-overlay {
+.rapports-page .rapport-modal-overlay {
     position: fixed;
     inset: 0;
-    z-index: 3000;
+    z-index: 1000;
 
     display: flex;
     align-items: center;
@@ -495,510 +612,407 @@
 
     padding: 20px;
 
-    background: rgba(0, 0, 0, 0.62);
+    background: rgba(0, 0, 0, 0.55);
+
+    animation: rapportOverlayIn 0.18s ease;
 }
 
-.rapport-print-modal,
-.rapport-detail-modal {
-    width: min(560px, 95vw);
+.rapports-page .rapport-print-modal,
+.rapports-page .rapport-detail-modal {
+    width: min(520px, 100%);
+    max-height: calc(100vh - 40px);
 
-    background: #1d2d35;
+    overflow-y: auto;
 
-    border: 1px solid #354952;
-    border-radius: 12px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.25);
 
-    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.35);
+    animation: rapportModalIn 0.2s ease;
 }
 
-.rapport-detail-modal {
-    width: min(680px, 95vw);
-}
+.rapports-page .rapport-modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-md);
 
-.rapport-modal-header {
     padding: 18px 20px;
 
-    display: flex;
-    justify-content: space-between;
-
-    border-bottom: 1px solid #354952;
+    border-bottom: 1px solid var(--border-color);
 }
 
-.rapport-modal-header h2 {
-    margin: 0 0 4px;
+.rapports-page .rapport-modal-header h2 {
+    margin: 0 0 5px;
 
+    color: var(--text-primary);
     font-size: 18px;
-
-    color: #edf3f5;
 }
 
-.rapport-modal-header p {
+.rapports-page .rapport-modal-header p {
     margin: 0;
 
-    color: #8fa3ae;
-
+    color: var(--text-secondary);
     font-size: 12px;
 }
 
-.rapport-modal-header > button {
-    width: 32px;
-    height: 32px;
+.rapports-page .rapport-modal-header > button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 
-    border: 0;
+    width: 34px;
+    height: 34px;
+
+    padding: 0;
+
+    border: 1px solid var(--border-color);
+    border-radius: 50%;
 
     background: transparent;
-    color: #8fa3ae;
+    color: var(--text-secondary);
 
     cursor: pointer;
 }
 
-.print-options {
-    padding: 20px;
-
-    display: grid;
-
-    gap: 10px;
+.rapports-page .rapport-modal-header > button:hover {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
 }
 
-.print-option {
-    width: 100%;
+/* =========================================================
+   OPTIONS IMPRESSION
+   ========================================================= */
 
-    padding: 15px;
+.rapports-page .print-options {
+    display: grid;
+    gap: 10px;
 
+    padding: 20px;
+}
+
+.rapports-page .print-option {
     display: flex;
     align-items: center;
     gap: 13px;
 
+    width: 100%;
+
+    padding: 14px;
+
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+
     text-align: left;
-
-    border: 1px solid #354952;
-    border-radius: 9px;
-
-    background: #22343e;
-    color: #dce5e9;
-
     cursor: pointer;
+
+    transition:
+        border-color 0.2s ease,
+        background-color 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
-.print-option.active,
-.print-option:hover {
-    border-color: #76512f;
+.rapports-page .print-option:hover {
+    background: var(--bg-tertiary);
 }
 
-.print-option svg {
-    color: #b6864a;
+.rapports-page .print-option.active {
+    border-color: var(--primary);
+    background: var(--primary-light);
+    box-shadow: 0 0 0 2px rgba(37, 211, 102, 0.08);
 }
 
-.print-option strong,
-.print-option span {
+.rapports-page .print-option svg {
+    flex: 0 0 auto;
+    color: var(--primary);
+}
+
+.rapports-page .print-option strong {
     display: block;
-}
 
-.print-option span {
-    color: #8da0aa;
+    margin-bottom: 4px;
 
-    font-size: 11px;
-
-    margin-top: 3px;
-}
-
-.rapport-modal-actions {
-    padding: 15px 20px;
-
-    display: flex;
-    justify-content: flex-end;
-    gap: 9px;
-
-    border-top: 1px solid #354952;
-}
-
-.detail-grid {
-    padding: 20px;
-
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-
-    gap: 10px;
-}
-
-.detail-grid > div {
-    padding: 13px;
-
-    border: 1px solid #30434c;
-    border-radius: 8px;
-
-    background: #18272e;
-}
-
-.detail-grid span,
-.detail-grid strong {
-    display: block;
-}
-
-.detail-grid span {
-    margin-bottom: 5px;
-
-    color: #8196a1;
-
-    font-size: 10px;
-}
-
-.detail-grid strong {
-    color: #e5edf1;
-
+    color: var(--text-primary);
     font-size: 13px;
 }
 
+.rapports-page .print-option span {
+    display: block;
+
+    color: var(--text-secondary);
+    font-size: 11px;
+}
 
 /* =========================================================
-   LIGHT MODE
+   ACTIONS MODALE
    ========================================================= */
 
-[data-theme="light"] .rapports-page {
-    color: #1f2937;
-}
+.rapports-page .rapport-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
 
-[data-theme="light"] .rapports-header h1 {
-    color: #1f2937;
-}
+    padding: 15px 20px;
 
-[data-theme="light"] .rapports-header p {
-    color: #64748b;
+    border-top: 1px solid var(--border-color);
 }
-
 
 /* =========================================================
-   LIGHT — BOUTONS
+   DÉTAIL TRANSACTION
    ========================================================= */
 
-[data-theme="light"] .rapport-btn.secondary {
-    background: #ffffff;
-    border-color: #d9e1e8;
-    color: #334155;
+.rapports-page .detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1px;
+
+    margin: 20px;
+
+    overflow: hidden;
+
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+
+    background: var(--border-color);
 }
 
-[data-theme="light"] .rapport-btn.secondary:hover {
-    background: #f1f5f9;
+.rapports-page .detail-grid > div {
+    min-width: 0;
+
+    padding: 13px;
+
+    background: var(--bg-secondary);
 }
 
+.rapports-page .detail-grid span {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: var(--text-secondary);
+    font-size: 11px;
+}
+
+.rapports-page .detail-grid strong {
+    display: block;
+
+    color: var(--text-primary);
+    font-size: 13px;
+
+    overflow-wrap: anywhere;
+}
 
 /* =========================================================
-   LIGHT — FILTRES
+   ANIMATIONS
    ========================================================= */
 
-[data-theme="light"] .rapport-filter-card {
-    background: #ffffff;
-    border-color: #e2e8f0;
+@keyframes rapportOverlayIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
-[data-theme="light"] .filter-title {
-    color: #1f2937;
-}
+@keyframes rapportModalIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px) scale(0.98);
+    }
 
-[data-theme="light"] .filter-title span {
-    color: #64748b;
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
-
-[data-theme="light"] .filter-title svg {
-    color: #b6864a;
-}
-
-[data-theme="light"] .filter-field label {
-    color: #475569;
-}
-
-[data-theme="light"] .filter-field select,
-[data-theme="light"] .filter-field input {
-    background: #ffffff;
-    border-color: #d9e1e8;
-    color: #1f2937;
-}
-
-[data-theme="light"] .date-input {
-    background: #ffffff;
-    border-color: #d9e1e8;
-}
-
-[data-theme="light"] .date-input input {
-    color: #1f2937;
-}
-
-[data-theme="light"] .filter-field select:focus,
-[data-theme="light"] .filter-field input:focus,
-[data-theme="light"] .date-input:focus-within {
-    border-color: #b6864a;
-    box-shadow: 0 0 0 3px rgba(182, 134, 74, 0.10);
-}
-
-[data-theme="light"] .date-input svg {
-    color: #64748b;
-}
-
 
 /* =========================================================
-   LIGHT — STATISTIQUES
-   ========================================================= */
-
-[data-theme="light"] .rapport-stat-card {
-    background: #ffffff;
-    border-color: #e2e8f0;
-}
-
-[data-theme="light"] .rapport-stat-card span,
-[data-theme="light"] .payment-breakdown span {
-    color: #64748b;
-}
-
-[data-theme="light"] .rapport-stat-card strong {
-    color: #1f2937;
-}
-
-[data-theme="light"] .stat-icon.blue {
-    background: #eff6ff;
-    color: #2563eb;
-}
-
-[data-theme="light"] .stat-icon.green {
-    background: #ecfdf5;
-    color: #059669;
-}
-
-[data-theme="light"] .stat-icon.orange {
-    background: #fff7ed;
-    color: #d97706;
-}
-
-[data-theme="light"] .stat-icon.purple {
-    background: #f5f3ff;
-    color: #7c3aed;
-}
-
-
-/* =========================================================
-   LIGHT — PAIEMENTS
-   ========================================================= */
-
-[data-theme="light"] .payment-breakdown > div {
-    background: #ffffff;
-    border-color: #e2e8f0;
-}
-
-[data-theme="light"] .payment-breakdown strong {
-    color: #1f2937;
-}
-
-
-/* =========================================================
-   LIGHT — TABLEAU
-   ========================================================= */
-
-[data-theme="light"] .rapport-table-card {
-    background: #ffffff;
-    border-color: #e2e8f0;
-}
-
-[data-theme="light"] .rapport-table-header {
-    border-bottom-color: #e2e8f0;
-}
-
-[data-theme="light"] .rapport-table-header h2 {
-    color: #1f2937;
-}
-
-[data-theme="light"] .rapport-table-header p {
-    color: #64748b;
-}
-
-[data-theme="light"] .rapport-table th {
-    background: #f8fafc;
-    border-bottom-color: #e2e8f0;
-    color: #64748b;
-}
-
-[data-theme="light"] .rapport-table td {
-    color: #334155;
-    border-bottom-color: #edf1f5;
-}
-
-[data-theme="light"] .rapport-table tbody tr:hover {
-    background: #f8fafc;
-}
-
-
-/* =========================================================
-   LIGHT — BADGES
-   ========================================================= */
-
-[data-theme="light"] .type-badge.vente {
-    background: #eff6ff;
-    color: #2563eb;
-}
-
-[data-theme="light"] .type-badge.reservation {
-    background: #fff7ed;
-    color: #d97706;
-}
-
-[data-theme="light"] .type-badge.autre {
-    background: #f1f5f9;
-    color: #64748b;
-}
-
-[data-theme="light"] .status-badge.payee {
-    background: #ecfdf5;
-    color: #059669;
-}
-
-[data-theme="light"] .status-badge.confirmee {
-    background: #eff6ff;
-    color: #2563eb;
-}
-
-[data-theme="light"] .status-badge.en_attente {
-    background: #fffbeb;
-    color: #d97706;
-}
-
-[data-theme="light"] .status-badge.annulee {
-    background: #fef2f2;
-    color: #dc2626;
-}
-
-[data-theme="light"] .status-badge.enregistre {
-    background: #f1f5f9;
-    color: #64748b;
-}
-
-
-/* =========================================================
-   LIGHT — BOUTON VOIR
-   ========================================================= */
-
-[data-theme="light"] .table-view-btn {
-    background: #ffffff;
-    border-color: #d9e1e8;
-    color: #64748b;
-}
-
-[data-theme="light"] .table-view-btn:hover {
-    background: #f1f5f9;
-    color: #334155;
-}
-
-
-/* =========================================================
-   LIGHT — LIGNE VIDE
-   ========================================================= */
-
-[data-theme="light"] .empty-row {
-    color: #64748b !important;
-}
-
-
-/* =========================================================
-   LIGHT — ERREUR
-   ========================================================= */
-
-[data-theme="light"] .rapport-error {
-    background: #fef2f2;
-    border-color: #fecaca;
-    color: #dc2626;
-}
-
-
-/* =========================================================
-   LIGHT — MODALES
-   ========================================================= */
-
-[data-theme="light"] .rapport-print-modal,
-[data-theme="light"] .rapport-detail-modal {
-    background: #ffffff;
-    border-color: #e2e8f0;
-}
-
-[data-theme="light"] .rapport-modal-header {
-    border-bottom-color: #e2e8f0;
-}
-
-[data-theme="light"] .rapport-modal-header h2 {
-    color: #1f2937;
-}
-
-[data-theme="light"] .rapport-modal-header p {
-    color: #64748b;
-}
-
-[data-theme="light"] .rapport-modal-header > button {
-    color: #64748b;
-}
-
-[data-theme="light"] .print-option {
-    background: #ffffff;
-    border-color: #d9e1e8;
-    color: #334155;
-}
-
-[data-theme="light"] .print-option span {
-    color: #64748b;
-}
-
-[data-theme="light"] .rapport-modal-actions {
-    border-top-color: #e2e8f0;
-}
-
-[data-theme="light"] .detail-grid > div {
-    background: #f8fafc;
-    border-color: #e2e8f0;
-}
-
-[data-theme="light"] .detail-grid span {
-    color: #64748b;
-}
-
-[data-theme="light"] .detail-grid strong {
-    color: #1f2937;
-}
-
-
-/* =========================================================
-   RESPONSIVE
+   RESPONSIVE — TABLETTE
    ========================================================= */
 
 @media (max-width: 1100px) {
 
-    .rapport-filters,
-    .rapport-stats {
-        grid-template-columns: repeat(2, 1fr);
+    .rapports-page .rapport-filters {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
-    .payment-breakdown {
-        grid-template-columns: repeat(2, 1fr);
+    .rapports-page .rapport-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
+    .rapports-page .search-field {
+        grid-column: span 2;
+    }
 }
 
+/* =========================================================
+   RESPONSIVE — MOBILE
+   ========================================================= */
 
-@media (max-width: 700px) {
+@media (max-width: 800px) {
 
     .rapports-page {
-        padding: 16px;
+        padding: var(--space-lg);
     }
 
-    .rapports-header {
+    .rapports-page .rapports-header {
         flex-direction: column;
     }
 
-    .rapport-filters,
-    .rapport-stats,
-    .payment-breakdown {
+    .rapports-page .rapports-header-actions {
+        width: 100%;
+    }
+
+    .rapports-page .rapports-header-actions .rapport-btn {
+        flex: 1;
+    }
+
+    .rapports-page .rapport-filters {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .rapports-page .search-field {
+        grid-column: span 2;
+    }
+
+    .rapports-page .payment-breakdown {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .rapports-page .rapport-table-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .rapports-page .rapport-table-header .rapport-btn {
+        width: 100%;
+    }
+}
+
+/* =========================================================
+   RESPONSIVE — PETIT MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .rapports-page {
+        padding: var(--space-md);
+    }
+
+    .rapports-page .rapports-header h1 {
+        font-size: 24px;
+    }
+
+    .rapports-page .rapports-header-actions {
+        flex-direction: column;
+    }
+
+    .rapports-page .rapports-header-actions .rapport-btn {
+        width: 100%;
+        flex: none;
+    }
+
+    .rapports-page .rapport-filters {
         grid-template-columns: 1fr;
     }
 
-    .search-field {
+    .rapports-page .search-field {
         grid-column: span 1;
     }
 
-    .detail-grid {
+    .rapports-page .rapport-stats {
         grid-template-columns: 1fr;
     }
 
+    .rapports-page .payment-breakdown {
+        grid-template-columns: 1fr;
+    }
+
+    .rapports-page .rapport-stat-card strong {
+        font-size: 18px;
+    }
+
+    .rapports-page .rapport-modal-overlay {
+        padding: 12px;
+    }
+
+    .rapports-page .rapport-print-modal,
+    .rapports-page .rapport-detail-modal {
+        max-height: calc(100vh - 24px);
+    }
+
+    .rapports-page .detail-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* =========================================================
+   TRÈS PETIT ÉCRAN
+   ========================================================= */
+
+@media (max-width: 400px) {
+
+    .rapports-page {
+        padding: 10px;
+    }
+
+    .rapports-page .rapport-filter-card {
+        padding: 13px;
+    }
+
+    .rapports-page .rapport-table-header {
+        padding: 15px;
+    }
+
+    .rapports-page .rapport-modal-actions {
+        flex-direction: column;
+    }
+
+    .rapports-page .rapport-modal-actions .rapport-btn {
+        width: 100%;
+    }
+}
+
+/* =========================================================
+   IMPRESSION DE LA PAGE
+   ========================================================= */
+
+@media print {
+
+    .rapports-page {
+        padding: 0;
+        background: #ffffff;
+        color: #000000;
+    }
+
+    .rapports-page .rapports-header-actions,
+    .rapports-page .rapport-filter-card,
+    .rapports-page .rapport-stats,
+    .rapports-page .payment-breakdown,
+    .rapports-page .rapport-table-header .rapport-btn,
+    .rapports-page .table-view-btn,
+    .rapports-page .rapport-modal-overlay {
+        display: none !important;
+    }
+
+    .rapports-page .rapport-table-card {
+        border: 0;
+        box-shadow: none;
+    }
+
+    .rapports-page .rapport-table {
+        min-width: 0;
+    }
+
+    .rapports-page .rapport-table th,
+    .rapports-page .rapport-table td {
+        color: #000000;
+        border-color: #cccccc;
+    }
 }

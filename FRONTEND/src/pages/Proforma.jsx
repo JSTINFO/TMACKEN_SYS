@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useSettings } from "../context/SettingsContext";
 
 import {
     Eye,
@@ -35,6 +36,7 @@ import "./Proformas.css";
 
 
 function Proformas() {
+    const { formatMoney } = useSettings();
 
     // =====================================================
     // DONNEES
@@ -1450,28 +1452,28 @@ function Proformas() {
     // FORMAT MONNAIE
     // =====================================================
 
-    const formatMoney =
-        (
-            value
-        ) => {
+    // const formatMoney =
+    //     (
+    //         value
+    //     ) => {
 
-            return (
+    //         return (
 
-                Number(
-                    value || 0
-                ).toLocaleString(
-                    "fr-FR",
-                    {
+    //             Number(
+    //                 value || 0
+    //             ).toLocaleString(
+    //                 "fr-FR",
+    //                 {
 
-                        minimumFractionDigits:
-                            2,
+    //                     minimumFractionDigits:
+    //                         2,
 
-                        maximumFractionDigits:
-                            2
-                    }
-                ) + " $"
-            );
-        };
+    //                     maximumFractionDigits:
+    //                         2
+    //                 }
+    //             ) + " $"
+    //         );
+    //     };
 
 
     // =====================================================

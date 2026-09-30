@@ -7,8 +7,12 @@ import { getClients } from "../services/clientService";
 import { getCurrentUser } from "../services/authService";
 import api from "../services/api";
 import "./Rapports.css";
+import { useSettings } from "../context/SettingsContext";
 
 function Rapport() {
+    const { formatMoney } = useSettings();
+
+
     const localDate = (d = new Date()) => {
         const y = d.getFullYear();
         const m = String(d.getMonth() + 1).padStart(2, "0");
@@ -69,7 +73,8 @@ function Rapport() {
     const reservationsMap = useMemo(() => Object.fromEntries(reservations.map(r => [r.id_reservation, r])), [reservations]);
     const utilisateursMap = useMemo(() => Object.fromEntries(utilisateurs.map(u => [u.id_utilisateur, u])), [utilisateurs]);
 
-    const money = (v) => `${Number(v || 0).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} $`;
+    // const money = (v) => `${Number(v || 0).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} $`;
+    const money = formatMoney;
     const dateText = (v) => v ? new Date(v).toLocaleString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "—";
     const dateOnly = (v) => v ? new Date(v).toLocaleDateString("fr-FR") : "—";
 

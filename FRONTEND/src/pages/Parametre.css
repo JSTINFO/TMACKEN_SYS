@@ -1,0 +1,170 @@
+/* =========================================
+   PARAMÈTRES
+========================================= */
+
+.parametres-page {
+    width: 100%;
+}
+
+
+/* =========================================
+   CARTE PARAMÈTRES
+========================================= */
+
+.settings-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+}
+
+
+/* =========================================
+   HEADER DE LA CARTE
+========================================= */
+
+.settings-card-header {
+    margin-bottom: 20px;
+}
+
+.settings-card-header h2 {
+    margin: 0 0 6px;
+    color: var(--text-primary);
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.settings-card-header p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+
+/* =========================================
+   OPTION
+========================================= */
+
+.settings-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+
+    padding: 18px 0;
+
+    border-top: 1px solid var(--border-color);
+}
+
+.settings-option-info {
+    flex: 1;
+}
+
+.settings-option-info h3 {
+    margin: 0 0 5px;
+    color: var(--text-primary);
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.settings-option-info p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+
+/* =========================================
+   BOUTON THÈME
+========================================= */
+
+.settings-toggle {
+    min-width: 130px;
+
+    padding: 10px 16px;
+
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+
+    font-size: 14px;
+    font-weight: 500;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.settings-toggle:hover {
+    border-color: var(--primary);
+    background: var(--primary-light);
+}
+
+.settings-toggle:active {
+    transform: scale(0.98);
+}
+
+
+/* =========================================
+   SELECT DEVISE
+========================================= */
+
+.settings-select {
+    min-width: 260px;
+
+    padding: 11px 14px;
+
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+
+    font-size: 14px;
+
+    outline: none;
+    cursor: pointer;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.settings-select:focus {
+    border-color: var(--primary);
+
+    box-shadow:
+        0 0 0 3px rgba(37, 211, 102, 0.12);
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 768px) {
+
+    .settings-card {
+        padding: 18px;
+    }
+
+    .settings-option {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+    }
+
+    .settings-toggle,
+    .settings-select {
+        width: 100%;
+        min-width: 0;
+    }
+}

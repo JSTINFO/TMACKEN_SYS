@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useSettings } from "../context/SettingsContext";
 
 import {
     Eye,
@@ -34,6 +35,8 @@ import "./Ventes.css";
 
 
 function Ventes() {
+
+    const { formatMoney } = useSettings();
 
     // =====================================================
     // DONNEES
@@ -1580,32 +1583,32 @@ function Ventes() {
         };
 
 
-    // =====================================================
-    // FORMAT MONNAIE
-    // =====================================================
+    // // =====================================================
+    // // FORMAT MONNAIE
+    // // =====================================================
 
-    const formatMoney =
-        (
-            value
-        ) => {
+    // const formatMoney =
+    //     (
+    //         value
+    //     ) => {
 
-            return (
+    //         return (
 
-                Number(
-                    value || 0
-                ).toLocaleString(
-                    "fr-FR",
-                    {
+    //             Number(
+    //                 value || 0
+    //             ).toLocaleString(
+    //                 "fr-FR",
+    //                 {
 
-                        minimumFractionDigits:
-                            2,
+    //                     minimumFractionDigits:
+    //                         2,
 
-                        maximumFractionDigits:
-                            2
-                    }
-                ) + " $"
-            );
-        };
+    //                     maximumFractionDigits:
+    //                         2
+    //                 }
+    //             ) + " $"
+    //         );
+    //     };
 
 
     // =====================================================

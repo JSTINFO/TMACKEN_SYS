@@ -6,8 +6,8 @@ import "./styles.css";
 import App from "./App";
 
 import { ThemeProvider } from "./context/ThemeContext";
+import { SettingsProvider } from "./context/SettingsContext";
 import { AuthProvider } from "./context/AuthContext";
-
 
 createRoot(document.getElementById("root")).render(
 
@@ -15,11 +15,15 @@ createRoot(document.getElementById("root")).render(
 
         <ThemeProvider>
 
-            <AuthProvider>
+            <SettingsProvider>
 
-                <App />
+                <AuthProvider>
 
-            </AuthProvider>
+                    <App />
+
+                </AuthProvider>
+
+            </SettingsProvider>
 
         </ThemeProvider>
 

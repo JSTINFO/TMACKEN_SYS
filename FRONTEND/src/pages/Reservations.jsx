@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useSettings } from "../context/SettingsContext";
 
 import {
     Plus,
@@ -35,6 +36,7 @@ import "./Reservation.css";
 
 
 function Reservations() {
+    const { formatMoney } = useSettings();
 
     // =====================================================
     // DONNEES
@@ -581,20 +583,21 @@ function Reservations() {
     // FORMAT PRIX
     // =====================================================
 
-    const formatPrice = price => {
+    // const formatPrice = price => {
 
-        return Number(
-            price || 0
-        ).toLocaleString(
-            "fr-FR",
-            {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            }
-        );
+    //     return Number(
+    //         price || 0
+    //     ).toLocaleString(
+    //         "fr-FR",
+    //         {
+    //             minimumFractionDigits: 2,
+    //             maximumFractionDigits: 2
+    //         }
+    //     );
 
-    };
+    // };
 
+    const formatPrice = formatMoney;
 
     // =====================================================
     // FORMAT DATE
@@ -823,7 +826,7 @@ function Reservations() {
                 "Créer la réservation ?",
 
             message:
-                `Créer une réservation pour ${client?.prenom || ""} ${client?.nom || ""} avec ${form.details.length} produit(s). Total brut : ${formatPrice(totalBrut)} $, rabais : ${formatPrice(montantRabais)} $, total à payer : ${formatPrice(totalFinal)} $.`,
+                `Créer une réservation pour ${client?.prenom || ""} ${client?.nom || ""} avec ${form.details.length} produit(s). Total brut : ${formatPrice(totalBrut)} , rabais : ${formatPrice(montantRabais)} , total à payer : ${formatPrice(totalFinal)} .`,
 
             confirmText:
                 "Créer",
@@ -2277,7 +2280,7 @@ const handleConfirmPaymentReservation = async ({
                                                                     )
                                                                 }
 
-                                                                {" $"}
+                                                                {/* {" $"} */}
 
                                                             </option>
 
@@ -2445,7 +2448,7 @@ const handleConfirmPaymentReservation = async ({
         <span>Total brut</span>
 
         <strong>
-            {formatPrice(calculateGrossTotal())} $
+            {formatPrice(calculateGrossTotal())} 
         </strong>
     </div>
 
@@ -2458,7 +2461,7 @@ const handleConfirmPaymentReservation = async ({
             <span>Rabais</span>
 
             <span className="vente-discount-value">
-                - {formatPrice(calculateDiscountAmount())} $
+                - {formatPrice(calculateDiscountAmount())} 
             </span>
 
         </div>
@@ -2472,7 +2475,7 @@ const handleConfirmPaymentReservation = async ({
         <span>Total à payer</span>
 
         <strong>
-            {formatPrice(calculateFinalTotal())} $
+            {formatPrice(calculateFinalTotal())} 
         </strong>
 
     </div>
@@ -2667,7 +2670,7 @@ const handleConfirmPaymentReservation = async ({
                                                 )
                                             }
 
-                                            {" $"}
+                                            {/* {" $"} */}
 
                                         </strong>
 
@@ -2742,7 +2745,7 @@ const handleConfirmPaymentReservation = async ({
                                                                     )
                                                                 }
 
-                                                                {" $"}
+                                                                {/* {" $"} */}
 
                                                             </span>
 
@@ -2759,7 +2762,7 @@ const handleConfirmPaymentReservation = async ({
                                                             )
                                                         }
 
-                                                        {" $"}
+                                                        {/* {" $"} */}
 
                                                     </strong>
 
@@ -2800,7 +2803,7 @@ const handleConfirmPaymentReservation = async ({
                                             )
                                         }
 
-                                        {" $"}
+                                        {/* {" $"} */}
 
                                     </strong>
 
@@ -2859,7 +2862,7 @@ const handleConfirmPaymentReservation = async ({
                                             )
                                         }
 
-                                        {" $"}
+                                        {/* {" $"} */}
 
                                     </strong>
 
@@ -2887,7 +2890,7 @@ const handleConfirmPaymentReservation = async ({
                                             )
                                         }
 
-                                        {" $"}
+                                        {/* {" $"} */}
 
                                     </strong>
 
