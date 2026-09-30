@@ -1190,13 +1190,13 @@ function Paiements() {
         <div className="paiements-page">
 
             <div className="page-header">
-                <div>
+                {/* <div>
                     <h1>Paiements</h1>
                     <p>
                         Gestion centralisée des paiements
                         des ventes et réservations
                     </p>
-                </div>
+                </div> */}
 
                 <button
                     type="button"
@@ -1223,7 +1223,7 @@ function Paiements() {
             {/* =================================================
                 FORMULAIRE
             ================================================== */}
-            <div className="paiement-form-card">
+            {/* <div className="paiement-form-card">
 
                 <div className="card-title">
                     <div>
@@ -1446,7 +1446,7 @@ function Paiements() {
                     </button>
 
                 </form>
-            </div>
+            </div> */}
 
             {/* =================================================
                 HISTORIQUE

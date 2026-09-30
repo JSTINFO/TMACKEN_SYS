@@ -1738,7 +1738,7 @@ function Ventes() {
 
             <div className="page-header">
 
-                <div>
+                {/* <div>
 
                     <h1 className="page-title">
                         Ventes
@@ -1748,7 +1748,7 @@ function Ventes() {
                         Gestion des ventes et des transactions
                     </p>
 
-                </div>
+                </div> */}
 
 
                 <button

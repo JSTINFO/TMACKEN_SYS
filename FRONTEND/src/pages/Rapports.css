@@ -59,9 +59,16 @@
 }
 
 .rapport-btn.primary {
-    background: #76512f;
+    background: #25D366;
     color: #ffffff;
 }
+
+
+.rapport-btn.primary:hover{
+    background: #128C7E;
+    color: #ffffff;
+}
+
 
 .rapport-btn.secondary {
     background: #22343e;

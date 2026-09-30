@@ -2789,7 +2789,7 @@ window.onafterprint = function() {
 
             <div className="page-header">
 
-                <div>
+                {/* <div>
 
                     <h1 className="page-title">
                         Proformas
@@ -2799,7 +2799,7 @@ window.onafterprint = function() {
                         Gestion des devis et propositions commerciales
                     </p>
 
-                </div>
+                </div> */}
 
 
                 <button
