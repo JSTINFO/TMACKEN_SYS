@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import { useSettings } from "../context/SettingsContext";
 
 import {
     CreditCard,
@@ -77,6 +78,7 @@ const roundMoney = (value) => {
 // ==========================================
 
 function PaymentModal({
+    
     open,
     onClose,
 
@@ -114,6 +116,7 @@ function PaymentModal({
     userName = "Utilisateur connecté"
 }) {
 
+    const { formatMoney, currentCurrency } = useSettings();
     // ==========================================
     // DÉTECTER RÉSERVATION
     // ==========================================
@@ -359,21 +362,21 @@ function PaymentModal({
     // FORMAT MONNAIE
     // ==========================================
 
-    const formatMoney = (value) => {
+    // const formatMoney = (value) => {
 
-        return (
-            roundMoney(value)
-                .toLocaleString(
-                    "fr-FR",
-                    {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    }
-                ) +
-            " $"
-        );
+    //     return (
+    //         roundMoney(value)
+    //             .toLocaleString(
+    //                 "fr-FR",
+    //                 {
+    //                     minimumFractionDigits: 2,
+    //                     maximumFractionDigits: 2
+    //                 }
+    //             ) +
+    //         " $"
+    //     );
 
-    };
+    // };
 
 
     // ==========================================
@@ -1093,11 +1096,13 @@ function PaymentModal({
     // IMPRESSION APRÈS PAIEMENT
     // ==========================================
 
-    const formatPrintMoney = (value) =>
-        `${roundMoney(value).toLocaleString("fr-FR", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-        })} $`;
+    // const formatPrintMoney = (value) =>
+    //     `${roundMoney(value).toLocaleString("fr-FR", {
+    //         minimumFractionDigits: 2,
+    //         maximumFractionDigits: 2
+    //     })} $`;
+
+    const formatPrintMoney = formatMoney;
 
     const escapeHtml = (value) =>
         String(value ?? "")
@@ -1750,7 +1755,7 @@ td{padding:4px 1px;border-bottom:1px dotted #aaa;vertical-align:top}
                                 {typeRabais ===
                                 "POURCENTAGE"
                                     ? "%"
-                                    : "$"}
+                                    :  currentCurrency.symbol }
 
                             </span>
 
@@ -1940,7 +1945,7 @@ td{padding:4px 1px;border-bottom:1px dotted #aaa;vertical-align:top}
 
 
                             <span className="payment-currency">
-                                $
+                                {currentCurrency.symbol}
                             </span>
 
                         </div>
@@ -2015,7 +2020,7 @@ td{padding:4px 1px;border-bottom:1px dotted #aaa;vertical-align:top}
 
 
                                         <span className="payment-currency">
-                                            $
+                                            {currentCurrency.symbol}
                                         </span>
 
                                     </div>

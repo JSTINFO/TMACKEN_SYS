@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useSettings } from "../context/SettingsContext";
 
 import {
     Plus,
@@ -23,6 +24,8 @@ import ConfirmModal from "../components/ConfirmModal";
 
 
 function Produits() {
+
+    const { formatMoney, currentCurrency } = useSettings();
 
     // =====================================================
     // PRODUITS
@@ -954,6 +957,10 @@ function Produits() {
                                                 {formatPrix(
                                                     produit.prix
                                                 )}
+
+                                                {" "}
+
+                                                {currentCurrency.symbol}
                                             </strong>
 
                                         </td>
@@ -1203,7 +1210,7 @@ function Produits() {
                                     name="prix"
                                     value={form.prix}
                                     onChange={handleChange}
-                                    placeholder="0.00"
+                                    placeholder={currentCurrency.symbol}
                                     min="0"
                                     step="0.01"
                                 />

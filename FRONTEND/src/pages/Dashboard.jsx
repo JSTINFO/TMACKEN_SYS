@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
 import { getDashboard } from "../services/dashboardService";
+import { useSettings } from "../context/SettingsContext";
 
 
 function Dashboard() {
+
+    const { formatMoney, currentCurrency } = useSettings();
 
     const [dashboard, setDashboard] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -387,10 +390,12 @@ function Dashboard() {
 
                                             <div className="activity-value">
 
-                                                $
+                                                
                                                 {formaterMontant(
                                                     activite.valeur
                                                 )}
+
+                                                {currentCurrency.symbol}
 
                                             </div>
 

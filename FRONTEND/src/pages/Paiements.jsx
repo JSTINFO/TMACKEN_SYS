@@ -21,8 +21,12 @@ import { getCurrentUser } from "../services/authService";
 
 import "./Paiements.css";
 
+import { useSettings } from "../context/SettingsContext";
+
 
 function Paiements() {
+
+    const { formatMoney, currentCurrency } = useSettings();
     // =========================================================
     // DONNEES
     // =========================================================
@@ -92,12 +96,13 @@ function Paiements() {
     // =========================================================
     // FORMAT MONTANT
     // =========================================================
-    const formatMontant = (value) => {
-        return Number(value || 0).toLocaleString("fr-FR", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-        });
-    };
+    // const formatMontant = (value) => {
+    //     return Number(value || 0).toLocaleString("fr-FR", {
+    //         minimumFractionDigits: 2,
+    //         maximumFractionDigits: 2,
+    //     });
+    // };
+    const formatMontant = formatMoney;
 
     // =========================================================
     // FORMAT DATE
