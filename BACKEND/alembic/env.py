@@ -23,6 +23,7 @@ from app.models.paiement import Paiement
 from app.models.parametre import Parametre
 from app.models.proforma import Proforma
 from app.models.detail_proforma import DetailProforma
+from app.models.entreprise import Entreprise
 
 
 # Configuration Alembic

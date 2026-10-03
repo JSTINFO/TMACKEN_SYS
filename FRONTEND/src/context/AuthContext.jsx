@@ -7,7 +7,8 @@ import {
 
 import {
     login as loginService,
-    getCurrentUser
+    getCurrentUser,
+    updateCurrentUser as updateCurrentUserService
 } from "../services/authService";
 
 
@@ -90,6 +91,23 @@ export function AuthProvider({ children }) {
 
 
     // =====================================
+    // MODIFIER L'UTILISATEUR
+    // =====================================
+
+    const updateUser = async (userData) => {
+
+        const updatedUser =
+            await updateCurrentUserService(
+                userData
+            );
+
+        setUser(updatedUser);
+
+        return updatedUser;
+    };
+
+
+    // =====================================
     // LOGOUT
     // =====================================
 
@@ -109,6 +127,7 @@ export function AuthProvider({ children }) {
                 loading,
                 login,
                 logout,
+                updateUser,
                 isAuthenticated: !!user
             }}
         >

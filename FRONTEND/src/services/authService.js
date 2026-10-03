@@ -34,3 +34,38 @@ export const getCurrentUser = async () => {
 
     return response.data;
 };
+
+// ==========================================
+// MODIFIER L'UTILISATEUR CONNECTÉ
+// ==========================================
+
+export const updateCurrentUser = async (userData) => {
+
+    const response = await api.put(
+        "/auth/me",
+        userData
+    );
+
+    return response.data;
+};
+
+
+// ==========================================
+// MODIFIER LE MOT DE PASSE
+// ==========================================
+
+export const updatePassword = async (
+    actuel,
+    nouveau
+) => {
+
+    const response = await api.put(
+        "/auth/me/password",
+        {
+            actuel,
+            nouveau
+        }
+    );
+
+    return response.data;
+};

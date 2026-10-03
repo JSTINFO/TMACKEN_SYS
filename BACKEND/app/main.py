@@ -20,11 +20,30 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.routers.dashboard import router as dashboard_router
 from app.routers import utilisateurs
 from app.routers.proforma import router as proforma_router
+from app.routers import entreprise
+
+
+from pathlib import Path
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI(
     title=settings.app_name,
     version=settings.app_version,
     description="API du système de gestion Tmacken"
+)
+
+
+UPLOAD_DIR = Path(__file__).resolve().parent / "uploads"
+
+UPLOAD_DIR.mkdir(
+    parents=True,
+    exist_ok=True
+)
+
+app.mount(
+    "/uploads",
+    StaticFiles(directory=UPLOAD_DIR),
+    name="uploads"
 )
 
 
@@ -60,6 +79,7 @@ app.include_router(parametres_router)
 app.include_router(dashboard_router)
 app.include_router(utilisateurs.router)
 app.include_router(proforma_router)
+app.include_router(entreprise.router)
 
 @app.get("/")
 def accueil():

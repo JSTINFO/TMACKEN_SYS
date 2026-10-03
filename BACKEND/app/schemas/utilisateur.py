@@ -29,3 +29,8 @@ class UtilisateurResponse(UtilisateurBase):
     model_config = ConfigDict(
         from_attributes=True
     )
+
+
+class PasswordUpdate(BaseModel):
+    actuel: str
+    nouveau: str    
