@@ -16,6 +16,11 @@ import {
 
 } from "../services/authService";
 
+import {
+    getParametres,
+    updateParametre,
+} from "../services/parametreService";
+
 
 
 
@@ -574,7 +579,10 @@ useEffect(() => {
 
 
 
+const [parametreId, setParametreId] = useState(null);
 
+const [documentsSaving, setDocumentsSaving] =
+    useState(false);
 
     // =========================================================
 
@@ -628,7 +636,61 @@ useEffect(() => {
 
 
 
+useEffect(() => {
 
+    const loadParametres = async () => {
+
+        try {
+
+            const data = await getParametres();
+
+            if (!Array.isArray(data) || data.length === 0) {
+                return;
+            }
+
+            const parametre = data[0];
+
+            setParametreId(parametre.id_parametre);
+
+            setDocuments({
+                afficherLogo:
+                    parametre.afficher_logo ?? true,
+
+                afficherAdresse:
+                    parametre.afficher_adresse ?? true,
+
+                afficherTelephone:
+                    parametre.afficher_telephone ?? true,
+
+                afficherEmail:
+                    parametre.afficher_email ?? true,
+
+                message:
+                    parametre.message_recu ??
+                    "Merci pour votre confiance !",
+
+                formatTicket:
+                    parametre.format_ticket ??
+                    "80mm",
+            });
+
+        } catch (error) {
+
+            console.error(
+                "Erreur lors du chargement des paramètres :",
+                error
+            );
+
+            alert(
+                "Impossible de charger les paramètres des reçus."
+            );
+        }
+
+    };
+
+    loadParametres();
+
+}, []);
 
 
 
@@ -788,6 +850,91 @@ useEffect(() => {
 
 
 
+
+
+const handleSaveDocuments = async () => {
+
+    if (!parametreId) {
+
+        alert(
+            "Impossible d'identifier les paramètres du système."
+        );
+
+        return;
+    }
+
+    try {
+
+        setDocumentsSaving(true);
+
+        const updated = await updateParametre(
+            parametreId,
+            {
+                afficher_logo:
+                    documents.afficherLogo,
+
+                afficher_adresse:
+                    documents.afficherAdresse,
+
+                afficher_telephone:
+                    documents.afficherTelephone,
+
+                afficher_email:
+                    documents.afficherEmail,
+
+                message_recu:
+                    documents.message || null,
+
+                format_ticket:
+                    documents.formatTicket,
+            }
+        );
+
+        setDocuments({
+            afficherLogo:
+                updated.afficher_logo ?? true,
+
+            afficherAdresse:
+                updated.afficher_adresse ?? true,
+
+            afficherTelephone:
+                updated.afficher_telephone ?? true,
+
+            afficherEmail:
+                updated.afficher_email ?? true,
+
+            message:
+                updated.message_recu ??
+                "Merci pour votre confiance !",
+
+            formatTicket:
+                updated.format_ticket ??
+                "80mm",
+        });
+
+        alert(
+            "Les paramètres des reçus ont été enregistrés."
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Erreur lors de l'enregistrement des paramètres :",
+            error
+        );
+
+        const message =
+            error?.response?.data?.detail ||
+            "Impossible d'enregistrer les paramètres.";
+
+        alert(message);
+
+    } finally {
+
+        setDocumentsSaving(false);
+
+    }
+};
 
 
 
@@ -2946,27 +3093,16 @@ const handleSaveCompany = async () => {
 
 
 
-                    <button
-
-
-
-                        type="button"
-
-
-
-                        className="btn-primary"
-
-
-
-                    >
-
-
-
-                        Enregistrer les paramètres
-
-
-
-                    </button>
+                 <button
+                    type="button"
+                    className="btn-primary"
+                    onClick={handleSaveDocuments}
+                    disabled={documentsSaving}
+                >
+                    {documentsSaving
+                        ? "Enregistrement..."
+                        : "Enregistrer les paramètres"}
+                </button>
 
 
 

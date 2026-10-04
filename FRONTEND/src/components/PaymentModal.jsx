@@ -1,5 +1,8 @@
 import { useState, useEffect, useMemo } from "react";
 import { useSettings } from "../context/SettingsContext";
+import { getParametres } from "../services/parametreService";
+import { getMyEntreprise } from "../services/entrepriseService";
+import api from "../services/api";
 
 import {
     CreditCard,
@@ -21,6 +24,7 @@ import {
 } from "lucide-react";
 
 import "./PaymentModal.css";
+
 
 
 // ==========================================
@@ -117,6 +121,109 @@ function PaymentModal({
 }) {
 
     const { formatMoney, currentCurrency } = useSettings();
+    
+const [receiptSettings, setReceiptSettings] = useState({
+    afficher_logo: true,
+    afficher_adresse: true,
+    afficher_telephone: true,
+    afficher_email: true,
+    message_recu: "Merci pour votre confiance !",
+    format_ticket: "80mm",
+    logo: null,
+
+    entreprise_nom: "",
+    entreprise_adresse: "",
+    entreprise_telephone: "",
+    entreprise_email: "",
+    entreprise_site_web: "",
+});
+
+useEffect(() => {
+    if (!open) {
+        return;
+    }
+
+    const chargerParametresRecu = async () => {
+        try {
+            const [
+                parametresData,
+                entrepriseData
+            ] = await Promise.all([
+                getParametres(),
+                getMyEntreprise()
+            ]);
+
+            const parametre =
+                Array.isArray(parametresData)
+                    ? parametresData[0]
+                    : parametresData;
+
+            let logoUrl = null;
+
+            if (entrepriseData?.logo) {
+                logoUrl = new URL(
+                    entrepriseData.logo,
+                    api.defaults.baseURL
+                ).href;
+            }
+
+setReceiptSettings({
+    afficher_logo:
+        parametre?.afficher_logo ?? true,
+
+    afficher_adresse:
+        parametre?.afficher_adresse ?? true,
+
+    afficher_telephone:
+        parametre?.afficher_telephone ?? true,
+
+    afficher_email:
+        parametre?.afficher_email ?? true,
+
+    message_recu:
+        parametre?.message_recu ??
+        "Merci pour votre confiance !",
+
+    format_ticket:
+        parametre?.format_ticket ??
+        "80mm",
+
+    logo: logoUrl,
+
+    entreprise_nom:
+        entrepriseData?.nom ||
+        companyName ||
+        "LAZARE",
+
+    entreprise_adresse:
+        entrepriseData?.adresse ||
+        companyAddress ||
+        "",
+
+    entreprise_telephone:
+        entrepriseData?.telephone ||
+        companyPhone ||
+        "",
+
+    entreprise_email:
+        entrepriseData?.email ||
+        companyEmail ||
+        "",
+
+    entreprise_site_web:
+        entrepriseData?.site_web ||
+        "",
+});
+        } catch (error) {
+            console.error(
+                "Erreur chargement paramètres du reçu :",
+                error
+            );
+        }
+    };
+
+    chargerParametresRecu();
+}, [open]);
     // ==========================================
     // DÉTECTER RÉSERVATION
     // ==========================================
@@ -1116,6 +1223,15 @@ function PaymentModal({
         if (!paymentSuccess) return;
 
         const thermal = format === "THERMAL";
+        const ticketWidth =
+    receiptSettings.format_ticket === "58mm"
+        ? "58mm"
+        : "80mm";
+
+const receiptWidth =
+    receiptSettings.format_ticket === "58mm"
+        ? "50mm"
+        : "72mm";
         const printWindow = window.open(
             "",
             "_blank",
@@ -1163,10 +1279,49 @@ function PaymentModal({
                 </tr>`;
         }).join("");
 
-        const companyContact = [companyAddress, companyPhone, companyEmail]
-            .filter(Boolean)
-            .map(value => `<div>${escapeHtml(value)}</div>`)
-            .join("");
+
+
+const companyContact = [
+
+    receiptSettings.afficher_adresse
+        ? receiptSettings.entreprise_adresse
+        : null,
+
+    receiptSettings.afficher_telephone
+        ? receiptSettings.entreprise_telephone
+        : null,
+
+    receiptSettings.afficher_email
+        ? receiptSettings.entreprise_email
+        : null,
+
+    receiptSettings.entreprise_site_web
+        ? receiptSettings.entreprise_site_web
+        : null
+
+]
+    .filter(Boolean)
+    .map(
+        value => `<div>${escapeHtml(value)}</div>`
+    )
+    .join("");
+
+
+    const logoHtml =
+    receiptSettings.afficher_logo &&
+    receiptSettings.logo
+        ? `
+            <img
+                src="${escapeHtml(receiptSettings.logo)}"
+                alt="Logo"
+                class="company-logo"
+            />
+        `
+        : "";
+
+
+
+
 
         const html = `<!doctype html>
 <html lang="fr">
@@ -1175,12 +1330,28 @@ function PaymentModal({
 <title>${escapeHtml(reference || "Reçu")}</title>
 <style>
 *{box-sizing:border-box}
+
+.company-logo{
+    display:block;
+    width:auto;
+    height:auto;
+    max-width:${thermal ? "35mm" : "55mm"};
+    max-height:${thermal ? "18mm" : "30mm"};
+    object-fit:contain;
+    margin:0 auto 4px;
+}
+
 html,body{margin:0;padding:0;background:#fff;color:#111;font-family:Arial,Helvetica,sans-serif}
 body{font-size:${thermal ? "9px" : "12px"}}
-.receipt{width:${thermal ? "72mm" : "190mm"};max-width:${thermal ? "72mm" : "190mm"};margin:0 auto;padding:${thermal ? "4mm 0" : "12mm"};line-height:1.35}
+.receipt{width:${thermal ? receiptWidth : "190mm"};max-width:${thermal ? receiptWidth : "190mm"};margin:0 auto;padding:${thermal ? "4mm 0" : "12mm"};line-height:1.35}
 .company{text-align:center;margin-bottom:7px}
 .company-name{font-size:${thermal ? "17px" : "25px"};font-weight:800;letter-spacing:.4px;text-transform:uppercase}
-.company-contact{font-size:${thermal ? "8px" : "10px"};line-height:1.35;margin-top:3px}
+.company-contact{
+    font-size:${thermal ? "8px" : "10px"};
+    line-height:1.35;
+    margin-top:3px;
+    overflow-wrap:anywhere;
+}
 .document-title{text-align:center;font-size:${thermal ? "12px" : "18px"};font-weight:800;margin:8px 0 2px;text-transform:uppercase}
 .document-ref{text-align:center;font-size:${thermal ? "9px" : "12px"};margin-bottom:8px}
 .line{border-top:1px dashed #333;margin:7px 0}
@@ -1199,20 +1370,32 @@ td{padding:4px 1px;border-bottom:1px dotted #aaa;vertical-align:top}
 .footer{text-align:center;margin-top:15px;font-size:${thermal ? "8px" : "10px"};line-height:1.5}
 .thanks{font-weight:800;font-size:${thermal ? "10px" : "13px"};margin-bottom:3px}
 .small{font-size:${thermal ? "7px" : "9px"};color:#555}
-@page{size:${thermal ? "80mm 120mm" : "A4"};margin:${thermal ? "0" : "10mm"}}
+@page{size:${thermal ? `${ticketWidth} 120mm` : "A4"};margin:${thermal ? "0" : "10mm"}}
 @media print{
-    html,body{width:${thermal ? "80mm" : "210mm"};min-width:${thermal ? "80mm" : "210mm"};margin:0;padding:0}
-    .receipt{width:${thermal ? "72mm" : "190mm"};max-width:${thermal ? "72mm" : "190mm"};margin:0 auto}
+    html,body{width:${thermal ? ticketWidth : "210mm"};min-width:${thermal ? ticketWidth : "210mm"};margin:0;padding:0}
+    .receipt{width:${thermal ? receiptWidth : "190mm"};max-width:${thermal ? receiptWidth : "190mm"};margin:0 auto}
 }
 </style>
 </head>
 <body>
 <div class="receipt">
-    <div class="company">
-        <div class="company-name">${escapeHtml(companyName)}</div>
-        ${companyContact ? `<div class="company-contact">${companyContact}</div>` : ""}
+<div class="company">
+
+    ${logoHtml}
+
+    <div class="company-name">
+        ${escapeHtml(receiptSettings.entreprise_nom)}
     </div>
 
+    ${
+        companyContact
+            ? `<div class="company-contact">
+                ${companyContact}
+            </div>`
+            : ""
+    }
+
+</div>
     <div class="document-title">Reçu de paiement</div>
     <div class="document-ref">${escapeHtml(reference || "-")}</div>
 
@@ -1254,10 +1437,28 @@ td{padding:4px 1px;border-bottom:1px dotted #aaa;vertical-align:top}
     <div class="line"></div>
 
     <div class="footer">
-        <div class="thanks">Merci pour votre confiance !</div>
-        <div>Nous vous remercions pour votre achat.</div>
-        <div class="small">Conservez ce reçu comme preuve de paiement.</div>
+
+    ${
+        receiptSettings.message_recu
+            ? `
+                <div class="thanks">
+                    ${escapeHtml(
+                        receiptSettings.message_recu
+                    )}
+                </div>
+            `
+            : ""
+    }
+
+    <div>
+        Nous vous remercions pour votre achat.
     </div>
+
+    <div class="small">
+        Conservez ce reçu comme preuve de paiement.
+    </div>
+
+</div>
 </div>
 <script>
 <\/script>
@@ -1288,27 +1489,29 @@ td{padding:4px 1px;border-bottom:1px dotted #aaa;vertical-align:top}
                         // + 2 mm de sécurité pour éviter une coupure du dernier élément.
                         const heightMm = Math.max(45, Math.ceil((heightPx * 25.4) / 96 + 2));
 
-                        style.textContent += `
-                            @media print {
-                                @page {
-                                    size: 80mm ${heightMm}mm !important;
-                                    margin: 0 !important;
-                                }
-                                html, body {
-                                    width: 80mm !important;
-                                    min-width: 80mm !important;
-                                    max-width: 80mm !important;
-                                    margin: 0 !important;
-                                    padding: 0 !important;
-                                    overflow: visible !important;
-                                }
-                                .receipt {
-                                    width: 72mm !important;
-                                    max-width: 72mm !important;
-                                    margin: 0 auto !important;
-                                    padding: 4mm 0 !important;
-                                }
-                            }`;
+                                        style.textContent += `
+                        @media print {
+                            @page {
+                                size: ${ticketWidth} ${heightMm}mm !important;
+                                margin: 0 !important;
+                            }
+
+                            html, body {
+                                width: ${ticketWidth} !important;
+                                min-width: ${ticketWidth} !important;
+                                max-width: ${ticketWidth} !important;
+                                margin: 0 !important;
+                                padding: 0 !important;
+                                overflow: visible !important;
+                            }
+
+                            .receipt {
+                                width: ${receiptWidth} !important;
+                                max-width: ${receiptWidth} !important;
+                                margin: 0 auto !important;
+                                padding: 4mm 0 !important;
+                            }
+                        }`;
                     }
                 } catch (error) {
                     console.error("Erreur préparation ticket 80 mm :", error);
@@ -1358,7 +1561,10 @@ td{padding:4px 1px;border-bottom:1px dotted #aaa;vertical-align:top}
                     <p className="payment-success-question">Souhaitez-vous imprimer le reçu ?</p>
                     <div className="payment-print-actions">
                         <button type="button" className="payment-print-btn primary" onClick={() => printPayment("THERMAL")}>
-                            <Printer size={18} /><span>Ticket thermique 80 mm</span>
+                            <Printer size={18} /><span>
+    Ticket thermique{" "}
+    {receiptSettings.format_ticket === "58mm" ? "58 mm" : "80 mm"}
+</span>
                         </button>
                         <button type="button" className="payment-print-btn" onClick={() => printPayment("A4")}>
                             <FileText size={18} /><span>Document A4</span>

@@ -305,7 +305,7 @@ function Login() {
                 <div className="login-footer">
 
                     <span>
-                        Lazare v1.0
+                        v1.0
                     </span>
 
                 </div>
