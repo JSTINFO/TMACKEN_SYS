@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 
 import {
     ResponsiveContainer,
+    AreaChart,
+    Area,
     LineChart,
     Line,
     BarChart,
@@ -21,12 +23,41 @@ import { getDashboard } from "../services/dashboardService";
 import { useSettings } from "../context/SettingsContext";
 
 function Dashboard() {
+    
+    const TooltipVentes = ({ active, payload, label }) => {
+
+    if (!active || !payload || !payload.length) {
+        return null;
+    }
+
+    const valeur = payload[0]?.value || 0;
+
+    return (
+        <div className="dashboard-tooltip">
+
+            <div className="dashboard-tooltip-month">
+                {label}
+            </div>
+
+            <div className="dashboard-tooltip-label">
+                Ventes
+            </div>
+
+            <div className="dashboard-tooltip-value">
+                {formatMoney(valeur)}
+            </div>
+
+        </div>
+    );
+};
 
     const { formatMoney, currentCurrency } = useSettings();
 
     const [dashboard, setDashboard] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [periodeVentes, setPeriodeVentes] = useState(6);
+    const [periodeReservations, setPeriodeReservations] = useState(6);
 
 
     // =========================================================
@@ -154,26 +185,143 @@ const nomsMois = [
 ];
 
 
-const graphiqueVentes =
-    ventesParMois.map((item) => ({
-        mois:
-            nomsMois[item.mois - 1] ||
-            `${item.mois}/${item.annee}`,
+const graphiqueVentes = ventesParMois.map((item) => ({
+    annee: Number(item.annee),
+    moisNumero: Number(item.mois),
+    mois:
+        nomsMois[Number(item.mois) - 1] ||
+        `${item.mois}/${item.annee}`,
+    ventes: Number(item.total) || 0
+}));
 
-        ventes: Number(item.total) || 0
-    }));
+
+const construirePeriodeVentes = () => {
+
+    if (graphiqueVentes.length === 0) {
+        return [];
+    }
+
+    // On prend le dernier mois disponible dans les données
+    const dernier =
+        graphiqueVentes[graphiqueVentes.length - 1];
+
+    const resultat = [];
+
+    let annee = dernier.annee;
+    let mois = dernier.moisNumero;
+
+    for (let i = periodeVentes - 1; i >= 0; i--) {
+
+        let moisCible = mois - i;
+        let anneeCible = annee;
+
+        while (moisCible <= 0) {
+            moisCible += 12;
+            anneeCible--;
+        }
+
+        const donneesMois = graphiqueVentes.find(
+            (item) =>
+                item.annee === anneeCible &&
+                item.moisNumero === moisCible
+        );
+
+        resultat.push({
+            mois:
+                nomsMois[moisCible - 1] ||
+                `${moisCible}/${anneeCible}`,
+
+            ventes: donneesMois
+                ? donneesMois.ventes
+                : 0
+        });
+    }
+
+    return resultat;
+};
 
 
-const graphiqueReservations =
-    reservationsParMois.map((item) => ({
-        mois:
-            nomsMois[item.mois - 1] ||
-            `${item.mois}/${item.annee}`,
+const graphiqueVentesFiltre =
+    construirePeriodeVentes();
 
-        reservations:
-            Number(item.total) || 0
-    }));
+    const graphiqueReservations =
+        reservationsParMois.map((item) => ({
+            annee: Number(item.annee),
 
+            moisNumero: Number(item.mois),
+
+            mois:
+                nomsMois[Number(item.mois) - 1] ||
+                `${item.mois}/${item.annee}`,
+
+            reservations:
+                Number(item.total) || 0
+        }));
+
+
+
+
+        const construirePeriodeReservations = () => {
+
+    if (graphiqueReservations.length === 0) {
+        return [];
+    }
+
+    const dernier =
+        graphiqueReservations[
+            graphiqueReservations.length - 1
+        ];
+
+    const resultat = [];
+
+    let annee = dernier.annee;
+    let mois = dernier.moisNumero;
+
+    for (
+        let i = periodeReservations - 1;
+        i >= 0;
+        i--
+    ) {
+
+        let moisCible = mois - i;
+        let anneeCible = annee;
+
+        while (moisCible <= 0) {
+
+            moisCible += 12;
+            anneeCible--;
+
+        }
+
+        const donneesMois =
+            graphiqueReservations.find(
+                (item) =>
+                    item.annee === anneeCible &&
+                    item.moisNumero === moisCible
+            );
+
+        resultat.push({
+
+            mois:
+                nomsMois[moisCible - 1] ||
+                `${moisCible}/${anneeCible}`,
+
+            reservations:
+                donneesMois
+                    ? donneesMois.reservations
+                    : 0
+
+        });
+    }
+
+    return resultat;
+};
+
+
+const graphiqueReservationsFiltre =
+    construirePeriodeReservations();
+
+        
 
 const graphiquePaiements =
     paiementsParMode.map((item) => ({
@@ -181,6 +329,15 @@ const graphiquePaiements =
         total: Number(item.total) || 0
     }));
 
+
+    
+
+const totalPaiements =
+    graphiquePaiements.reduce(
+        (total, paiement) =>
+            total + paiement.total,
+        0
+    );
     // =========================================================
     // FORMATAGE MONNAIE
     // =========================================================
@@ -267,6 +424,18 @@ const graphiquePaiements =
     };
 
 
+    const getPaymentColor = (mode) => {
+
+    const couleurs = {
+        ESPECES: "var(--primary)",
+        CARTE: "#3B82F6",
+        VIREMENT: "var(--warning)",
+        CHEQUE: "#8B5CF6",
+        AUTRE: "var(--text-secondary)"
+    };
+
+    return couleurs[mode] || "var(--text-secondary)";
+};
     return (
 
         <div>
@@ -402,18 +571,40 @@ const graphiquePaiements =
 
         <div className="section-header">
 
-            <div>
+           <div>
+    <h2>
+        Évolution des ventes
+    </h2>
 
-                <h2>
-                    Évolution des ventes
-                </h2>
+    <p>
+        Chiffre des ventes par mois
+    </p>
+</div>
 
-                <p>
-                    Chiffre des ventes par mois
-                </p>
+<div className="sales-period-selector">
 
-            </div>
+    <button
+        className={periodeVentes === 3 ? "active" : ""}
+        onClick={() => setPeriodeVentes(3)}
+    >
+        3M
+    </button>
 
+    <button
+        className={periodeVentes === 6 ? "active" : ""}
+        onClick={() => setPeriodeVentes(6)}
+    >
+        6M
+    </button>
+
+    <button
+        className={periodeVentes === 12 ? "active" : ""}
+        onClick={() => setPeriodeVentes(12)}
+    >
+        12M
+    </button>
+
+</div>
         </div>
 
 
@@ -432,52 +623,90 @@ const graphiquePaiements =
                     height={320}
                 >
 
-                    <LineChart
-                        data={graphiqueVentes}
-                        margin={{
-                            top: 15,
-                            right: 20,
-                            left: 10,
-                            bottom: 5
-                        }}
-                    >
+                    <AreaChart
+    data={graphiqueVentesFiltre}
+    margin={{
+        top: 15,
+        right: 20,
+        left: 10,
+        bottom: 5
+    }}
+>
 
-                        <CartesianGrid
-                            strokeDasharray="3 3"
-                            opacity={0.25}
-                        />
+    <defs>
 
-                        <XAxis
-                            dataKey="mois"
-                        />
+        <linearGradient
+            id="ventesGradient"
+            x1="0"
+            y1="0"
+            x2="0"
+            y2="1"
+        >
 
-                        <YAxis
-                            tickFormatter={(value) =>
-                                value.toLocaleString("fr-FR")
-                            }
-                        />
+            <stop
+                offset="0%"
+                stopColor="var(--primary)"
+                stopOpacity={0.35}
+            />
 
-                        <Tooltip
-                            formatter={(value) =>
-                                formatMoney(value)
-                            }
-                        />
+            <stop
+                offset="100%"
+                stopColor="var(--primary)"
+                stopOpacity={0.02}
+            />
 
-                        <Line
-                            type="monotone"
-                            dataKey="ventes"
-                            name="Ventes"
-                            stroke="var(--primary)"
-                            strokeWidth={3}
-                            dot={{
-                                r: 4
-                            }}
-                            activeDot={{
-                                r: 7
-                            }}
-                        />
+                </linearGradient>
 
-                    </LineChart>
+            </defs>
+
+
+            <CartesianGrid
+                strokeDasharray="3 3"
+                opacity={0.18}
+            />
+
+
+            <XAxis
+                dataKey="mois"
+                tickLine={false}
+                axisLine={false}
+            />
+
+
+            <YAxis
+                tickLine={false}
+                axisLine={false}
+                tickFormatter={(value) =>
+                    value >= 1000
+                        ? `${Math.round(value / 1000)}k`
+                        : value
+                }
+            />
+
+
+            <Tooltip
+                content={<TooltipVentes />}
+            />
+
+
+            <Area
+                type="monotone"
+                dataKey="ventes"
+                stroke="var(--primary)"
+                strokeWidth={3}
+                fill="url(#ventesGradient)"
+                dot={{
+                    r: 4,
+                    fill: "var(--primary)",
+                    strokeWidth: 2
+                }}
+                activeDot={{
+                    r: 7,
+                    strokeWidth: 3
+                }}
+            />
+
+        </AreaChart>
 
                 </ResponsiveContainer>
 
@@ -496,18 +725,63 @@ const graphiquePaiements =
     <div className="card dashboard-chart-card">
 
         <div className="section-header">
+<div>
 
-            <div>
+    <h2>
+        Réservations
+    </h2>
 
-                <h2>
-                    Réservations
-                </h2>
+    <p>
+        Nombre de réservations par mois
+    </p>
 
-                <p>
-                    Nombre de réservations par mois
-                </p>
+</div>
 
-            </div>
+
+<div className="sales-period-selector">
+
+    <button
+        className={
+            periodeReservations === 3
+                ? "active"
+                : ""
+        }
+        onClick={() =>
+            setPeriodeReservations(3)
+        }
+    >
+        3M
+    </button>
+
+
+    <button
+        className={
+            periodeReservations === 6
+                ? "active"
+                : ""
+        }
+        onClick={() =>
+            setPeriodeReservations(6)
+        }
+    >
+        6M
+    </button>
+
+
+    <button
+        className={
+            periodeReservations === 12
+                ? "active"
+                : ""
+        }
+        onClick={() =>
+            setPeriodeReservations(12)
+        }
+    >
+        12M
+    </button>
+
+</div>
 
         </div>
 
@@ -527,42 +801,90 @@ const graphiquePaiements =
                     height={320}
                 >
 
-                    <BarChart
-                        data={graphiqueReservations}
-                        margin={{
-                            top: 15,
-                            right: 20,
-                            left: 10,
-                            bottom: 5
+                            <AreaChart
+                    data={graphiqueReservationsFiltre}
+                    margin={{
+                        top: 15,
+                        right: 20,
+                        left: 10,
+                        bottom: 5
+                    }}
+                >
+
+                    <defs>
+
+                        <linearGradient
+                            id="reservationsGradient"
+                            x1="0"
+                            y1="0"
+                            x2="0"
+                            y2="1"
+                        >
+
+                            <stop
+                                offset="0%"
+                                stopColor="var(--primary)"
+                                stopOpacity={0.30}
+                            />
+
+                            <stop
+                                offset="100%"
+                                stopColor="var(--primary)"
+                                stopOpacity={0.02}
+                            />
+
+                        </linearGradient>
+
+                    </defs>
+
+
+                    <CartesianGrid
+                        strokeDasharray="3 3"
+                        opacity={0.18}
+                    />
+
+
+                    <XAxis
+                        dataKey="mois"
+                        tickLine={false}
+                        axisLine={false}
+                    />
+
+
+                    <YAxis
+                        allowDecimals={false}
+                        tickLine={false}
+                        axisLine={false}
+                    />
+
+
+                    <Tooltip
+                        formatter={(value) => [
+                            `${value} réservation${value > 1 ? "s" : ""}`,
+                            "Total"
+                        ]}
+                    />
+
+
+                    <Area
+                        type="monotone"
+                        dataKey="reservations"
+                        name="Réservations"
+                        stroke="var(--primary)"
+                        strokeWidth={3}
+                        fill="url(#reservationsGradient)"
+                        dot={{
+                            r: 4,
+                            fill: "var(--primary)",
+                            strokeWidth: 2
                         }}
-                    >
+                        activeDot={{
+                            r: 7,
+                            strokeWidth: 3
+                        }}
+                    />
 
-                        <CartesianGrid
-                            strokeDasharray="3 3"
-                            opacity={0.25}
-                        />
-
-                        <XAxis
-                            dataKey="mois"
-                        />
-
-                        <YAxis />
-
-                        <Tooltip />
-
-                        <Bar
-                            dataKey="reservations"
-                            name="Réservations"
-                            fill="var(--primary)"
-                            radius={[
-                                5,
-                                5,
-                                0,
-                                0
-                            ]}
-                        />
-
-                    </BarChart>
+                </AreaChart>
 
                 </ResponsiveContainer>
 
@@ -578,98 +900,182 @@ const graphiquePaiements =
         PAIEMENTS
     ================================================= */}
 
-    <div className="card dashboard-chart-card dashboard-payment-chart">
+  {/* =================================================
+    PAIEMENTS
+================================================= */}
 
-        <div className="section-header">
+<div className="card dashboard-chart-card dashboard-payment-chart">
 
-            <div>
+    <div className="section-header">
 
-                <h2>
-                    Répartition des paiements
-                </h2>
+        <div>
 
-                <p>
-                    Montant par mode de paiement
-                </p>
+            <h2>
+                Répartition des paiements
+            </h2>
+
+            <p>
+                Montant par mode de paiement
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div className="payment-chart-layout">
+
+        {/* =================================================
+            DONUT
+        ================================================= */}
+
+        <div className="payment-donut">
+
+            <ResponsiveContainer
+                width="100%"
+                height={300}
+            >
+
+                <PieChart>
+
+                    <Pie
+                        data={graphiquePaiements}
+                        dataKey="total"
+                        nameKey="mode"
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={70}
+                        outerRadius={105}
+                        paddingAngle={3}
+                        stroke="var(--bg-primary)"
+                        strokeWidth={2}
+                    >
+
+                        {graphiquePaiements.map(
+                            (entry, index) => (
+                        <Cell
+                            key={`payment-cell-${index}`}
+                            fill={getPaymentColor(entry.mode)}
+                        />
+
+                            )
+                        )}
+
+                    </Pie>
+
+
+                    <Tooltip
+                        formatter={(value) =>
+                            formatMoney(value)
+                        }
+                    />
+
+                </PieChart>
+
+            </ResponsiveContainer>
+
+
+            <div className="payment-donut-center">
+
+                <span>
+                    Total
+                </span>
+
+                <strong>
+                    {formatMoney(totalPaiements)}
+                </strong>
 
             </div>
 
         </div>
 
 
-        <div className="dashboard-chart">
+        {/* =================================================
+            DÉTAILS DES PAIEMENTS
+        ================================================= */}
 
-            {graphiquePaiements.length === 0 ? (
+        <div className="payment-details">
 
-                <div className="empty-state">
-                    Aucun paiement enregistré.
-                </div>
+            {graphiquePaiements.map(
+                (paiement, index) => {
 
-            ) : (
+                    const pourcentage =
+                        totalPaiements > 0
+                            ? (
+                                paiement.total /
+                                totalPaiements
+                            ) * 100
+                            : 0;
 
-                <ResponsiveContainer
-                    width="100%"
-                    height={320}
-                >
+                   const couleur =
+    getPaymentColor(paiement.mode);
 
-                    <PieChart>
+                    return (
 
-                        <Pie
-                            data={graphiquePaiements}
-                            dataKey="total"
-                            nameKey="mode"
-                            cx="50%"
-                            cy="50%"
-                            outerRadius={105}
-                            innerRadius={55}
-                            paddingAngle={3}
-                            label
+                        <div
+                            className="payment-detail-item"
+                            key={paiement.mode}
                         >
 
-                            {graphiquePaiements.map(
-                                (entry, index) => (
+                            <div className="payment-detail-header">
 
-                                    <Cell
-                                        key={`cell-${index}`}
-                                        fill={
-                                            [
-                                                "var(--primary)",
-                                                "var(--success)",
-                                                "var(--warning)",
-                                                "var(--danger)",
-                                                "var(--text-secondary)"
-                                            ][
-                                                index %
-                                                5
-                                            ]
-                                        }
+                                <div className="payment-detail-name">
+
+                                    <span
+                                        className="payment-dot"
+                                        style={{
+                                            background:
+                                                couleur
+                                        }}
                                     />
 
-                                )
-                            )}
+                                    <span>
+                                        {paiement.mode}
+                                    </span>
 
-                        </Pie>
-
-
-                        <Tooltip
-                            formatter={(value) =>
-                                formatMoney(value)
-                            }
-                        />
+                                </div>
 
 
-                        <Legend />
+                                <strong>
+                                    {formatMoney(
+                                        paiement.total
+                                    )}
+                                </strong>
 
-                    </PieChart>
+                            </div>
 
-                </ResponsiveContainer>
 
+                            <div className="payment-progress">
+
+                                <div
+                                    className="payment-progress-bar"
+                                    style={{
+                                        width:
+                                            `${pourcentage}%`,
+                                        background:
+                                            couleur
+                                    }}
+                                />
+
+                            </div>
+
+
+                            <span className="payment-percentage">
+                                {pourcentage.toFixed(1)} %
+                            </span>
+
+                        </div>
+
+                    );
+
+                }
             )}
 
         </div>
 
     </div>
 
+</div>
 </div>
 
 
