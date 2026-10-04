@@ -1,7 +1,24 @@
 import { useEffect, useState } from "react";
-import { getDashboard } from "../services/dashboardService";
-import { useSettings } from "../context/SettingsContext";
 
+import {
+    ResponsiveContainer,
+    LineChart,
+    Line,
+    BarChart,
+    Bar,
+    PieChart,
+    Pie,
+    Cell,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    Legend
+} from "recharts";
+
+import { getDashboard } from "../services/dashboardService";
+
+import { useSettings } from "../context/SettingsContext";
 
 function Dashboard() {
 
@@ -93,18 +110,76 @@ function Dashboard() {
     // DONNÉES
     // =========================================================
 
-    const clients = dashboard.clients || {};
+  const clients = dashboard.clients || {};
 
-    const produits = dashboard.produits || {};
+const produits = dashboard.produits || {};
 
-    const stock = dashboard.stock || {};
+const stock = dashboard.stock || {};
 
-    const ventes = dashboard.ventes || {};
+const ventes = dashboard.ventes || {};
 
-    const activites = dashboard.activites_recentes || [];
+const ventesParMois =
+    dashboard.ventes_par_mois || [];
 
-    const produitsFaibles = stock.produits_faibles || [];
+const reservationsParMois =
+    dashboard.reservations_par_mois || [];
 
+const paiementsParMode =
+    dashboard.paiements_par_mode || [];
+
+const activites =
+    dashboard.activites_recentes || [];
+
+const produitsFaibles =
+    stock.produits_faibles || [];
+
+
+    // =========================================================
+// DONNÉES GRAPHIQUES
+// =========================================================
+
+const nomsMois = [
+    "Jan",
+    "Fév",
+    "Mar",
+    "Avr",
+    "Mai",
+    "Juin",
+    "Juil",
+    "Août",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Déc"
+];
+
+
+const graphiqueVentes =
+    ventesParMois.map((item) => ({
+        mois:
+            nomsMois[item.mois - 1] ||
+            `${item.mois}/${item.annee}`,
+
+        ventes: Number(item.total) || 0
+    }));
+
+
+const graphiqueReservations =
+    reservationsParMois.map((item) => ({
+        mois:
+            nomsMois[item.mois - 1] ||
+            `${item.mois}/${item.annee}`,
+
+        reservations:
+            Number(item.total) || 0
+    }));
+
+
+const graphiquePaiements =
+    paiementsParMode.map((item) => ({
+        mode: item.mode,
+        total: Number(item.total) || 0
+    }));
 
     // =========================================================
     // FORMATAGE MONNAIE
@@ -309,6 +384,293 @@ function Dashboard() {
                 </div> */}
 
             </div>
+
+
+
+            {/* =================================================
+    GRAPHIQUES
+================================================= */}
+
+<div className="dashboard-charts">
+
+
+    {/* =================================================
+        ÉVOLUTION DES VENTES
+    ================================================= */}
+
+    <div className="card dashboard-chart-card">
+
+        <div className="section-header">
+
+            <div>
+
+                <h2>
+                    Évolution des ventes
+                </h2>
+
+                <p>
+                    Chiffre des ventes par mois
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div className="dashboard-chart">
+
+            {graphiqueVentes.length === 0 ? (
+
+                <div className="empty-state">
+                    Aucune donnée de vente disponible.
+                </div>
+
+            ) : (
+
+                <ResponsiveContainer
+                    width="100%"
+                    height={320}
+                >
+
+                    <LineChart
+                        data={graphiqueVentes}
+                        margin={{
+                            top: 15,
+                            right: 20,
+                            left: 10,
+                            bottom: 5
+                        }}
+                    >
+
+                        <CartesianGrid
+                            strokeDasharray="3 3"
+                            opacity={0.25}
+                        />
+
+                        <XAxis
+                            dataKey="mois"
+                        />
+
+                        <YAxis
+                            tickFormatter={(value) =>
+                                value.toLocaleString("fr-FR")
+                            }
+                        />
+
+                        <Tooltip
+                            formatter={(value) =>
+                                formatMoney(value)
+                            }
+                        />
+
+                        <Line
+                            type="monotone"
+                            dataKey="ventes"
+                            name="Ventes"
+                            stroke="var(--primary)"
+                            strokeWidth={3}
+                            dot={{
+                                r: 4
+                            }}
+                            activeDot={{
+                                r: 7
+                            }}
+                        />
+
+                    </LineChart>
+
+                </ResponsiveContainer>
+
+            )}
+
+        </div>
+
+    </div>
+
+
+
+    {/* =================================================
+        RÉSERVATIONS
+    ================================================= */}
+
+    <div className="card dashboard-chart-card">
+
+        <div className="section-header">
+
+            <div>
+
+                <h2>
+                    Réservations
+                </h2>
+
+                <p>
+                    Nombre de réservations par mois
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div className="dashboard-chart">
+
+            {graphiqueReservations.length === 0 ? (
+
+                <div className="empty-state">
+                    Aucune réservation disponible.
+                </div>
+
+            ) : (
+
+                <ResponsiveContainer
+                    width="100%"
+                    height={320}
+                >
+
+                    <BarChart
+                        data={graphiqueReservations}
+                        margin={{
+                            top: 15,
+                            right: 20,
+                            left: 10,
+                            bottom: 5
+                        }}
+                    >
+
+                        <CartesianGrid
+                            strokeDasharray="3 3"
+                            opacity={0.25}
+                        />
+
+                        <XAxis
+                            dataKey="mois"
+                        />
+
+                        <YAxis />
+
+                        <Tooltip />
+
+                        <Bar
+                            dataKey="reservations"
+                            name="Réservations"
+                            fill="var(--primary)"
+                            radius={[
+                                5,
+                                5,
+                                0,
+                                0
+                            ]}
+                        />
+
+                    </BarChart>
+
+                </ResponsiveContainer>
+
+            )}
+
+        </div>
+
+    </div>
+
+
+
+    {/* =================================================
+        PAIEMENTS
+    ================================================= */}
+
+    <div className="card dashboard-chart-card dashboard-payment-chart">
+
+        <div className="section-header">
+
+            <div>
+
+                <h2>
+                    Répartition des paiements
+                </h2>
+
+                <p>
+                    Montant par mode de paiement
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div className="dashboard-chart">
+
+            {graphiquePaiements.length === 0 ? (
+
+                <div className="empty-state">
+                    Aucun paiement enregistré.
+                </div>
+
+            ) : (
+
+                <ResponsiveContainer
+                    width="100%"
+                    height={320}
+                >
+
+                    <PieChart>
+
+                        <Pie
+                            data={graphiquePaiements}
+                            dataKey="total"
+                            nameKey="mode"
+                            cx="50%"
+                            cy="50%"
+                            outerRadius={105}
+                            innerRadius={55}
+                            paddingAngle={3}
+                            label
+                        >
+
+                            {graphiquePaiements.map(
+                                (entry, index) => (
+
+                                    <Cell
+                                        key={`cell-${index}`}
+                                        fill={
+                                            [
+                                                "var(--primary)",
+                                                "var(--success)",
+                                                "var(--warning)",
+                                                "var(--danger)",
+                                                "var(--text-secondary)"
+                                            ][
+                                                index %
+                                                5
+                                            ]
+                                        }
+                                    />
+
+                                )
+                            )}
+
+                        </Pie>
+
+
+                        <Tooltip
+                            formatter={(value) =>
+                                formatMoney(value)
+                            }
+                        />
+
+
+                        <Legend />
+
+                    </PieChart>
+
+                </ResponsiveContainer>
+
+            )}
+
+        </div>
+
+    </div>
+
+</div>
 
 
             {/* =================================================

@@ -28,7 +28,7 @@ function Sidebar({ isOpen, onClose }) {
 
     const navigate = useNavigate();
 
-    const { logout } = useAuth();
+    const { user, logout } = useAuth();
 
 
     // =====================================================
@@ -148,16 +148,25 @@ function Sidebar({ isOpen, onClose }) {
             {/* =================================================
                 LOGO
             ================================================= */}
-
             <div className="sidebar-logo">
 
-                <h2>
-                    TMACKEN_SYS
-                </h2>
+                {user?.entreprise?.logo ? (
+                    <img
+                        src={`http://127.0.0.1:8000${user.entreprise.logo}`}
+                        alt={`Logo ${user?.entreprise?.nom || "entreprise"}`}
+                        className="sidebar-company-logo"
+                    />
+                ) : (
+                    <div className="sidebar-company-logo-placeholder">
+                        TMACKEN_SYS
+                    </div>
+                )}
+
+                <div className="sidebar-company-name">
+                    {user?.entreprise?.nom || "TMACKEN_SYS"}
+                </div>
 
             </div>
-
-
 
             {/* =================================================
                 NAVIGATION
@@ -372,7 +381,7 @@ function Sidebar({ isOpen, onClose }) {
             <div className="sidebar-footer">
 
                 <span>
-                    tmacken_sys v1.0
+                    v1.0
                 </span>
 
             </div>

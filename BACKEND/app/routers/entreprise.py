@@ -263,3 +263,28 @@ async def upload_logo(
     db.refresh(entreprise)
 
     return entreprise
+
+# =========================================================
+# GET - INFORMATIONS PUBLIQUES DE L'ENTREPRISE
+# =========================================================
+
+@router.get(
+    "/public",
+    response_model=EntrepriseResponse
+)
+def get_public_entreprise(
+    db: Session = Depends(get_db)
+):
+    entreprise = (
+        db.query(Entreprise)
+        .order_by(Entreprise.id_entreprise.asc())
+        .first()
+    )
+
+    if entreprise is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Aucune entreprise configurée"
+        )
+
+    return entreprise

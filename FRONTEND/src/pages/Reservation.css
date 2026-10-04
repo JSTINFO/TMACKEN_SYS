@@ -887,39 +887,39 @@
 
 .reservations-page .form-input {
     width: 100%;
-
-    min-height: 42px;
+    height: 42px;
 
     padding: 0 12px;
 
     box-sizing: border-box;
 
-    border-radius: 6px;
-
     border: 1px solid var(--border-color);
+    border-radius: 7px;
 
     outline: none;
 
     background: var(--bg-secondary);
-
     color: var(--text-primary);
 
-    font-size: 14px;
+    font-size: 13px;
 
     transition:
         border-color 0.2s ease,
         box-shadow 0.2s ease,
-        background 0.2s ease;
+        background 0.2s ease,
+        color 0.2s ease;
 }
 
 
 .reservations-page .form-input:focus {
     border-color: var(--primary);
 
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+
     box-shadow:
         0 0 0 3px rgba(37, 211, 102, 0.10);
 }
-
 
 .reservations-page .form-input::placeholder {
     color: var(--text-muted);

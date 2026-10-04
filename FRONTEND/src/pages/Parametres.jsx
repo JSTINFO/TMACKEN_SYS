@@ -49,19 +49,7 @@ import {
 function Parametre() {
 
 
-
-
-
-
-
     const { theme, toggleTheme } = useTheme();
-
-
-
-
-
-
-
 
 
           const handleSaveProfile = async () => {

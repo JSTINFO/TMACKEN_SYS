@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, LockKeyhole, User } from "lucide-react";
 
 import { useAuth } from "../context/AuthContext";
+
+import { getPublicEntreprise } from "../services/entrepriseService";
 
 
 function Login() {
@@ -25,6 +27,31 @@ function Login() {
 
     const [submitting, setSubmitting] = useState(false);
 
+    const [entreprise, setEntreprise] = useState(null);
+    const [entrepriseLoading, setEntrepriseLoading] = useState(true);
+
+
+
+
+
+    useEffect(() => {
+    const loadEntreprise = async () => {
+        try {
+            const data = await getPublicEntreprise();
+
+            setEntreprise(data);
+        } catch (error) {
+            console.error(
+                "Erreur lors du chargement de l'entreprise :",
+                error
+            );
+        } finally {
+            setEntrepriseLoading(false);
+        }
+    };
+
+    loadEntreprise();
+}, []);
 
     // =====================================
     // SI DÉJÀ CONNECTÉ
@@ -107,14 +134,25 @@ function Login() {
                     LOGO
                 ========================== */}
 
-                <div className="login-logo">
+                        <div className="login-logo">
 
+                {entreprise?.logo ? (
+                    <img
+                        src={`http://127.0.0.1:8000${entreprise.logo}`}
+                        alt={`Logo ${entreprise.nom || "entreprise"}`}
+                        className="login-company-logo"
+                    />
+                ) : (
                     <h1>
                         TMACKEN_SYS
                     </h1>
+                )}
 
+                <div className="login-company-name">
+                    {entreprise?.nom || "TMACKEN_SYS"}
                 </div>
 
+            </div>
 
                 {/* =========================
                     TITRE
