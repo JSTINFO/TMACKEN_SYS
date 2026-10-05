@@ -18,6 +18,9 @@ import {
 
 import { getClients } from "../services/clientService";
 import { getCurrentUser } from "../services/authService";
+import { getParametres } from "../services/parametreService";
+import { getMyEntreprise } from "../services/entrepriseService";
+import api from "../services/api";
 
 import "./Paiements.css";
 
@@ -69,6 +72,62 @@ function Paiements() {
     const [transactionDetail, setTransactionDetail] = useState(null);
     const [loadingDetail, setLoadingDetail] = useState(false);
     const [openPrintMenu, setOpenPrintMenu] = useState(null);
+
+    // =========================================================
+    // PARAMÈTRES DES REÇUS / ENTREPRISE
+    // =========================================================
+    const [receiptSettings, setReceiptSettings] = useState({
+        afficher_logo: true,
+        afficher_adresse: true,
+        afficher_telephone: true,
+        afficher_email: true,
+        message_recu: "Merci pour votre confiance !",
+        format_ticket: "80mm",
+        logo: null,
+        entreprise_nom: "LAZARE",
+        entreprise_adresse: "",
+        entreprise_telephone: "",
+        entreprise_email: "",
+        entreprise_site_web: "",
+    });
+
+    const chargerParametresRecu = async () => {
+        try {
+            const [parametresData, entrepriseData] = await Promise.all([
+                getParametres(),
+                getMyEntreprise(),
+            ]);
+
+            const parametre = Array.isArray(parametresData)
+                ? parametresData[0]
+                : parametresData;
+
+            const logoUrl = entrepriseData?.logo
+                ? new URL(entrepriseData.logo, api.defaults.baseURL).href
+                : null;
+
+            setReceiptSettings({
+                afficher_logo: parametre?.afficher_logo ?? true,
+                afficher_adresse: parametre?.afficher_adresse ?? true,
+                afficher_telephone: parametre?.afficher_telephone ?? true,
+                afficher_email: parametre?.afficher_email ?? true,
+                message_recu: parametre?.message_recu || "Merci pour votre confiance !",
+                format_ticket: parametre?.format_ticket || "80mm",
+                logo: logoUrl,
+                entreprise_nom: entrepriseData?.nom || "LAZARE",
+                entreprise_adresse: entrepriseData?.adresse || "",
+                entreprise_telephone: entrepriseData?.telephone || "",
+                entreprise_email: entrepriseData?.email || "",
+                entreprise_site_web: entrepriseData?.site_web || "",
+            });
+        } catch (error) {
+            console.error("Erreur chargement paramètres des reçus :", error);
+        }
+    };
+
+    useEffect(() => {
+        chargerParametresRecu();
+    }, []);
 
     // =========================================================
     // ERREUR FASTAPI -> TEXTE
@@ -342,6 +401,24 @@ function Paiements() {
 
             const thermal = format === "THERMAL";
 
+            const ticketWidth =
+                receiptSettings.format_ticket === "58mm" ? "58mm" : "80mm";
+
+            const receiptWidth =
+                receiptSettings.format_ticket === "58mm" ? "50mm" : "72mm";
+
+            const companyContact = [
+                receiptSettings.afficher_adresse ? receiptSettings.entreprise_adresse : null,
+                receiptSettings.afficher_telephone ? receiptSettings.entreprise_telephone : null,
+                receiptSettings.afficher_email ? receiptSettings.entreprise_email : null,
+                receiptSettings.entreprise_site_web || null,
+            ].filter(Boolean);
+
+            const logoHtml =
+                receiptSettings.afficher_logo && receiptSettings.logo
+                    ? `<img src="${escapeHtml(receiptSettings.logo)}" alt="Logo de l’entreprise" class="company-logo" />`
+                    : "";
+
             printWindow.document.open();
             printWindow.document.write(`
                 <!DOCTYPE html>
@@ -369,22 +446,22 @@ function Paiements() {
                              * remplacée par la hauteur réelle du ticket avant print().
                              */
                             @page {
-                                size: 80mm 120mm;
+                                size: ${ticketWidth} 120mm;
                                 margin: 0 !important;
                             }
 
                             html, body {
-                                width: 80mm !important;
-                                min-width: 80mm !important;
-                                max-width: 80mm !important;
+                                width: ${ticketWidth} !important;
+                                min-width: ${ticketWidth} !important;
+                                max-width: ${ticketWidth} !important;
                                 margin: 0 !important;
                                 padding: 0 !important;
                                 background: #fff !important;
                             }
 
                             .receipt {
-                                width: 72mm;
-                                max-width: 72mm;
+                                width: ${receiptWidth};
+                                max-width: ${receiptWidth};
                                 margin: 0 auto;
                                 padding: 3mm 0;
                                 font-size: 9px;
@@ -471,6 +548,16 @@ function Paiements() {
 
                         .receipt { background: #fff; }
 
+                        .company-logo {
+                            display: block;
+                            max-width: 45mm;
+                            max-height: 20mm;
+                            width: auto;
+                            height: auto;
+                            margin: 0 auto 3mm;
+                            object-fit: contain;
+                        }
+
                         .header {
                             text-align: center;
                             border-bottom: 1px dashed #000;
@@ -548,7 +635,13 @@ function Paiements() {
                 <body>
                     <main class="receipt">
                         <header class="header">
-                            <h1>LAZARE</h1>
+                            ${logoHtml}
+                            <h1>${escapeHtml(receiptSettings.entreprise_nom)}</h1>
+                            ${
+                                companyContact.length
+                                    ? `<p>${companyContact.map((value) => escapeHtml(value)).join("<br>")}</p>`
+                                    : ""
+                            }
                             <p>REÇU DE PAIEMENT</p>
                             <p>
                                 ${d.type === "VENTE" ? "Vente" : "Réservation"}
@@ -619,7 +712,10 @@ function Paiements() {
                         </section>
 
                         <footer class="footer">
-                            <p>Merci pour votre confiance !</p>
+                            <p>${escapeHtml(
+                                receiptSettings.message_recu ||
+                                "Merci pour votre confiance !"
+                            )}</p>
                             <p>Nous vous remercions pour votre achat.</p>
                             <p>Conservez ce reçu comme preuve de paiement.</p>
                         </footer>
@@ -641,8 +737,27 @@ function Paiements() {
             const lancerImpression = async () => {
                 try {
                     if (thermal) {
-                        // Laisser le navigateur terminer le rendu du contenu.
-                        await new Promise((resolve) => setTimeout(resolve, 350));
+                        // Attendre que le contenu ET les images du reçu soient chargés
+                        // avant de mesurer puis d'imprimer le ticket.
+                        await new Promise((resolve) => setTimeout(resolve, 150));
+
+                        const images = Array.from(printWindow.document.images);
+
+                        await Promise.all(
+                            images.map((img) => {
+                                if (img.complete) {
+                                    return Promise.resolve();
+                                }
+
+                                return new Promise((resolve) => {
+                                    img.onload = resolve;
+                                    img.onerror = resolve;
+                                });
+                            })
+                        );
+
+                        // Laisser le navigateur appliquer le rendu de l'image.
+                        await new Promise((resolve) => setTimeout(resolve, 150));
 
                         const receipt = printWindow.document.querySelector(".receipt");
                         const style = printWindow.document.querySelector("style");
@@ -666,14 +781,14 @@ function Paiements() {
                         style.textContent += `
                             @media print {
                                 @page {
-                                    size: 80mm ${hauteurMm}mm !important;
+                                    size: ${ticketWidth} ${hauteurMm}mm !important;
                                     margin: 0 !important;
                                 }
 
                                 html, body {
-                                    width: 80mm !important;
-                                    min-width: 80mm !important;
-                                    max-width: 80mm !important;
+                                    width: ${ticketWidth} !important;
+                                    min-width: ${ticketWidth} !important;
+                                    max-width: ${ticketWidth} !important;
                                     height: ${hauteurMm}mm !important;
                                     min-height: ${hauteurMm}mm !important;
                                     margin: 0 !important;
@@ -682,9 +797,9 @@ function Paiements() {
                                 }
 
                                 .receipt {
-                                    width: 72mm !important;
-                                    max-width: 72mm !important;
-                                    min-width: 72mm !important;
+                                    width: ${receiptWidth} !important;
+                                    max-width: ${receiptWidth} !important;
+                                    min-width: ${receiptWidth} !important;
                                     margin: 0 auto !important;
                                     padding: 3mm 0 !important;
                                 }
@@ -694,6 +809,22 @@ function Paiements() {
                         // Forcer un reflow après l'injection de la taille exacte.
                         void printWindow.document.body.offsetHeight;
                     }
+
+                    // Pour A4 également, attendre les images avant l'impression.
+                    const imagesAvantImpression = Array.from(printWindow.document.images);
+
+                    await Promise.all(
+                        imagesAvantImpression.map((img) => {
+                            if (img.complete) {
+                                return Promise.resolve();
+                            }
+
+                            return new Promise((resolve) => {
+                                img.onload = resolve;
+                                img.onerror = resolve;
+                            });
+                        })
+                    );
 
                     printWindow.focus();
                     printWindow.print();
@@ -732,8 +863,30 @@ function Paiements() {
             const d = await construireDetailTransaction(paiement);
             const doc = new jsPDF({ unit: "mm", format: "a4" });
             const w = doc.internal.pageSize.getWidth(), m = 15; let y = 18;
-            doc.setFontSize(18); doc.setFont(undefined, "bold"); doc.text("RECU DE PAIEMENT", w / 2, y, { align: "center" }); y += 10;
-            doc.setFontSize(10); doc.setFont(undefined, "normal");
+            doc.setFontSize(18);
+            doc.setFont(undefined, "bold");
+            doc.text(receiptSettings.entreprise_nom || "LAZARE", w / 2, y, { align: "center" });
+            y += 7;
+
+            doc.setFontSize(11);
+            doc.text("RECU DE PAIEMENT", w / 2, y, { align: "center" });
+            y += 7;
+
+            doc.setFontSize(9);
+            doc.setFont(undefined, "normal");
+
+            const pdfCompanyContact = [
+                receiptSettings.afficher_adresse ? receiptSettings.entreprise_adresse : null,
+                receiptSettings.afficher_telephone ? receiptSettings.entreprise_telephone : null,
+                receiptSettings.afficher_email ? receiptSettings.entreprise_email : null,
+                receiptSettings.entreprise_site_web || null,
+            ].filter(Boolean);
+
+            pdfCompanyContact.forEach((line) => {
+                doc.text(String(line), w / 2, y, { align: "center" });
+                y += 4.5;
+            });
+            y += 3;
             doc.text(`Transaction #${d.paiement.id_paiement}`, m, y); doc.text(`Date : ${formatDate(d.paiement.date_paiement)}`, w - m, y, { align: "right" }); y += 7;
             doc.text(`Type : ${d.type === "VENTE" ? "Vente" : "Reservation"}`, m, y); doc.text(`Reference : #${d.reference}`, w - m, y, { align: "right" }); y += 7;
             doc.text(`Caissier : ${d.utilisateurNom}`, m, y); y += 7;
@@ -1827,7 +1980,9 @@ function Paiements() {
                                                             </button>
                                                             {openPrintMenu === `table-${paiement.id_paiement}` && (
                                                                 <div className="print-menu">
-                                                                    <button type="button" onClick={() => imprimerTransaction(paiement, "THERMAL")}>🧾 Ticket thermique 80 mm</button>
+                                                                    <button type="button" onClick={() => imprimerTransaction(paiement, "THERMAL")}>
+                                                                    🧾 Ticket thermique {receiptSettings.format_ticket === "58mm" ? "58 mm" : "80 mm"}
+                                                                </button>
                                                                     <button type="button" onClick={() => imprimerTransaction(paiement, "A4")}>📄 Document A4</button>
                                                                     <button type="button" onClick={() => telechargerPDF(paiement)}>📥 Télécharger PDF</button>
                                                                 </div>
@@ -2051,7 +2206,7 @@ function Paiements() {
                                                 )
                                             }
                                         >
-                                            🧾 Ticket thermique 80 mm
+                                            🧾 Ticket thermique {receiptSettings.format_ticket === "58mm" ? "58 mm" : "80 mm"}
                                         </button>
 
                                         <button

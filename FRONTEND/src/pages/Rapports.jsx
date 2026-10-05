@@ -6,12 +6,13 @@ import { getReservations } from "../services/reservationService";
 import { getClients } from "../services/clientService";
 import { getCurrentUser } from "../services/authService";
 import api from "../services/api";
-import "./Rapports.css";
 import { useSettings } from "../context/SettingsContext";
+import { getMyEntreprise } from "../services/entrepriseService";
+import { getParametres } from "../services/parametreService";
+import "./Rapports.css";
 
 function Rapport() {
     const { formatMoney } = useSettings();
-
 
     const localDate = (d = new Date()) => {
         const y = d.getFullYear();
@@ -40,6 +41,9 @@ function Rapport() {
     const [printFormat, setPrintFormat] = useState("A4");
     const [detail, setDetail] = useState(null);
 
+    const [entreprise, setEntreprise] = useState({ nom:"LAZARE_SYS", adresse:"", telephone:"", email:"", site_web:"", logo:null });
+    const [receiptSettings, setReceiptSettings] = useState({ afficher_logo:true, afficher_adresse:true, afficher_telephone:true, afficher_email:true, format_ticket:"80mm" });
+
     const chargerDonnees = async () => {
         try {
             setLoading(true);
@@ -66,14 +70,25 @@ function Rapport() {
         }
     };
 
-    useEffect(() => { chargerDonnees(); }, []);
+    useEffect(() => {
+        chargerDonnees();
+        const loadSettings = async () => {
+            try {
+                const [e, p] = await Promise.all([getMyEntreprise().catch(() => null), getParametres().catch(() => null)]);
+                const param = Array.isArray(p) ? p[0] : p;
+                const logo = e?.logo ? new URL(e.logo, api.defaults.baseURL).href : null;
+                setEntreprise({ nom:e?.nom || "LAZARE_SYS", adresse:e?.adresse || "", telephone:e?.telephone || "", email:e?.email || "", site_web:e?.site_web || "", logo });
+                setReceiptSettings({ afficher_logo:param?.afficher_logo ?? true, afficher_adresse:param?.afficher_adresse ?? true, afficher_telephone:param?.afficher_telephone ?? true, afficher_email:param?.afficher_email ?? true, format_ticket:param?.format_ticket || "80mm" });
+            } catch (err) { console.error("Erreur chargement entreprise/paramètres :", err); }
+        };
+        loadSettings();
+    }, []);
 
     const clientsMap = useMemo(() => Object.fromEntries(clients.map(c => [c.id_client, c])), [clients]);
     const ventesMap = useMemo(() => Object.fromEntries(ventes.map(v => [v.id_vente, v])), [ventes]);
     const reservationsMap = useMemo(() => Object.fromEntries(reservations.map(r => [r.id_reservation, r])), [reservations]);
     const utilisateursMap = useMemo(() => Object.fromEntries(utilisateurs.map(u => [u.id_utilisateur, u])), [utilisateurs]);
 
-    // const money = (v) => `${Number(v || 0).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} $`;
     const money = formatMoney;
     const dateText = (v) => v ? new Date(v).toLocaleString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "—";
     const dateOnly = (v) => v ? new Date(v).toLocaleDateString("fr-FR") : "—";
@@ -318,24 +333,25 @@ function Rapport() {
         const w = window.open("", "_blank", "width=1000,height=900,scrollbars=yes");
         if (!w) { setError("La fenêtre d'impression a été bloquée par le navigateur."); return; }
         const thermal = format === "THERMIQUE";
+        const ticketWidth = receiptSettings.format_ticket === "58mm" ? "58mm" : "80mm";
+        const receiptWidth = receiptSettings.format_ticket === "58mm" ? "50mm" : "72mm";
+        const companyContact = [
+            receiptSettings.afficher_adresse ? entreprise.adresse : null,
+            receiptSettings.afficher_telephone ? entreprise.telephone : null,
+            receiptSettings.afficher_email ? entreprise.email : null,
+            entreprise.site_web
+        ].filter(Boolean).map(v => `<div>${escapeHtml(v)}</div>`).join("");
+        const logoHtml = receiptSettings.afficher_logo && entreprise.logo
+            ? `<img class="company-logo" src="${escapeHtml(entreprise.logo)}" alt="Logo" />`
+            : "";
         const rows = transactions.map(t => `<tr><td>${dateText(t.date)}</td><td>${escapeHtml(t.reference)}</td><td>${t.typeTransaction}</td><td>${escapeHtml(t.client)}</td><td>${escapeHtml(t.mode_paiement || "—")}</td><td class="right">${money(t.montant)}</td><td>${escapeHtml(t.statutTransaction)}</td></tr>`).join("");
         w.document.write(`<!doctype html><html lang="fr"><head><meta charset="UTF-8"><title>Inventaire des transactions</title><style>
-        *{box-sizing:border-box} @page{size:${thermal ? "80mm 120mm" : "A4 portrait"};margin:${thermal ? "0" : "12mm"}} html,body{margin:0;padding:0;background:#fff;color:#111;font-family:Arial,sans-serif}.report{width:${thermal ? "72mm" : "100%"};margin:${thermal ? "0 auto" : "0"};font-size:${thermal ? "9px" : "11px"}}.center{text-align:center}.right{text-align:right}h1{margin:0 0 3px;font-size:${thermal ? "16px" : "24px"}}h2{margin:0 0 10px;font-size:${thermal ? "11px" : "16px"}}.company{text-align:center;font-weight:bold;margin-bottom:8px}.meta{border-top:1px dashed #222;border-bottom:1px dashed #222;padding:7px 0;margin:8px 0;line-height:1.55}.summary{display:grid;grid-template-columns:repeat(${thermal ? 2 : 4},1fr);gap:6px;margin:10px 0}.box{border:1px solid #ccc;padding:6px}.box span{display:block;font-size:9px;color:#555}.box strong{display:block;margin-top:2px}table{width:100%;border-collapse:collapse}th,td{padding:${thermal ? "4px 2px" : "7px 5px"};border-bottom:1px solid #ddd;text-align:left;vertical-align:top}th{border-top:1px solid #222;border-bottom:1px solid #222}.total{display:flex;justify-content:space-between;border-top:2px solid #111;margin-top:10px;padding-top:8px;font-weight:bold;font-size:${thermal ? "11px" : "14px"}}.footer{text-align:center;border-top:1px dashed #222;margin-top:15px;padding-top:9px}@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}</style></head><body><main class="report"><div class="company"><h1>LAZARE</h1>INVENTAIRE DES TRANSACTIONS</div><div class="meta"><div><b>Période :</b> ${escapeHtml(dateDebut)} → ${escapeHtml(dateFin)}</div><div><b>Type :</b> ${escapeHtml(type)}</div><div><b>Mode :</b> ${escapeHtml(mode)}</div><div><b>Statut :</b> ${escapeHtml(statut)}</div><div><b>Généré le :</b> ${dateText(new Date())}</div></div><div class="summary"><div class="box"><span>Transactions</span><strong>${stats.count}</strong></div><div class="box"><span>Ventes</span><strong>${stats.ventes}</strong></div><div class="box"><span>Réservations</span><strong>${stats.reservations}</strong></div><div class="box"><span>Encaissé</span><strong>${money(stats.total)}</strong></div></div><table><thead><tr><th>Date</th><th>Réf.</th><th>Type</th><th>Client</th><th>Mode</th><th>Montant</th><th>Statut</th></tr></thead><tbody>${rows || `<tr><td colspan="7" class="center">Aucune transaction.</td></tr>`}</tbody></table><div class="total"><span>TOTAL ENCAISSÉ</span><span>${money(stats.total)}</span></div><div class="footer"><b>Merci pour votre confiance !</b><br>Rapport généré par LAZARE.</div></main><script>window.onload=()=>setTimeout(()=>{${thermal ? `const r=document.querySelector('.report'),s=document.querySelector('style');const h=Math.max(60,Math.ceil((r.scrollHeight||r.getBoundingClientRect().height)*25.4/96+4));s.textContent+=\`@media print{@page{size:80mm \${h}mm!important;margin:0!important}html,body{width:80mm!important;min-width:80mm!important;margin:0!important;padding:0!important}.report{width:72mm!important;margin:0 auto!important}}\`;` : ""}window.focus();window.print();},500)</script></body></html>`);
+        *{box-sizing:border-box} @page{size:${thermal ? `${ticketWidth} 120mm` : "A4 portrait"};margin:${thermal ? "0" : "12mm"}} html,body{margin:0;padding:0;background:#fff;color:#111;font-family:Arial,sans-serif}.report{width:${thermal ? receiptWidth : "100%"};margin:${thermal ? "0 auto" : "0"};font-size:${thermal ? "9px" : "11px"}}.center{text-align:center}.right{text-align:right}h1{margin:0 0 3px;font-size:${thermal ? "16px" : "24px"}}h2{margin:0 0 10px;font-size:${thermal ? "11px" : "16px"}}.company{text-align:center;font-weight:bold;margin-bottom:8px}.company-logo{display:block;max-width:45mm;max-height:20mm;width:auto;height:auto;margin:0 auto 5px;object-fit:contain}.meta{border-top:1px dashed #222;border-bottom:1px dashed #222;padding:7px 0;margin:8px 0;line-height:1.55}.summary{display:grid;grid-template-columns:repeat(${thermal ? 2 : 4},1fr);gap:6px;margin:10px 0}.box{border:1px solid #ccc;padding:6px}.box span{display:block;font-size:9px;color:#555}.box strong{display:block;margin-top:2px}table{width:100%;border-collapse:collapse}th,td{padding:${thermal ? "4px 2px" : "7px 5px"};border-bottom:1px solid #ddd;text-align:left;vertical-align:top}th{border-top:1px solid #222;border-bottom:1px solid #222}.total{display:flex;justify-content:space-between;border-top:2px solid #111;margin-top:10px;padding-top:8px;font-weight:bold;font-size:${thermal ? "11px" : "14px"}}.footer{text-align:center;border-top:1px dashed #222;margin-top:15px;padding-top:9px}@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}</style></head><body><main class="report"><div class="company">${logoHtml}<h1>${escapeHtml(entreprise.nom)}</h1>${companyContact}<div>INVENTAIRE DES TRANSACTIONS</div></div><div class="meta"><div><b>Période :</b> ${escapeHtml(dateDebut)} → ${escapeHtml(dateFin)}</div><div><b>Type :</b> ${escapeHtml(type)}</div><div><b>Mode :</b> ${escapeHtml(mode)}</div><div><b>Statut :</b> ${escapeHtml(statut)}</div><div><b>Généré le :</b> ${dateText(new Date())}</div></div><div class="summary"><div class="box"><span>Transactions</span><strong>${stats.count}</strong></div><div class="box"><span>Ventes</span><strong>${stats.ventes}</strong></div><div class="box"><span>Réservations</span><strong>${stats.reservations}</strong></div><div class="box"><span>Encaissé</span><strong>${money(stats.total)}</strong></div></div><table><thead><tr><th>Date</th><th>Réf.</th><th>Type</th><th>Client</th><th>Mode</th><th>Montant</th><th>Statut</th></tr></thead><tbody>${rows || `<tr><td colspan="7" class="center">Aucune transaction.</td></tr>`}</tbody></table><div class="total"><span>TOTAL ENCAISSÉ</span><span>${money(stats.total)}</span></div><div class="footer"><b>Merci pour votre confiance !</b><br>Rapport généré par ${escapeHtml(entreprise.nom)}.</div></main><script>window.onload=()=>setTimeout(()=>{${thermal ? `const r=document.querySelector('.report'),s=document.querySelector('style');const h=Math.max(60,Math.ceil((r.scrollHeight||r.getBoundingClientRect().height)*25.4/96+4));s.textContent+=\`@media print{@page{size:${ticketWidth} \${h}mm!important;margin:0!important}html,body{width:${ticketWidth}!important;min-width:${ticketWidth}!important;margin:0!important;padding:0!important}.report{width:${receiptWidth}!important;margin:0 auto!important}}\`;` : ""}const images=Array.from(document.images);Promise.all(images.map(img=>img.complete?Promise.resolve():new Promise(resolve=>{img.onload=resolve;img.onerror=resolve;}))).then(()=>{window.focus();window.print();});},500)</script></body></html>`);
         w.document.close();
     };
 
     return <div className="rapports-page">
-
-        <div className="rapports-header">
-            
-            {/* <div>
-            <h1>Rapports</h1>
-        <p>Inventaire des transactions et encaissements</p>
-            </div>
-         */}
-        <div className="rapports-header-actions"><button className="rapport-btn secondary" onClick={chargerDonnees}><RefreshCw size={16}/> Actualiser</button><button className="rapport-btn primary" onClick={() => setPrintOpen(true)}><Printer size={16}/> Imprimer l'inventaire</button></div></div>
-        
-        
+        <div className="rapports-header"><div><h1>Rapports</h1><p>Inventaire des transactions et encaissements</p></div><div className="rapports-header-actions"><button className="rapport-btn secondary" onClick={chargerDonnees}><RefreshCw size={16}/> Actualiser</button><button className="rapport-btn primary" onClick={() => setPrintOpen(true)}><Printer size={16}/> Imprimer l'inventaire</button></div></div>
         {error && <div className="rapport-error">{error}</div>}
         <section className="rapport-filter-card"><div className="filter-title"><Filter size={18}/><div><h2>Filtres du rapport</h2><span>Choisissez la période et les critères de l'inventaire.</span></div></div><div className="rapport-filters">
             <div className="filter-field"><label>Période</label><select value={periode} onChange={e=>changePeriode(e.target.value)}><option value="AUJOURD_HUI">Aujourd'hui</option><option value="HIER">Hier</option><option value="CETTE_SEMAINE">Cette semaine</option><option value="SEMAINE_PRECEDENTE">Semaine précédente</option><option value="CE_MOIS">Ce mois</option><option value="MOIS_PRECEDENT">Mois précédent</option><option value="CETTE_ANNEE">Cette année</option><option value="ANNEE_PRECEDENTE">Année précédente</option><option value="7_JOURS">7 derniers jours</option><option value="30_JOURS">30 derniers jours</option><option value="PERSONNALISEE">Période personnalisée</option></select></div>
@@ -349,7 +365,7 @@ function Rapport() {
         <section className="rapport-stats"><div className="rapport-stat-card"><div className="stat-icon blue"><FileText size={19}/></div><div><span>Transactions</span><strong>{stats.count}</strong></div></div><div className="rapport-stat-card"><div className="stat-icon green"><DollarSign size={19}/></div><div><span>Total encaissé</span><strong>{money(stats.total)}</strong></div></div><div className="rapport-stat-card"><div className="stat-icon orange"><ShoppingCart size={19}/></div><div><span>Ventes</span><strong>{stats.ventes}</strong></div></div><div className="rapport-stat-card"><div className="stat-icon purple"><CreditCard size={19}/></div><div><span>Réservations</span><strong>{stats.reservations}</strong></div></div></section>
         <section className="payment-breakdown"><div><span>Espèces</span><strong>{money(stats.especes)}</strong></div><div><span>Carte</span><strong>{money(stats.carte)}</strong></div><div><span>Virement</span><strong>{money(stats.virement)}</strong></div><div><span>Chèque</span><strong>{money(stats.cheque)}</strong></div></section>
         <section className="rapport-table-card"><div className="rapport-table-header"><div><h2>Inventaire des transactions</h2><p>{dateDebut} → {dateFin} · {transactions.length} transaction(s)</p></div><button className="rapport-btn primary" onClick={()=>setPrintOpen(true)}><Printer size={16}/> Imprimer</button></div><div className="table-wrapper"><table className="rapport-table"><thead><tr><th>Date</th><th>Type</th><th>Référence</th><th>Client</th><th>Caissier</th><th>Mode</th><th>Montant</th><th>Statut</th><th>Action</th></tr></thead><tbody>{loading?<tr><td colSpan="9" className="empty-row">Chargement...</td></tr>:transactions.length===0?<tr><td colSpan="9" className="empty-row">Aucune transaction pour les critères sélectionnés.</td></tr>:transactions.map(t=><tr key={t.id_paiement}><td>{dateText(t.date)}</td><td><span className={`type-badge ${t.typeTransaction.toLowerCase()}`}>{t.typeTransaction}</span></td><td className="reference-cell">{t.reference}</td><td>{t.client}</td><td>{t.utilisateur || utilisateurName(t, t.id_utilisateur)}</td><td>{t.mode_paiement||"—"}</td><td className="amount-cell">{money(t.montant)}</td><td><span className={`status-badge ${t.statutTransaction.toLowerCase()}`}>{t.statutTransaction}</span></td><td><button className="table-view-btn" onClick={()=>setDetail(t)}><Eye size={15}/></button></td></tr>)}</tbody></table></div></section>
-        {printOpen && <div className="rapport-modal-overlay" onMouseDown={()=>setPrintOpen(false)}><div className="rapport-print-modal" onMouseDown={e=>e.stopPropagation()}><div className="rapport-modal-header"><div><h2>Imprimer l'inventaire</h2><p>Choisissez le format.</p></div><button onClick={()=>setPrintOpen(false)}><X size={20}/></button></div><div className="print-options"><button className={`print-option ${printFormat==="A4"?"active":""}`} onClick={()=>setPrintFormat("A4")}><FileText size={24}/><div><strong>Document A4</strong><span>Rapport complet</span></div></button><button className={`print-option ${printFormat==="THERMIQUE"?"active":""}`} onClick={()=>setPrintFormat("THERMIQUE")}><Printer size={24}/><div><strong>Ticket thermique 80 mm</strong><span>Format compact POS</span></div></button></div><div className="rapport-modal-actions"><button className="rapport-btn secondary" onClick={()=>setPrintOpen(false)}>Annuler</button><button className="rapport-btn primary" onClick={()=>imprimer(printFormat)}><Printer size={16}/> Imprimer</button></div></div></div>}
+        {printOpen && <div className="rapport-modal-overlay" onMouseDown={()=>setPrintOpen(false)}><div className="rapport-print-modal" onMouseDown={e=>e.stopPropagation()}><div className="rapport-modal-header"><div><h2>Imprimer l'inventaire</h2><p>Choisissez le format.</p></div><button onClick={()=>setPrintOpen(false)}><X size={20}/></button></div><div className="print-options"><button className={`print-option ${printFormat==="A4"?"active":""}`} onClick={()=>setPrintFormat("A4")}><FileText size={24}/><div><strong>Document A4</strong><span>Rapport complet</span></div></button><button className={`print-option ${printFormat==="THERMIQUE"?"active":""}`} onClick={()=>setPrintFormat("THERMIQUE")}><Printer size={24}/><div><strong>Ticket thermique {receiptSettings.format_ticket === "58mm" ? "58 mm" : "80 mm"}</strong><span>Format compact POS</span></div></button></div><div className="rapport-modal-actions"><button className="rapport-btn secondary" onClick={()=>setPrintOpen(false)}>Annuler</button><button className="rapport-btn primary" onClick={()=>imprimer(printFormat)}><Printer size={16}/> Imprimer</button></div></div></div>}
         {detail && <div className="rapport-modal-overlay" onMouseDown={()=>setDetail(null)}><div className="rapport-detail-modal" onMouseDown={e=>e.stopPropagation()}><div className="rapport-modal-header"><div><h2>{detail.reference}</h2><p>{dateText(detail.date)}</p></div><button onClick={()=>setDetail(null)}><X size={20}/></button></div><div className="detail-grid"><div><span>Type</span><strong>{detail.typeTransaction}</strong></div><div><span>Client</span><strong>{detail.client}</strong></div><div><span>Mode</span><strong>{detail.mode_paiement||"—"}</strong></div><div><span>Utilisateur</span><strong>{detail.utilisateur || utilisateurName(detail, detail.id_utilisateur)}</strong></div><div><span>Montant</span><strong>{money(detail.montant)}</strong></div><div><span>Statut</span><strong>{detail.statutTransaction}</strong></div></div><div className="rapport-modal-actions"><button className="rapport-btn secondary" onClick={()=>setDetail(null)}>Fermer</button></div></div></div>}
     </div>;
 }

@@ -29,6 +29,8 @@ import {
 import { getClients } from "../services/clientService";
 import { getProduits } from "../services/produitService";
 import { getCurrentUser } from "../services/authService";
+import { getMyEntreprise } from "../services/entrepriseService";
+import api from "../services/api";
 
 import ConfirmModal from "../components/ConfirmModal";
 
@@ -46,6 +48,15 @@ function Proformas() {
     const [clients, setClients] = useState([]);
     const [produits, setProduits] = useState([]);
     const [currentUser, setCurrentUser] = useState(null);
+
+    const [entreprise, setEntreprise] = useState({
+        nom: "TMACKEN SYSTEM",
+        adresse: "",
+        telephone: "",
+        email: "",
+        site_web: "",
+        logo: null,
+    });
 
 
     // =====================================================
@@ -197,6 +208,30 @@ function Proformas() {
     // =====================================================
     // CHARGEMENT INITIAL
     // =====================================================
+
+    useEffect(() => {
+        const chargerEntreprise = async () => {
+            try {
+                const data = await getMyEntreprise();
+                const logoUrl = data?.logo
+                    ? new URL(data.logo, api.defaults.baseURL).href
+                    : null;
+
+                setEntreprise({
+                    nom: data?.nom || "TMACKEN SYSTEM",
+                    adresse: data?.adresse || "",
+                    telephone: data?.telephone || "",
+                    email: data?.email || "",
+                    site_web: data?.site_web || "",
+                    logo: logoUrl,
+                });
+            } catch (error) {
+                console.error("Erreur chargement entreprise :", error);
+            }
+        };
+
+        chargerEntreprise();
+    }, []);
 
     useEffect(() => {
 
@@ -1889,6 +1924,21 @@ body {
     flex: 1;
 }
 
+.company-logo {
+    display: block;
+    max-width: 45mm;
+    max-height: 20mm;
+    width: auto;
+    height: auto;
+    margin: 0 0 7px;
+    object-fit: contain;
+}
+
+.company-contact {
+    margin: 2px 0 0;
+    color: #6b7280;
+    font-size: 10px;
+}
 
 .company-name {
     margin: 0 0 5px;
@@ -2322,13 +2372,20 @@ body {
 
         <div class="company">
 
+            ${entreprise.logo ? `<img class="company-logo" src="${escapeHtml(entreprise.logo)}" alt="Logo" />` : ""}
+
             <h1 class="company-name">
-                TMACKEN SYSTEM
+                ${escapeHtml(entreprise.nom)}
             </h1>
 
             <p class="company-subtitle">
                 Gestion commerciale
             </p>
+
+            ${entreprise.adresse ? `<p class="company-contact">${escapeHtml(entreprise.adresse)}</p>` : ""}
+            ${entreprise.telephone ? `<p class="company-contact">${escapeHtml(entreprise.telephone)}</p>` : ""}
+            ${entreprise.email ? `<p class="company-contact">${escapeHtml(entreprise.email)}</p>` : ""}
+            ${entreprise.site_web ? `<p class="company-contact">${escapeHtml(entreprise.site_web)}</p>` : ""}
 
         </div>
 
@@ -2707,14 +2764,23 @@ body {
 
 window.onload = function() {
 
-    setTimeout(
-        function() {
+    setTimeout(async function() {
 
-            window.print();
+        const images = Array.from(document.images);
 
-        },
-        300
-    );
+        await Promise.all(
+            images.map((img) => {
+                if (img.complete) return Promise.resolve();
+                return new Promise((resolve) => {
+                    img.onload = resolve;
+                    img.onerror = resolve;
+                });
+            })
+        );
+
+        window.print();
+
+    }, 300);
 
 };
 
