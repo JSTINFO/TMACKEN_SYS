@@ -2,7 +2,7 @@
    PAGE VENTES
 ===================================================== */
 
-.ventes-page {
+.ventes-page{
     width: 100%;
     min-height: 100%;
     padding: 32px;
@@ -14,7 +14,7 @@
    HEADER
 ===================================================== */
 
-.page-header {
+.ventes-page .page-header{
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -23,14 +23,14 @@
 }
 
 
-.page-title {
+.ventes-page .page-title{
     margin: 0;
     font-size: 28px;
     font-weight: 700;
 }
 
 
-.page-description {
+.ventes-page .page-description{
     margin: 6px 0 0;
     color: #82909b;
     font-size: 14px;
@@ -41,7 +41,7 @@
    BOUTONS
 ===================================================== */
 
-.btn {
+.ventes-page .btn{
     border: none;
     border-radius: 7px;
     min-height: 40px;
@@ -64,47 +64,47 @@
 }
 
 
-.btn:hover {
+.ventes-page .btn:hover{
     transform: translateY(-1px);
 }
 
 
-.btn:disabled {
+.ventes-page .btn:disabled{
     opacity: 0.55;
     cursor: not-allowed;
     transform: none;
 }
 
 
-.btn-primary {
+.ventes-page .btn-primary{
     background: #19d36b;
     color: #ffffff;
 }
 
 
-.btn-primary:hover {
+.ventes-page .btn-primary:hover{
     background: #15bd5e;
 }
 
 
-.btn-secondary {
+.ventes-page .btn-secondary{
     background: #293943;
     color: #ffffff;
 }
 
 
-.btn-secondary:hover {
+.ventes-page .btn-secondary:hover{
     background: #334954;
 }
 
 
-.btn-danger {
+.ventes-page .btn-danger{
     background: #d83d3d;
     color: #ffffff;
 }
 
 
-.btn-danger:hover {
+.ventes-page .btn-danger:hover{
     background: #bd3030;
 }
 
@@ -113,36 +113,21 @@
    ERREUR
 ===================================================== */
 
-.vente-error {
-    position: fixed;
-    top: 82px;
-    right: 24px;
-    z-index: 99999;
-
-    width: min(420px, calc(100vw - 48px));
+.ventes-page .vente-error{
+    width: 100%;
     box-sizing: border-box;
 
-    margin: 0;
-    padding: 14px 18px;
+    margin-bottom: 20px;
+    padding: 13px 16px;
 
-    border-radius: 10px;
+    border-radius: 8px;
 
-    background: #3a171b;
-    border: 1px solid rgba(255, 90, 90, 0.45);
-    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35);
+    background: rgba(220, 53, 69, 0.12);
+    border: 1px solid rgba(220, 53, 69, 0.35);
 
     color: #ff7676;
 
     font-size: 14px;
-    line-height: 1.45;
-}
-
-@media (max-width: 700px) {
-    .vente-error {
-        top: 70px;
-        right: 14px;
-        width: calc(100vw - 28px);
-    }
 }
 
 
@@ -150,7 +135,7 @@
    STATISTIQUES
 ===================================================== */
 
-.stats-grid {
+.ventes-page .stats-grid{
     display: grid;
 
     grid-template-columns:
@@ -162,7 +147,7 @@
 }
 
 
-.stat-card {
+.ventes-page .stat-card{
     min-height: 105px;
 
     padding: 22px;
@@ -185,7 +170,7 @@
 }
 
 
-.stat-label {
+.ventes-page .stat-label{
     display: block;
 
     color: #8da0ad;
@@ -196,7 +181,7 @@
 }
 
 
-.stat-value {
+.ventes-page .stat-value{
     display: block;
 
     color: #ffffff;
@@ -211,7 +196,7 @@
    TOOLBAR
 ===================================================== */
 
-.toolbar {
+.ventes-page .toolbar{
     display: flex;
 
     align-items: center;
@@ -222,7 +207,7 @@
 }
 
 
-.vente-search-wrapper {
+.ventes-page .vente-search-wrapper{
     width: 350px;
 
     min-height: 42px;
@@ -247,7 +232,7 @@
 }
 
 
-.vente-search-wrapper input {
+.ventes-page .vente-search-wrapper input{
     width: 100%;
 
     border: none;
@@ -262,7 +247,7 @@
 }
 
 
-.vente-search-wrapper input::placeholder {
+.ventes-page .vente-search-wrapper input::placeholder{
     color: #758792;
 }
 
@@ -271,7 +256,7 @@
    TABLE
 ===================================================== */
 
-.table-container {
+.ventes-page .table-container{
     width: 100%;
 
     overflow-x: auto;
@@ -284,7 +269,7 @@
 }
 
 
-.table {
+.ventes-page .table{
     width: 100%;
 
     border-collapse: collapse;
@@ -293,12 +278,12 @@
 }
 
 
-.table thead {
+.ventes-page .table thead{
     background: #253640;
 }
 
 
-.table th {
+.ventes-page .table th{
     padding: 15px;
 
     text-align: left;
@@ -313,7 +298,7 @@
 }
 
 
-.table td {
+.ventes-page .table td{
     padding: 16px 15px;
 
     border-top: 1px solid #293941;
@@ -324,7 +309,7 @@
 }
 
 
-.table tbody tr:hover {
+.ventes-page .table tbody tr:hover{
     background: rgba(255, 255, 255, 0.025);
 }
 
@@ -333,7 +318,7 @@
    CLIENT
 ===================================================== */
 
-.vente-client {
+.ventes-page .vente-client{
     display: flex;
 
     align-items: center;
@@ -346,7 +331,7 @@
    STATUT
 ===================================================== */
 
-.vente-status {
+.ventes-page .vente-status{
     display: inline-flex;
 
     align-items: center;
@@ -359,17 +344,17 @@
 }
 
 
-.vente-status.pending {
+.ventes-page .vente-status.pending{
     color: #f4c95d;
 }
 
 
-.vente-status.paid {
+.ventes-page .vente-status.paid{
     color: #26d978;
 }
 
 
-.vente-status.cancelled {
+.ventes-page .vente-status.cancelled{
     color: #ff6666;
 }
 
@@ -378,7 +363,7 @@
    ACTIONS
 ===================================================== */
 
-.vente-actions {
+.ventes-page .vente-actions{
     display: flex;
 
     align-items: center;
@@ -387,7 +372,7 @@
 }
 
 
-.table-action {
+.ventes-page .table-action{
     width: 32px;
 
     height: 32px;
@@ -410,27 +395,27 @@
 }
 
 
-.table-action:hover {
+.ventes-page .table-action:hover{
     background: #263740;
 }
 
 
-.table-action.view:hover {
+.ventes-page .table-action.view:hover{
     color: #6cb8ff;
 }
 
 
-.table-action.confirm:hover {
+.ventes-page .table-action.confirm:hover{
     color: #28dd79;
 }
 
 
-.table-action.delete:hover {
+.ventes-page .table-action.delete:hover{
     color: #ff6464;
 }
 
 
-.table-action:disabled {
+.ventes-page .table-action:disabled{
     opacity: 0.4;
 
     cursor: not-allowed;
@@ -441,7 +426,7 @@
    EMPTY
 ===================================================== */
 
-.vente-empty {
+.ventes-page .vente-empty{
     min-height: 300px;
 
     display: flex;
@@ -458,14 +443,14 @@
 }
 
 
-.vente-empty h3 {
+.ventes-page .vente-empty h3{
     margin: 8px 0 0;
 
     color: #dce5e9;
 }
 
 
-.vente-empty p {
+.ventes-page .vente-empty p{
     margin: 0;
 
     font-size: 14px;
@@ -476,7 +461,7 @@
    LOADING
 ===================================================== */
 
-.vente-loading {
+.ventes-page .vente-loading{
     min-height: 400px;
 
     display: flex;
@@ -491,7 +476,7 @@
 }
 
 
-.spin {
+.ventes-page .spin{
     animation: spin 1s linear infinite;
 }
 
@@ -513,7 +498,7 @@
    MODAL
 ===================================================== */
 
-.modal-overlay {
+.ventes-page .modal-overlay{
     position: fixed;
 
     inset: 0;
@@ -536,7 +521,7 @@
 }
 
 
-.client-modal {
+.ventes-page .client-modal{
     width: 100%;
 
     max-width: 560px;
@@ -560,12 +545,12 @@
 }
 
 
-.vente-modal {
+.ventes-page .vente-modal{
     max-width: 620px;
 }
 
 
-.vente-detail-modal {
+.ventes-page .vente-detail-modal{
     max-width: 700px;
 }
 
@@ -574,7 +559,7 @@
    MODAL HEADER
 ===================================================== */
 
-.modal-header {
+.ventes-page .modal-header{
     display: flex;
 
     align-items: flex-start;
@@ -587,7 +572,7 @@
 }
 
 
-.modal-header h2 {
+.ventes-page .modal-header h2{
     margin: 0;
 
     color: #ffffff;
@@ -596,7 +581,7 @@
 }
 
 
-.modal-header p {
+.ventes-page .modal-header p{
     margin: 6px 0 0;
 
     color: #82939e;
@@ -605,7 +590,7 @@
 }
 
 
-.modal-close {
+.ventes-page .modal-close{
     width: 34px;
 
     height: 34px;
@@ -630,7 +615,7 @@
 }
 
 
-.modal-close:hover {
+.ventes-page .modal-close:hover{
     background: #374b57;
 
     color: #ffffff;
@@ -641,12 +626,12 @@
    FORMULAIRE
 ===================================================== */
 
-.form-group {
+.ventes-page .form-group{
     margin-bottom: 20px;
 }
 
 
-.form-label {
+.ventes-page .form-label{
     display: block;
 
     margin-bottom: 8px;
@@ -659,7 +644,7 @@
 }
 
 
-.form-input {
+.ventes-page .form-input{
     width: 100%;
 
     min-height: 42px;
@@ -682,12 +667,12 @@
 }
 
 
-.form-input:focus {
+.ventes-page .form-input:focus{
     border-color: #20d66f;
 }
 
 
-.form-input option {
+.ventes-page .form-input option{
     background: #1a2930;
 
     color: #ffffff;
@@ -698,12 +683,12 @@
    PRODUITS
 ===================================================== */
 
-.reservation-form-section {
+.ventes-page .reservation-form-section{
     margin-top: 20px;
 }
 
 
-.reservation-products-header {
+.ventes-page .reservation-products-header{
     display: flex;
 
     align-items: center;
@@ -716,7 +701,7 @@
 }
 
 
-.reservation-products-header h3 {
+.ventes-page .reservation-products-header h3{
     margin: 0;
 
     color: #ffffff;
@@ -725,7 +710,7 @@
 }
 
 
-.reservation-products-header p {
+.ventes-page .reservation-products-header p{
     margin: 4px 0 0;
 
     color: #82939e;
@@ -734,7 +719,7 @@
 }
 
 
-.reservation-product-form-row {
+.ventes-page .reservation-product-form-row{
     display: grid;
 
     grid-template-columns:
@@ -748,7 +733,7 @@
 }
 
 
-.quantity-input {
+.ventes-page .quantity-input{
     text-align: center;
 }
 
@@ -757,8 +742,8 @@
    TOTAL
 ===================================================== */
 
-.reservation-total-preview,
-.reservation-total-row {
+.ventes-page .reservation-total-preview,
+.ventes-page .reservation-total-row{
     display: flex;
 
     align-items: center;
@@ -777,8 +762,8 @@
 }
 
 
-.reservation-total-preview strong,
-.reservation-total-row strong {
+.ventes-page .reservation-total-preview strong,
+.ventes-page .reservation-total-row strong{
     color: #ffffff;
 
     font-size: 19px;
@@ -789,7 +774,7 @@
    MODAL ACTIONS
 ===================================================== */
 
-.modal-actions {
+.ventes-page .modal-actions{
     display: flex;
 
     align-items: center;
@@ -808,7 +793,7 @@
    DÉTAIL VENTE
 ===================================================== */
 
-.vente-detail-top {
+.ventes-page .vente-detail-top{
     display: grid;
 
     grid-template-columns:
@@ -820,7 +805,7 @@
 }
 
 
-.vente-detail-top > div {
+.ventes-page .vente-detail-top > div{
     padding: 14px;
 
     border-radius: 7px;
@@ -831,7 +816,7 @@
 }
 
 
-.detail-label {
+.ventes-page .detail-label{
     display: block;
 
     margin-bottom: 6px;
@@ -842,7 +827,7 @@
 }
 
 
-.vente-detail-top strong {
+.ventes-page .vente-detail-top strong{
     color: #ffffff;
 
     font-size: 14px;
@@ -853,7 +838,7 @@
    LISTE PRODUITS
 ===================================================== */
 
-.reservation-products-list {
+.ventes-page .reservation-products-list{
     display: flex;
 
     flex-direction: column;
@@ -862,7 +847,7 @@
 }
 
 
-.reservation-product-row {
+.ventes-page .reservation-product-row{
     display: flex;
 
     align-items: center;
@@ -881,7 +866,7 @@
 }
 
 
-.reservation-product-info {
+.ventes-page .reservation-product-info{
     display: flex;
 
     align-items: center;
@@ -890,7 +875,7 @@
 }
 
 
-.reservation-product-icon {
+.ventes-page .reservation-product-icon{
     width: 34px;
 
     height: 34px;
@@ -909,7 +894,7 @@
 }
 
 
-.reservation-product-info strong {
+.ventes-page .reservation-product-info strong{
     display: block;
 
     color: #ffffff;
@@ -918,7 +903,7 @@
 }
 
 
-.reservation-product-info span {
+.ventes-page .reservation-product-info span{
     display: block;
 
     margin-top: 4px;
@@ -929,7 +914,7 @@
 }
 
 
-.reservation-product-row > strong {
+.ventes-page .reservation-product-row > strong{
     color: #ffffff;
 
     white-space: nowrap;
@@ -940,7 +925,7 @@
    CONFIRMATION MODAL
 ===================================================== */
 
-.confirm-overlay {
+.ventes-page .confirm-overlay{
     position: fixed;
 
     inset: 0;
@@ -961,7 +946,7 @@
 }
 
 
-.confirm-modal {
+.ventes-page .confirm-modal{
     position: relative;
 
     width: 100%;
@@ -983,7 +968,7 @@
 }
 
 
-.confirm-close {
+.ventes-page .confirm-close{
     position: absolute;
 
     top: 15px;
@@ -1012,7 +997,7 @@
 }
 
 
-.confirm-icon {
+.ventes-page .confirm-icon{
     width: 52px;
 
     height: 52px;
@@ -1033,21 +1018,21 @@
 }
 
 
-.confirm-modal.danger .confirm-icon {
+.ventes-page .confirm-modal.danger .confirm-icon{
     background: rgba(255, 90, 90, 0.12);
 
     color: #ff6666;
 }
 
 
-.confirm-modal.success .confirm-icon {
+.ventes-page .confirm-modal.success .confirm-icon{
     background: rgba(38, 217, 120, 0.12);
 
     color: #26d978;
 }
 
 
-.confirm-content h2 {
+.ventes-page .confirm-content h2{
     margin: 0 0 8px;
 
     color: #ffffff;
@@ -1056,7 +1041,7 @@
 }
 
 
-.confirm-content p {
+.ventes-page .confirm-content p{
     margin: 0;
 
     line-height: 1.6;
@@ -1067,7 +1052,7 @@
 }
 
 
-.confirm-actions {
+.ventes-page .confirm-actions{
     display: flex;
 
     justify-content: flex-end;
@@ -1084,7 +1069,7 @@
 
 @media (max-width: 1000px) {
 
-    .stats-grid {
+    .ventes-page .stats-grid{
         grid-template-columns:
             repeat(2, minmax(0, 1fr));
     }
@@ -1094,47 +1079,47 @@
 
 @media (max-width: 700px) {
 
-    .ventes-page {
+    .ventes-page{
         padding: 20px;
     }
 
 
-    .page-header {
+    .ventes-page .page-header{
         align-items: flex-start;
 
         flex-direction: column;
     }
 
 
-    .page-header .btn {
+    .ventes-page .page-header .btn{
         width: 100%;
     }
 
 
-    .stats-grid {
+    .ventes-page .stats-grid{
         grid-template-columns:
             1fr;
     }
 
 
-    .vente-search-wrapper {
+    .ventes-page .vente-search-wrapper{
         width: 100%;
     }
 
 
-    .reservation-product-form-row {
+    .ventes-page .reservation-product-form-row{
         grid-template-columns:
             1fr 90px 38px;
     }
 
 
-    .vente-detail-top {
+    .ventes-page .vente-detail-top{
         grid-template-columns:
             1fr;
     }
 
 
-    .client-modal {
+    .ventes-page .client-modal{
         padding: 20px;
     }
 
@@ -1144,73 +1129,73 @@
    Ces règles complètent le CSS existant sans modifier Ventes.jsx.
 ===================================================== */
 
-.ventes-page {
+.ventes-page{
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
     overflow-x: hidden;
 }
 
-.ventes-page .stats-grid {
+.ventes-page .stats-grid{
     width: 100%;
     box-sizing: border-box;
 }
 
-.ventes-page .stat-card {
+.ventes-page .stat-card{
     min-width: 0;
 }
 
-.ventes-page .stat-value {
+.ventes-page .stat-value{
     overflow-wrap: anywhere;
 }
 
-.ventes-page .vente-search-wrapper {
+.ventes-page .vente-search-wrapper{
     width: min(360px, 100%);
     min-width: 0;
 }
 
-.ventes-page .vente-search-wrapper input {
+.ventes-page .vente-search-wrapper input{
     appearance: none;
     -webkit-appearance: none;
 }
 
-.ventes-page .table-container {
+.ventes-page .table-container{
     max-width: 100%;
     box-sizing: border-box;
 }
 
 .ventes-page .table th,
-.ventes-page .table td {
+.ventes-page .table td{
     vertical-align: middle;
 }
 
-.ventes-page .table td:nth-child(1) {
+.ventes-page .table td:nth-child(1){
     width: 80px;
 }
 
-.ventes-page .table td:nth-child(4) strong {
+.ventes-page .table td:nth-child(4) strong{
     white-space: nowrap;
 }
 
-.ventes-page .vente-status {
+.ventes-page .vente-status{
     padding: 6px 10px;
     border-radius: 999px;
     line-height: 1;
 }
 
-.ventes-page .vente-status.pending {
+.ventes-page .vente-status.pending{
     background: rgba(244, 201, 93, 0.10);
 }
 
-.ventes-page .vente-status.paid {
+.ventes-page .vente-status.paid{
     background: rgba(38, 217, 120, 0.10);
 }
 
-.ventes-page .vente-status.cancelled {
+.ventes-page .vente-status.cancelled{
     background: rgba(255, 102, 102, 0.10);
 }
 
-.ventes-page .table-action {
+.ventes-page .table-action{
     flex-shrink: 0;
     transition:
         background 0.2s ease,
@@ -1219,30 +1204,178 @@
         transform 0.2s ease;
 }
 
-.ventes-page .table-action:hover {
+.ventes-page .table-action:hover{
     transform: translateY(-1px);
 }
 
-.ventes-page .vente-client span {
+.ventes-page .vente-client span{
     white-space: nowrap;
 }
 
 @media (max-width: 1100px) {
-    .ventes-page .stats-grid {
+    .ventes-page .stats-grid{
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
 @media (max-width: 700px) {
-    .ventes-page {
+    .ventes-page{
         padding: 20px;
     }
 
-    .ventes-page .stats-grid {
+    .ventes-page .stats-grid{
         grid-template-columns: 1fr;
     }
 
-    .ventes-page .vente-search-wrapper {
+    .ventes-page .vente-search-wrapper{
         width: 100%;
     }
+}
+
+
+/* =====================================================
+   CORRECTION THEME
+   IMPORTANT : Ventes.css ne doit jamais imposer son
+   ancien thème sombre aux autres pages.
+   ===================================================== */
+
+.ventes-page {
+    color: var(--text-primary);
+}
+
+.ventes-page .page-description {
+    color: var(--text-secondary);
+}
+
+.ventes-page .btn-secondary {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.ventes-page .vente-search-wrapper {
+    border-color: var(--border-color);
+    background: var(--card-bg);
+    color: var(--text-secondary);
+}
+
+.ventes-page .vente-search-wrapper input {
+    color: var(--text-primary);
+}
+
+.ventes-page .vente-search-wrapper input::placeholder {
+    color: var(--text-muted);
+}
+
+.ventes-page .table-container {
+    border-color: var(--border-color);
+    background: var(--card-bg);
+}
+
+.ventes-page .table {
+    background: var(--card-bg);
+}
+
+.ventes-page .table thead,
+.ventes-page .table th {
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+}
+
+.ventes-page .table td {
+    background: var(--card-bg);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.ventes-page .table tbody tr:hover,
+.ventes-page .table tbody tr:hover td {
+    background: var(--bg-tertiary);
+}
+
+.ventes-page .table-action {
+    border-color: var(--border-color);
+    color: var(--text-secondary);
+}
+
+.ventes-page .table-action:hover {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+.ventes-page .stat-card {
+    background: var(--card-bg);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.ventes-page .stat-label {
+    color: var(--text-secondary);
+}
+
+.ventes-page .stat-value {
+    color: var(--text-primary);
+}
+
+.ventes-page .client-modal,
+.ventes-page .confirm-modal {
+    background: var(--card-bg);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.ventes-page .modal-header h2,
+.ventes-page .reservation-products-header h3,
+.ventes-page .reservation-total-preview strong,
+.ventes-page .reservation-total-row strong,
+.ventes-page .vente-detail-top strong,
+.ventes-page .reservation-product-info strong,
+.ventes-page .reservation-product-row > strong,
+.ventes-page .confirm-content h2 {
+    color: var(--text-primary);
+}
+
+.ventes-page .modal-header p,
+.ventes-page .reservation-products-header p,
+.ventes-page .detail-label,
+.ventes-page .reservation-product-info span,
+.ventes-page .confirm-content p {
+    color: var(--text-secondary);
+}
+
+.ventes-page .modal-close,
+.ventes-page .confirm-close {
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+}
+
+.ventes-page .form-input {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+.ventes-page .form-input option {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.ventes-page .vente-detail-top > div,
+.ventes-page .reservation-product-row {
+    background: var(--bg-secondary);
+    border-color: var(--border-color);
+}
+
+.ventes-page .reservation-product-icon {
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+}
+
+.ventes-page .vente-empty,
+.ventes-page .vente-loading {
+    color: var(--text-secondary);
+}
+
+.ventes-page .vente-empty h3 {
+    color: var(--text-primary);
 }
