@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 
 
@@ -15,11 +16,6 @@ import {
     updatePassword
 
 } from "../services/authService";
-
-import {
-    getParametres,
-    updateParametre,
-} from "../services/parametreService";
 
 
 
@@ -54,7 +50,44 @@ import {
 function Parametre() {
 
 
+
+
+
+
+
     const { theme, toggleTheme } = useTheme();
+
+    // Toast de confirmation / information
+    const [toast, setToast] = useState(null);
+
+    const toastTimerRef = useRef(null);
+
+    const showToast = (message, type = "success") => {
+        if (toastTimerRef.current) {
+            clearTimeout(toastTimerRef.current);
+        }
+
+        setToast({ message, type });
+
+        toastTimerRef.current = setTimeout(() => {
+            setToast(null);
+        }, 3000);
+    };
+
+    useEffect(() => {
+        return () => {
+            if (toastTimerRef.current) {
+                clearTimeout(toastTimerRef.current);
+            }
+        };
+    }, []);
+
+
+
+
+
+
+
 
 
           const handleSaveProfile = async () => {
@@ -109,7 +142,7 @@ function Parametre() {
 
 
 
-        alert("Profil enregistré avec succès.");
+        showToast("Profil enregistré avec succès.");
 
 
 
@@ -137,7 +170,7 @@ function Parametre() {
 
 
 
-        alert(message);
+        showToast(message, "error");
 
     }
 
@@ -159,11 +192,7 @@ const handleSavePassword = async () => {
 
 
 
-        alert(
-
-            "Veuillez saisir votre mot de passe actuel."
-
-        );
+        showToast("Veuillez saisir votre mot de passe actuel.", "error");
 
 
 
@@ -179,11 +208,7 @@ const handleSavePassword = async () => {
 
 
 
-        alert(
-
-            "Veuillez saisir un nouveau mot de passe."
-
-        );
+        showToast("Veuillez saisir un nouveau mot de passe.", "error");
 
 
 
@@ -205,11 +230,7 @@ const handleSavePassword = async () => {
 
 
 
-        alert(
-
-            "La confirmation du mot de passe ne correspond pas."
-
-        );
+        showToast("La confirmation du mot de passe ne correspond pas.", "error");
 
 
 
@@ -237,7 +258,7 @@ const handleSavePassword = async () => {
 
 
 
-        alert(result.message);
+        showToast(result.message);
 
 
 
@@ -273,13 +294,11 @@ const handleSavePassword = async () => {
 
 
 
-        alert(
-
-            error.response?.data?.detail ||
-
-            "Impossible de modifier le mot de passe."
-
-        );
+        showToast(
+            error.response?.data?.detail ||
+            "Impossible de modifier le mot de passe.",
+            "error"
+        );
 
     }
 
@@ -579,10 +598,7 @@ useEffect(() => {
 
 
 
-const [parametreId, setParametreId] = useState(null);
 
-const [documentsSaving, setDocumentsSaving] =
-    useState(false);
 
     // =========================================================
 
@@ -636,61 +652,7 @@ const [documentsSaving, setDocumentsSaving] =
 
 
 
-useEffect(() => {
 
-    const loadParametres = async () => {
-
-        try {
-
-            const data = await getParametres();
-
-            if (!Array.isArray(data) || data.length === 0) {
-                return;
-            }
-
-            const parametre = data[0];
-
-            setParametreId(parametre.id_parametre);
-
-            setDocuments({
-                afficherLogo:
-                    parametre.afficher_logo ?? true,
-
-                afficherAdresse:
-                    parametre.afficher_adresse ?? true,
-
-                afficherTelephone:
-                    parametre.afficher_telephone ?? true,
-
-                afficherEmail:
-                    parametre.afficher_email ?? true,
-
-                message:
-                    parametre.message_recu ??
-                    "Merci pour votre confiance !",
-
-                formatTicket:
-                    parametre.format_ticket ??
-                    "80mm",
-            });
-
-        } catch (error) {
-
-            console.error(
-                "Erreur lors du chargement des paramètres :",
-                error
-            );
-
-            alert(
-                "Impossible de charger les paramètres des reçus."
-            );
-        }
-
-    };
-
-    loadParametres();
-
-}, []);
 
 
 
@@ -852,91 +814,6 @@ useEffect(() => {
 
 
 
-const handleSaveDocuments = async () => {
-
-    if (!parametreId) {
-
-        alert(
-            "Impossible d'identifier les paramètres du système."
-        );
-
-        return;
-    }
-
-    try {
-
-        setDocumentsSaving(true);
-
-        const updated = await updateParametre(
-            parametreId,
-            {
-                afficher_logo:
-                    documents.afficherLogo,
-
-                afficher_adresse:
-                    documents.afficherAdresse,
-
-                afficher_telephone:
-                    documents.afficherTelephone,
-
-                afficher_email:
-                    documents.afficherEmail,
-
-                message_recu:
-                    documents.message || null,
-
-                format_ticket:
-                    documents.formatTicket,
-            }
-        );
-
-        setDocuments({
-            afficherLogo:
-                updated.afficher_logo ?? true,
-
-            afficherAdresse:
-                updated.afficher_adresse ?? true,
-
-            afficherTelephone:
-                updated.afficher_telephone ?? true,
-
-            afficherEmail:
-                updated.afficher_email ?? true,
-
-            message:
-                updated.message_recu ??
-                "Merci pour votre confiance !",
-
-            formatTicket:
-                updated.format_ticket ??
-                "80mm",
-        });
-
-        alert(
-            "Les paramètres des reçus ont été enregistrés."
-        );
-
-    } catch (error) {
-
-        console.error(
-            "Erreur lors de l'enregistrement des paramètres :",
-            error
-        );
-
-        const message =
-            error?.response?.data?.detail ||
-            "Impossible d'enregistrer les paramètres.";
-
-        alert(message);
-
-    } finally {
-
-        setDocumentsSaving(false);
-
-    }
-};
-
-
 
 
        const handleLogoChange = (event) => {
@@ -967,7 +844,7 @@ const handleSaveDocuments = async () => {
 
     if (!allowedTypes.includes(file.type)) {
 
-        alert("Veuillez choisir une image PNG, JPG ou WEBP.");
+        showToast("Veuillez choisir une image PNG, JPG ou WEBP.", "error");
 
         return;
 
@@ -981,7 +858,7 @@ const handleSaveDocuments = async () => {
 
     if (file.size > maxSize) {
 
-        alert("Le logo ne doit pas dépasser 5 MB.");
+        showToast("Le logo ne doit pas dépasser 5 MB.", "error");
 
         return;
 
@@ -1091,7 +968,7 @@ const handleSaveCompany = async () => {
 
 
 
-        alert("Les informations de l'entreprise ont été enregistrées.");
+        showToast("Les informations de l'entreprise ont été enregistrées.");
 
 
 
@@ -1115,7 +992,7 @@ const handleSaveCompany = async () => {
 
 
 
-        alert(message);
+        showToast(message, "error");
 
 
 
@@ -1126,24 +1003,41 @@ const handleSaveCompany = async () => {
     }
 
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-            return (
-
+            return (
         <div className="parametres-page">
-
-            {/* =====================================================
+            {toast && typeof document !== "undefined" &&
+                createPortal(
+                    <div
+                        role="alert"
+                        aria-live="assertive"
+                        style={{
+                            position: "fixed",
+                            right: "24px",
+                            bottom: "24px",
+                            zIndex: 2147483647,
+                            minWidth: "300px",
+                            maxWidth: "440px",
+                            padding: "14px 18px",
+                            borderRadius: "12px",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "10px",
+                            background: toast.type === "error" ? "#b42318" : "#16803c",
+                            color: "#fff",
+                            boxShadow: "0 10px 30px rgba(0,0,0,.30)",
+                            fontSize: "14px",
+                            fontWeight: 600,
+                            pointerEvents: "none",
+                        }}
+                    >
+                        <span style={{ fontSize: "20px", lineHeight: 1 }}>
+                            {toast.type === "error" ? "✕" : "✓"}
+                        </span>
+                        <span>{toast.message}</span>
+                    </div>,
+                    document.body
+                )}
+{/* =====================================================
 
 
 
@@ -3093,16 +2987,27 @@ const handleSaveCompany = async () => {
 
 
 
-                 <button
-                    type="button"
-                    className="btn-primary"
-                    onClick={handleSaveDocuments}
-                    disabled={documentsSaving}
-                >
-                    {documentsSaving
-                        ? "Enregistrement..."
-                        : "Enregistrer les paramètres"}
-                </button>
+                    <button
+
+
+
+                        type="button"
+
+
+
+                        className="btn-primary"
+
+
+
+                    >
+
+
+
+                        Enregistrer les paramètres
+
+
+
+                    </button>
 
 
 
