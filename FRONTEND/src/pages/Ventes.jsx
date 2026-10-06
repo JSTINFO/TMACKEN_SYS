@@ -1885,29 +1885,34 @@ function Ventes() {
                 BARRE RECHERCHE
             ================================================= */}
 
-            <div className="toolbar">
+           <div className="toolbar">
+    <div className="vente-search-wrapper">
+        <Search size={17} />
 
-                <div className="vente-search-wrapper">
+        <input
+            type="text"
+            placeholder="Rechercher une vente..."
+            value={search}
+            onChange={e =>
+                setSearch(
+                    e.target.value
+                )
+            }
+        />
+    </div>
 
-                    <Search
-                        size={17}
-                    />
-
-                    <input
-                        type="text"
-                        placeholder="Rechercher une vente..."
-                        value={search}
-                        onChange={e =>
-                            setSearch(
-                                e.target.value
-                            )
-                        }
-                    />
-
-                </div>
-
-            </div>
-
+    <button
+        className="btn btn-secondary"
+        onClick={chargerDonnees}
+        disabled={loading}
+    >
+        <RefreshCw
+            size={16}
+            className={loading ? "spin" : ""}
+        />
+        Actualiser
+    </button>
+</div>
 
             {/* =================================================
                 TABLEAU

@@ -1061,7 +1061,7 @@ const handleSaveCompany = async () => {
 
 
 
-                    <h1 className="page-title">
+{/*                     <h1 className="page-title">
 
 
 
@@ -1069,7 +1069,7 @@ const handleSaveCompany = async () => {
 
 
 
-                    </h1>
+                    </h1> */}
 
 
 
@@ -1077,7 +1077,7 @@ const handleSaveCompany = async () => {
 
 
 
-                    <p className="page-description">
+{/*                     <p className="page-description">
 
 
 
@@ -1089,7 +1089,7 @@ const handleSaveCompany = async () => {
 
 
 
-                    </p>
+                    </p> */}
 
 
 
