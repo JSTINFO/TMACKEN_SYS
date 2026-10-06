@@ -40,6 +40,12 @@ import {
 } from "../services/entrepriseService";
 
 
+import {
+    getParametres,
+    updateParametre,
+} from "../services/parametreService";
+
+
 
 
 
@@ -53,7 +59,42 @@ function Parametre() {
 
 
 
+const [savingDocuments, setSavingDocuments] = useState(false);
+const [documentsMessage, setDocumentsMessage] = useState("");
+useEffect(() => {
+    const chargerParametres = async () => {
+        try {
+            const data = await getParametres();
 
+            const parametre = Array.isArray(data)
+                ? data[0]
+                : data;
+
+            if (!parametre) {
+                return;
+            }
+
+            setDocuments({
+                afficherLogo: parametre.afficher_logo ?? true,
+                afficherAdresse: parametre.afficher_adresse ?? true,
+                afficherTelephone: parametre.afficher_telephone ?? true,
+                afficherEmail: parametre.afficher_email ?? true,
+                message:
+                    parametre.message_recu ??
+                    "Merci pour votre confiance !",
+                formatTicket:
+                    parametre.format_ticket ?? "80mm",
+            });
+        } catch (error) {
+            console.error(
+                "Erreur lors du chargement des paramètres :",
+                error
+            );
+        }
+    };
+
+    chargerParametres();
+}, []);
 
     const { theme, toggleTheme } = useTheme();
 
@@ -812,6 +853,116 @@ useEffect(() => {
 
 
 
+
+
+
+const chargerParametresDocuments = async () => {
+    try {
+        const data = await getParametres();
+
+        const parametre = Array.isArray(data)
+            ? data[0]
+            : data;
+
+        if (!parametre) {
+            return;
+        }
+
+        setDocuments({
+            afficherLogo: parametre.afficher_logo ?? true,
+            afficherAdresse: parametre.afficher_adresse ?? true,
+            afficherTelephone: parametre.afficher_telephone ?? true,
+            afficherEmail: parametre.afficher_email ?? true,
+            message: parametre.message_recu ?? "Merci pour votre confiance !",
+            formatTicket: parametre.format_ticket ?? "80mm",
+        });
+
+    } catch (error) {
+        console.error(
+            "Erreur lors du chargement des paramètres des reçus :",
+            error
+        );
+    }
+};
+
+
+
+
+const sauvegarderParametresDocuments = async () => {
+    try {
+        setSavingDocuments(true);
+        setDocumentsMessage("");
+
+        // Récupérer les paramètres existants
+        const data = await getParametres();
+
+        const parametre = Array.isArray(data)
+            ? data[0]
+            : data;
+
+        if (!parametre?.id_parametre) {
+            throw new Error(
+                "Aucun paramètre système trouvé dans la base de données."
+            );
+        }
+
+        // Préparer exactement les valeurs des champs
+        const payload = {
+            afficher_logo: documents.afficherLogo === true,
+            afficher_adresse: documents.afficherAdresse === true,
+            afficher_telephone: documents.afficherTelephone === true,
+            afficher_email: documents.afficherEmail === true,
+            message_recu: documents.message || "",
+            format_ticket: documents.formatTicket || "80mm",
+        };
+
+        console.log("ID paramètre :", parametre.id_parametre);
+        console.log("Payload envoyé :", payload);
+
+        // Mise à jour en base
+        const resultat = await updateParametre(
+            parametre.id_parametre,
+            payload
+        );
+
+        console.log("Paramètres enregistrés :", resultat);
+
+        // Mettre immédiatement l'état React à jour
+        setDocuments({
+            afficherLogo: resultat.afficher_logo ?? false,
+            afficherAdresse: resultat.afficher_adresse ?? false,
+            afficherTelephone: resultat.afficher_telephone ?? false,
+            afficherEmail: resultat.afficher_email ?? false,
+            message: resultat.message_recu ?? "",
+            formatTicket: resultat.format_ticket ?? "80mm",
+        });
+
+        setDocumentsMessage(
+            "Les paramètres des reçus ont été enregistrés avec succès."
+        );
+
+        showToast(
+            "Les paramètres des reçus ont été enregistrés."
+        );
+
+    } catch (error) {
+        console.error(
+            "Erreur lors de l'enregistrement des paramètres des reçus :",
+            error
+        );
+
+        const message =
+            error?.response?.data?.detail ||
+            error?.message ||
+            "Impossible d'enregistrer les paramètres des reçus.";
+
+        setDocumentsMessage(message);
+        showToast(message, "error");
+
+    } finally {
+        setSavingDocuments(false);
+    }
+};
 
 
 
@@ -2987,27 +3138,16 @@ const handleSaveCompany = async () => {
 
 
 
-                    <button
-
-
-
-                        type="button"
-
-
-
-                        className="btn-primary"
-
-
-
-                    >
-
-
-
-                        Enregistrer les paramètres
-
-
-
-                    </button>
+                 <button
+                    type="button"
+                    className="btn-primary"
+                    onClick={sauvegarderParametresDocuments}
+                    disabled={savingDocuments}
+                >
+                    {savingDocuments
+                        ? "Enregistrement..."
+                        : "Enregistrer les paramètres"}
+                </button>
 
 
 

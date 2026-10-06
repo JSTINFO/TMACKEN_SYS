@@ -97,3 +97,40 @@ class Parametre(Base):
         server_default=func.current_timestamp(),
         onupdate=func.current_timestamp()
     )
+
+
+    afficher_logo: Mapped[bool] = mapped_column(
+    Boolean,
+    nullable=False,
+    default=True
+)
+
+afficher_adresse: Mapped[bool] = mapped_column(
+    Boolean,
+    nullable=False,
+    default=True
+)
+
+afficher_telephone: Mapped[bool] = mapped_column(
+    Boolean,
+    nullable=False,
+    default=True
+)
+
+afficher_email: Mapped[bool] = mapped_column(
+    Boolean,
+    nullable=False,
+    default=True
+)
+
+message_recu: Mapped[str] = mapped_column(
+    String(255),
+    nullable=False,
+    default="Merci pour votre confiance !"
+)
+
+format_ticket: Mapped[str] = mapped_column(
+    String(20),
+    nullable=False,
+    default="80mm"
+)
