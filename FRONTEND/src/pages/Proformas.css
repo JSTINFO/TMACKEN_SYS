@@ -163,19 +163,28 @@
 
 .proformas-page .proforma-error,
 .proformas-page .error-message {
-    padding: 13px 16px;
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 3000;
 
-    margin-bottom: 20px;
+    width: auto;
+    max-width: 420px;
+    box-sizing: border-box;
+
+    margin: 0;
+    padding: 13px 16px;
 
     border-radius: 8px;
 
-    background: rgba(234, 67, 53, 0.10);
+    background: var(--danger-bg, #fde8e7);
+    border: 1px solid var(--danger, #ea4335);
 
-    color: var(--danger);
-
-    border: 1px solid rgba(234, 67, 53, 0.25);
+    color: var(--danger, #b42318);
 
     font-size: 14px;
+
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
 }
 
 
