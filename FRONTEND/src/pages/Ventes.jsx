@@ -31,7 +31,7 @@ import { createPaiement } from "../services/paiementService";
 import ConfirmModal from "../components/ConfirmModal";
 import PaymentModal from "../components/PaymentModal";
 
-import "./ventes.css";
+import "./Ventes.css";
 
 
 function Ventes() {
