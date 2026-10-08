@@ -53,6 +53,8 @@ app.add_middleware(
         "http://localhost:5173",
         "http://127.0.0.1:5173",
         "https://frontend-production-5e8ae.up.railway.app",
+        "https://lazaresystem.jstinfo.tech",
+        
 
     ],
     allow_credentials=True,
