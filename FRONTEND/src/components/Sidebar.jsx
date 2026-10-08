@@ -152,7 +152,7 @@ function Sidebar({ isOpen, onClose }) {
 
                 {user?.entreprise?.logo ? (
                     <img
-                        src={`http://127.0.0.1:8000${user.entreprise.logo}`}
+                        src={`${import.meta.env.VITE_API_URL}${user?.entreprise?.logo}`}
                         alt={`Logo ${user?.entreprise?.nom || "entreprise"}`}
                         className="sidebar-company-logo"
                     />

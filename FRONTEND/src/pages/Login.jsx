@@ -138,7 +138,7 @@ function Login() {
 
                 {entreprise?.logo ? (
                     <img
-                        src={`http://127.0.0.1:8000${entreprise.logo}`}
+                        src={`${import.meta.env.VITE_API_URL}${user?.entreprise?.logo}`}
                         alt={`Logo ${entreprise.nom || "entreprise"}`}
                         className="login-company-logo"
                     />

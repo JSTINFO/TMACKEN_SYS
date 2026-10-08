@@ -569,7 +569,7 @@ useEffect(() => {
 
                     file: null,
 
-                    preview: `http://127.0.0.1:8000${data.logo}`,
+                    preview: `${import.meta.env.VITE_API_URL}${data.logo}`,
 
                 });
 
@@ -1109,7 +1109,7 @@ const handleSaveCompany = async () => {
 
                     file: null,
 
-                    preview: `http://127.0.0.1:8000${result.logo}`,
+                    preview: `${import.meta.env.VITE_API_URL}${data.logo}`,
 
                 });
 
