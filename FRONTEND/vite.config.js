@@ -8,6 +8,7 @@ export default defineConfig({
     host: '0.0.0.0',
     allowedHosts: [
       'frontend-production-5e8ae.up.railway.app',
+      'lazaresystem.jstinfo.tech',
     ],
   },
 })
