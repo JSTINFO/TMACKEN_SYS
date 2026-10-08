@@ -52,7 +52,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:5173",
         "http://127.0.0.1:5173",
-        "http://192.168.1.226:5173",
+        "https://frontend-production-5e8ae.up.railway.app",
 
     ],
     allow_credentials=True,
