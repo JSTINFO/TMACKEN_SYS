@@ -4,6 +4,8 @@ from decimal import Decimal
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+import logging
+logger = logging.getLogger(__name__)
 
 from app.database.dependencies import get_db
 
@@ -489,12 +491,13 @@ def create_reservation(
 
         db.rollback()
 
+        logger.exception(
+            "ERREUR CREATION RESERVATION"
+        )
+
         raise HTTPException(
             status_code=500,
-            detail=(
-                "Impossible de créer "
-                "la réservation."
-            ),
+            detail="Impossible de créer la réservation.",
         ) from e
 
     return build_reservation_complete(
