@@ -17,14 +17,20 @@ if TYPE_CHECKING:
 class DetailReservation(Base):
     __tablename__ = "detail_reservation"
 
+    id_detail_reservation: Mapped[int] = mapped_column(
+        Integer,
+        primary_key=True,
+        autoincrement=True
+    )
+
     id_reservation: Mapped[int] = mapped_column(
         ForeignKey("reservation.id_reservation"),
-        primary_key=True
+        nullable=False
     )
 
     id_produit: Mapped[int] = mapped_column(
         ForeignKey("produit.id_produit"),
-        primary_key=True
+        nullable=False
     )
 
     quantite: Mapped[int] = mapped_column(
@@ -35,6 +41,14 @@ class DetailReservation(Base):
     prix_unitaire: Mapped[Decimal] = mapped_column(
         Numeric(10, 2),
         nullable=False
+    )
+
+    __table_args__ = (
+        UniqueConstraint(
+            "id_reservation",
+            "id_produit",
+            name="uq_detail_reservation_produit"
+        ),
     )
 
     reservation: Mapped["Reservation"] = relationship(
