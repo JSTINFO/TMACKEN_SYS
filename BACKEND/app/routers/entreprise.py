@@ -1,38 +1,20 @@
-from pathlib import Path
-import uuid
-from sqlalchemy.orm import Session
-
 from fastapi import (
     APIRouter,
     Depends,
+    File,
     HTTPException,
     UploadFile,
-    File,
 )
-
-from app.database.dependencies import get_db
-from app.models.entreprise import Entreprise
-from app.models.utilisateur import Utilisateur
-
-from app.schemas.entreprise import (
-    EntrepriseResponse,
-    EntrepriseUpdate,
-)
-
-from app.core.security import get_current_user
-
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import Response
 from sqlalchemy.orm import Session
 
 from app.database.dependencies import get_db
 from app.models.entreprise import Entreprise
 from app.models.utilisateur import Utilisateur
-
 from app.schemas.entreprise import (
     EntrepriseResponse,
     EntrepriseUpdate,
 )
-
 from app.core.security import get_current_user
 
 
@@ -42,9 +24,9 @@ router = APIRouter(
 )
 
 
-# =========================================================
-# GET - ENTREPRISE DE L'UTILISATEUR CONNECTÉ
-# =========================================================
+# ============================================================
+# ENTREPRISE DE L'UTILISATEUR CONNECTÉ
+# ============================================================
 
 @router.get(
     "/me",
@@ -54,7 +36,6 @@ def get_my_entreprise(
     db: Session = Depends(get_db),
     current_user: Utilisateur = Depends(get_current_user)
 ):
-
     if current_user.id_entreprise is None:
         raise HTTPException(
             status_code=404,
@@ -64,8 +45,7 @@ def get_my_entreprise(
     entreprise = (
         db.query(Entreprise)
         .filter(
-            Entreprise.id_entreprise
-            == current_user.id_entreprise
+            Entreprise.id_entreprise == current_user.id_entreprise
         )
         .first()
     )
@@ -76,12 +56,19 @@ def get_my_entreprise(
             detail="Entreprise introuvable"
         )
 
-    return entreprise
+    return {
+    "id_entreprise": entreprise.id_entreprise,
+    "nom": entreprise.nom,
+    "adresse": entreprise.adresse,
+    "telephone": entreprise.telephone,
+    "email": entreprise.email,
+    "site_web": entreprise.site_web,
+    "has_logo": entreprise.logo_data is not None,
+}
 
-
-# =========================================================
-# PUT - MODIFIER L'ENTREPRISE
-# =========================================================
+# ============================================================
+# MODIFIER LES INFORMATIONS DE L'ENTREPRISE
+# ============================================================
 
 @router.put(
     "/me",
@@ -92,7 +79,6 @@ def update_my_entreprise(
     db: Session = Depends(get_db),
     current_user: Utilisateur = Depends(get_current_user)
 ):
-
     if current_user.id_entreprise is None:
         raise HTTPException(
             status_code=404,
@@ -102,8 +88,7 @@ def update_my_entreprise(
     entreprise = (
         db.query(Entreprise)
         .filter(
-            Entreprise.id_entreprise
-            == current_user.id_entreprise
+            Entreprise.id_entreprise == current_user.id_entreprise
         )
         .first()
     )
@@ -123,12 +108,20 @@ def update_my_entreprise(
     db.commit()
     db.refresh(entreprise)
 
-    return entreprise
+    return {
+    "id_entreprise": entreprise.id_entreprise,
+    "nom": entreprise.nom,
+    "adresse": entreprise.adresse,
+    "telephone": entreprise.telephone,
+    "email": entreprise.email,
+    "site_web": entreprise.site_web,
+    "has_logo": entreprise.logo_data is not None,
+}
 
 
-# =========================================================
-# POST - UPLOAD LOGO ENTREPRISE
-# =========================================================
+# ============================================================
+# UPLOAD DU LOGO
+# ============================================================
 
 @router.post(
     "/me/logo",
@@ -137,13 +130,8 @@ def update_my_entreprise(
 async def upload_logo(
     file: UploadFile = File(...),
     db: Session = Depends(get_db),
-    current_user: Utilisateur = Depends(get_current_user),
+    current_user: Utilisateur = Depends(get_current_user)
 ):
-
-    # -----------------------------------------------------
-    # Vérifier l'entreprise
-    # -----------------------------------------------------
-
     if current_user.id_entreprise is None:
         raise HTTPException(
             status_code=404,
@@ -153,8 +141,7 @@ async def upload_logo(
     entreprise = (
         db.query(Entreprise)
         .filter(
-            Entreprise.id_entreprise
-            == current_user.id_entreprise
+            Entreprise.id_entreprise == current_user.id_entreprise
         )
         .first()
     )
@@ -165,14 +152,11 @@ async def upload_logo(
             detail="Entreprise introuvable"
         )
 
-    # -----------------------------------------------------
-    # Vérifier le type de fichier
-    # -----------------------------------------------------
-
+    # Formats autorisés
     allowed_types = {
-        "image/png": ".png",
-        "image/jpeg": ".jpg",
-        "image/webp": ".webp",
+        "image/png",
+        "image/jpeg",
+        "image/webp",
     }
 
     if file.content_type not in allowed_types:
@@ -184,16 +168,10 @@ async def upload_logo(
             )
         )
 
-    # -----------------------------------------------------
-    # Lire le fichier
-    # -----------------------------------------------------
-
+    # Lecture du fichier
     content = await file.read()
 
-    # -----------------------------------------------------
-    # Limite : 5 MB
-    # -----------------------------------------------------
-
+    # Taille maximale : 5 MB
     max_size = 5 * 1024 * 1024
 
     if len(content) > max_size:
@@ -202,71 +180,80 @@ async def upload_logo(
             detail="Le logo ne doit pas dépasser 5 MB."
         )
 
-    # -----------------------------------------------------
-    # Dossier de stockage
-    # -----------------------------------------------------
+    if len(content) == 0:
+        raise HTTPException(
+            status_code=400,
+            detail="Le fichier du logo est vide."
+        )
 
-    upload_dir = (
-        Path(__file__).resolve().parent.parent
-        / "uploads"
-        / "entreprise"
-    )
-
-    upload_dir.mkdir(
-        parents=True,
-        exist_ok=True
-    )
-
-    # -----------------------------------------------------
-    # Nom unique
-    # -----------------------------------------------------
-
-    extension = allowed_types[file.content_type]
-
-    filename = (
-        f"entreprise_{entreprise.id_entreprise}_"
-        f"{uuid.uuid4().hex}{extension}"
-    )
-
-    file_path = upload_dir / filename
-
-    # -----------------------------------------------------
-    # Supprimer l'ancien logo
-    # -----------------------------------------------------
-
-    if entreprise.logo:
-        old_filename = Path(
-            entreprise.logo
-        ).name
-
-        old_path = upload_dir / old_filename
-
-        if old_path.exists():
-            old_path.unlink()
-
-    # -----------------------------------------------------
-    # Sauvegarder le nouveau logo
-    # -----------------------------------------------------
-
-    with open(file_path, "wb") as buffer:
-        buffer.write(content)
-
-    # -----------------------------------------------------
-    # Enregistrer le chemin en DB
-    # -----------------------------------------------------
-
-    entreprise.logo = (
-        f"/uploads/entreprise/{filename}"
-    )
+    # Stockage DIRECTEMENT dans MySQL
+    entreprise.logo_data = content
+    entreprise.logo_mime_type = file.content_type
+    entreprise.logo_filename = file.filename
 
     db.commit()
     db.refresh(entreprise)
 
-    return entreprise
+    return {
+    "id_entreprise": entreprise.id_entreprise,
+    "nom": entreprise.nom,
+    "adresse": entreprise.adresse,
+    "telephone": entreprise.telephone,
+    "email": entreprise.email,
+    "site_web": entreprise.site_web,
+    "has_logo": entreprise.logo_data is not None,
+}
 
-# =========================================================
-# GET - INFORMATIONS PUBLIQUES DE L'ENTREPRISE
-# =========================================================
+
+# ============================================================
+# AFFICHER LE LOGO DE L'ENTREPRISE CONNECTÉE
+# ============================================================
+
+@router.get(
+    "/me/logo"
+)
+def get_my_logo(
+    db: Session = Depends(get_db),
+    current_user: Utilisateur = Depends(get_current_user)
+):
+    if current_user.id_entreprise is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Aucune entreprise associée à cet utilisateur"
+        )
+
+    entreprise = (
+        db.query(Entreprise)
+        .filter(
+            Entreprise.id_entreprise == current_user.id_entreprise
+        )
+        .first()
+    )
+
+    if entreprise is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Entreprise introuvable"
+        )
+
+    if not entreprise.logo_data:
+        raise HTTPException(
+            status_code=404,
+            detail="Aucun logo configuré"
+        )
+
+    return Response(
+        content=entreprise.logo_data,
+        media_type=entreprise.logo_mime_type or "image/png",
+        headers={
+            "Content-Disposition": "inline"
+        }
+    )
+
+
+# ============================================================
+# ENTREPRISE PUBLIQUE
+# ============================================================
 
 @router.get(
     "/public",
@@ -277,7 +264,9 @@ def get_public_entreprise(
 ):
     entreprise = (
         db.query(Entreprise)
-        .order_by(Entreprise.id_entreprise.asc())
+        .order_by(
+            Entreprise.id_entreprise.asc()
+        )
         .first()
     )
 
@@ -287,4 +276,50 @@ def get_public_entreprise(
             detail="Aucune entreprise configurée"
         )
 
-    return entreprise
+    return {
+    "id_entreprise": entreprise.id_entreprise,
+    "nom": entreprise.nom,
+    "adresse": entreprise.adresse,
+    "telephone": entreprise.telephone,
+    "email": entreprise.email,
+    "site_web": entreprise.site_web,
+    "has_logo": entreprise.logo_data is not None,
+}
+
+# ============================================================
+# LOGO PUBLIC
+# ============================================================
+
+@router.get(
+    "/public/logo"
+)
+def get_public_logo(
+    db: Session = Depends(get_db)
+):
+    entreprise = (
+        db.query(Entreprise)
+        .order_by(
+            Entreprise.id_entreprise.asc()
+        )
+        .first()
+    )
+
+    if entreprise is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Aucune entreprise configurée"
+        )
+
+    if not entreprise.logo_data:
+        raise HTTPException(
+            status_code=404,
+            detail="Aucun logo configuré"
+        )
+
+    return Response(
+        content=entreprise.logo_data,
+        media_type=entreprise.logo_mime_type or "image/png",
+        headers={
+            "Content-Disposition": "inline"
+        }
+    )

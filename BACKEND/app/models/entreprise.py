@@ -1,22 +1,22 @@
 from datetime import datetime
+from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, Integer, String, func
+from sqlalchemy import DateTime, Integer, String, LargeBinary, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database.base import Base
 
-from typing import TYPE_CHECKING
-
 if TYPE_CHECKING:
- from app.models.utilisateur import Utilisateur
+    from app.models.utilisateur import Utilisateur
 
 
 class Entreprise(Base):
 
     __tablename__ = "entreprise"
+
     __table_args__ = {
-    "mysql_engine": "InnoDB"
-}
+        "mysql_engine": "InnoDB"
+    }
 
     id_entreprise: Mapped[int] = mapped_column(
         Integer,
@@ -49,7 +49,17 @@ class Entreprise(Base):
         nullable=True
     )
 
-    logo: Mapped[str | None] = mapped_column(
+    logo_data: Mapped[bytes | None] = mapped_column(
+        LargeBinary,
+        nullable=True
+    )
+
+    logo_mime_type: Mapped[str | None] = mapped_column(
+        String(50),
+        nullable=True
+    )
+
+    logo_filename: Mapped[str | None] = mapped_column(
         String(255),
         nullable=True
     )

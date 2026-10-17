@@ -1,5 +1,6 @@
-from pydantic import BaseModel, EmailStr
 from typing import Optional
+
+from pydantic import BaseModel, EmailStr
 
 
 class EntrepriseResponse(BaseModel):
@@ -9,7 +10,7 @@ class EntrepriseResponse(BaseModel):
     telephone: Optional[str] = None
     email: Optional[EmailStr] = None
     site_web: Optional[str] = None
-    logo: Optional[str] = None
+    has_logo: bool = False
 
     class Config:
         from_attributes = True

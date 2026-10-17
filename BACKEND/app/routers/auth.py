@@ -98,7 +98,9 @@ def get_me(
                 "telephone": current_user.entreprise.telephone,
                 "email": current_user.entreprise.email,
                 "site_web": current_user.entreprise.site_web,
-                "logo": current_user.entreprise.logo,
+                "logo": "/entreprise/public/logo"
+                if current_user.entreprise.logo_data
+                else None,
             }
             if current_user.entreprise
             else None
