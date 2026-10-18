@@ -1,1 +1,3 @@
 backend/backup_railway_*.sql
+BACKEND/*.sql
+BACKEND/backups/*.sql
