@@ -158,14 +158,11 @@ useEffect(() => {
                     ? parametresData[0]
                     : parametresData;
 
-            let logoUrl = null;
+           
 
-            if (entrepriseData?.logo) {
-                logoUrl = new URL(
-                    entrepriseData.logo,
-                    api.defaults.baseURL
-                ).href;
-            }
+                const logoUrl = entrepriseData?.has_logo
+            ? `${import.meta.env.VITE_API_URL}/entreprise/public/logo`
+            : null;
 
 setReceiptSettings({
     afficher_logo:

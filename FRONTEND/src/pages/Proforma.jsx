@@ -213,9 +213,9 @@ function Proformas() {
         const chargerEntreprise = async () => {
             try {
                 const data = await getMyEntreprise();
-                const logoUrl = data?.logo
-                    ? new URL(data.logo, api.defaults.baseURL).href
-                    : null;
+                const logoUrl = data?.has_logo
+                ? `${import.meta.env.VITE_API_URL}/entreprise/public/logo?t=${Date.now()}`
+                : null;
 
                 setEntreprise({
                     nom: data?.nom || "TMACKEN SYSTEM",
@@ -2372,8 +2372,13 @@ body {
 
         <div class="company">
 
-            ${entreprise.logo ? `<img class="company-logo" src="${escapeHtml(entreprise.logo)}" alt="Logo" />` : ""}
-
+                ${entreprise?.logo ? `
+                <img
+                    class="company-logo"
+                    src="${entreprise.logo}"
+                    alt="Logo"
+                />
+            ` : ""}
             <h1 class="company-name">
                 ${escapeHtml(entreprise.nom)}
             </h1>

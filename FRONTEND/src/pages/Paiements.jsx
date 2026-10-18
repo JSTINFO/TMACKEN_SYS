@@ -102,9 +102,9 @@ function Paiements() {
                 ? parametresData[0]
                 : parametresData;
 
-            const logoUrl = entrepriseData?.logo
-                ? new URL(entrepriseData.logo, api.defaults.baseURL).href
-                : null;
+           const logoUrl = entrepriseData?.has_logo
+            ? `${import.meta.env.VITE_API_URL}/entreprise/public/logo?t=${Date.now()}`
+            : null;
 
             setReceiptSettings({
                 afficher_logo: parametre?.afficher_logo ?? true,

@@ -76,8 +76,19 @@ function Rapport() {
             try {
                 const [e, p] = await Promise.all([getMyEntreprise().catch(() => null), getParametres().catch(() => null)]);
                 const param = Array.isArray(p) ? p[0] : p;
-                const logo = e?.logo ? new URL(e.logo, api.defaults.baseURL).href : null;
-                setEntreprise({ nom:e?.nom || "LAZARE_SYS", adresse:e?.adresse || "", telephone:e?.telephone || "", email:e?.email || "", site_web:e?.site_web || "", logo });
+                const logo = e?.has_logo
+    ? `${import.meta.env.VITE_API_URL}/entreprise/public/logo?t=${Date.now()}`
+    : null;
+
+        setEntreprise({
+            nom: e?.nom || "LAZARE_SYS",
+            adresse: e?.adresse || "",
+            telephone: e?.telephone || "",
+            email: e?.email || "",
+            site_web: e?.site_web || "",
+            has_logo: e?.has_logo || false,
+            logo
+        });
                 setReceiptSettings({ afficher_logo:param?.afficher_logo ?? true, afficher_adresse:param?.afficher_adresse ?? true, afficher_telephone:param?.afficher_telephone ?? true, afficher_email:param?.afficher_email ?? true, format_ticket:param?.format_ticket || "80mm" });
             } catch (err) { console.error("Erreur chargement entreprise/paramètres :", err); }
         };
@@ -341,9 +352,12 @@ function Rapport() {
             receiptSettings.afficher_email ? entreprise.email : null,
             entreprise.site_web
         ].filter(Boolean).map(v => `<div>${escapeHtml(v)}</div>`).join("");
-        const logoHtml = receiptSettings.afficher_logo && entreprise.logo
-            ? `<img class="company-logo" src="${escapeHtml(entreprise.logo)}" alt="Logo" />`
-            : "";
+        const logoHtml =
+    receiptSettings.afficher_logo && entreprise.has_logo
+        ? `<img class="company-logo" src="${escapeHtml(
+              `${import.meta.env.VITE_API_URL}/entreprise/public/logo`
+          )}" alt="Logo" />`
+        : "";
         const rows = transactions.map(t => `<tr><td>${dateText(t.date)}</td><td>${escapeHtml(t.reference)}</td><td>${t.typeTransaction}</td><td>${escapeHtml(t.client)}</td><td>${escapeHtml(t.mode_paiement || "—")}</td><td class="right">${money(t.montant)}</td><td>${escapeHtml(t.statutTransaction)}</td></tr>`).join("");
         w.document.write(`<!doctype html><html lang="fr"><head><meta charset="UTF-8"><title>Inventaire des transactions</title><style>
         *{box-sizing:border-box} @page{size:${thermal ? `${ticketWidth} 120mm` : "A4 portrait"};margin:${thermal ? "0" : "12mm"}} html,body{margin:0;padding:0;background:#fff;color:#111;font-family:Arial,sans-serif}.report{width:${thermal ? receiptWidth : "100%"};margin:${thermal ? "0 auto" : "0"};font-size:${thermal ? "9px" : "11px"}}.center{text-align:center}.right{text-align:right}h1{margin:0 0 3px;font-size:${thermal ? "16px" : "24px"}}h2{margin:0 0 10px;font-size:${thermal ? "11px" : "16px"}}.company{text-align:center;font-weight:bold;margin-bottom:8px}.company-logo{display:block;max-width:45mm;max-height:20mm;width:auto;height:auto;margin:0 auto 5px;object-fit:contain}.meta{border-top:1px dashed #222;border-bottom:1px dashed #222;padding:7px 0;margin:8px 0;line-height:1.55}.summary{display:grid;grid-template-columns:repeat(${thermal ? 2 : 4},1fr);gap:6px;margin:10px 0}.box{border:1px solid #ccc;padding:6px}.box span{display:block;font-size:9px;color:#555}.box strong{display:block;margin-top:2px}table{width:100%;border-collapse:collapse}th,td{padding:${thermal ? "4px 2px" : "7px 5px"};border-bottom:1px solid #ddd;text-align:left;vertical-align:top}th{border-top:1px solid #222;border-bottom:1px solid #222}.total{display:flex;justify-content:space-between;border-top:2px solid #111;margin-top:10px;padding-top:8px;font-weight:bold;font-size:${thermal ? "11px" : "14px"}}.footer{text-align:center;border-top:1px dashed #222;margin-top:15px;padding-top:9px}@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}</style></head><body><main class="report"><div class="company">${logoHtml}<h1>${escapeHtml(entreprise.nom)}</h1>${companyContact}<div>INVENTAIRE DES TRANSACTIONS</div></div><div class="meta"><div><b>Période :</b> ${escapeHtml(dateDebut)} → ${escapeHtml(dateFin)}</div><div><b>Type :</b> ${escapeHtml(type)}</div><div><b>Mode :</b> ${escapeHtml(mode)}</div><div><b>Statut :</b> ${escapeHtml(statut)}</div><div><b>Généré le :</b> ${dateText(new Date())}</div></div><div class="summary"><div class="box"><span>Transactions</span><strong>${stats.count}</strong></div><div class="box"><span>Ventes</span><strong>${stats.ventes}</strong></div><div class="box"><span>Réservations</span><strong>${stats.reservations}</strong></div><div class="box"><span>Encaissé</span><strong>${money(stats.total)}</strong></div></div><table><thead><tr><th>Date</th><th>Réf.</th><th>Type</th><th>Client</th><th>Mode</th><th>Montant</th><th>Statut</th></tr></thead><tbody>${rows || `<tr><td colspan="7" class="center">Aucune transaction.</td></tr>`}</tbody></table><div class="total"><span>TOTAL ENCAISSÉ</span><span>${money(stats.total)}</span></div><div class="footer"><b>Merci pour votre confiance !</b><br>Rapport généré par ${escapeHtml(entreprise.nom)}.</div></main><script>window.onload=()=>setTimeout(()=>{${thermal ? `const r=document.querySelector('.report'),s=document.querySelector('style');const h=Math.max(60,Math.ceil((r.scrollHeight||r.getBoundingClientRect().height)*25.4/96+4));s.textContent+=\`@media print{@page{size:${ticketWidth} \${h}mm!important;margin:0!important}html,body{width:${ticketWidth}!important;min-width:${ticketWidth}!important;margin:0!important;padding:0!important}.report{width:${receiptWidth}!important;margin:0 auto!important}}\`;` : ""}const images=Array.from(document.images);Promise.all(images.map(img=>img.complete?Promise.resolve():new Promise(resolve=>{img.onload=resolve;img.onerror=resolve;}))).then(()=>{window.focus();window.print();});},500)</script></body></html>`);

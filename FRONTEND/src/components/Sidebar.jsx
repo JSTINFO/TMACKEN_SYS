@@ -150,17 +150,32 @@ function Sidebar({ isOpen, onClose }) {
             ================================================= */}
             <div className="sidebar-logo">
 
-                {user?.entreprise?.logo ? (
+                            <div className="sidebar-company-logo-container">
                     <img
-                        src={`${import.meta.env.VITE_API_URL}${user?.entreprise?.logo}`}
-                        alt={`Logo ${user?.entreprise?.nom || "entreprise"}`}
+                        src={`${import.meta.env.VITE_API_URL}/entreprise/public/logo`}
+                        alt={user?.entreprise?.nom || "entreprise"}
                         className="sidebar-company-logo"
+                        onError={(e) => {
+                            e.currentTarget.style.display = "none";
+
+                            const fallback =
+                                e.currentTarget.parentElement.querySelector(
+                                    ".sidebar-company-logo-placeholder"
+                                );
+
+                            if (fallback) {
+                                fallback.style.display = "flex";
+                            }
+                        }}
                     />
-                ) : (
-                    <div className="sidebar-company-logo-placeholder">
+
+                    <div
+                        className="sidebar-company-logo-placeholder"
+                        style={{ display: "none" }}
+                    >
                         TMACKEN_SYS
                     </div>
-                )}
+                </div>
 
                 <div className="sidebar-company-name">
                     {user?.entreprise?.nom || "TMACKEN_SYS"}

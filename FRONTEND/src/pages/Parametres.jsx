@@ -562,19 +562,10 @@ useEffect(() => {
             });
 
 
-
-            if (data.logo) {
-
-                setLogo({
-
-                    file: null,
-
-                    preview: `${import.meta.env.VITE_API_URL}${data.logo}`,
-
-                });
-
-            }
-
+            setLogo({
+                file: null,
+                preview: `${import.meta.env.VITE_API_URL}/entreprise/public/logo`,
+            });
 
 
         } catch (error) {
@@ -1093,30 +1084,14 @@ const handleSaveCompany = async () => {
 
 
 
-        if (logo?.file) {
+                      if (logo?.file) {
+            await uploadEntrepriseLogo(logo.file);
 
-            const result = await uploadEntrepriseLogo(
-
-                logo.file
-
-            );
-
-
-
-            if (result.logo) {
-
-                setLogo({
-
-                    file: null,
-
-                    preview: `${import.meta.env.VITE_API_URL}${data.logo}`,
-
-                });
-
-            }
-
-        }
-
+            setLogo({
+                file: null,
+                preview: `${import.meta.env.VITE_API_URL}/entreprise/public/logo?t=${Date.now()}`,
+            });
+        }
 
 
         showToast("Les informations de l'entreprise ont été enregistrées.");

@@ -136,17 +136,26 @@ function Login() {
 
                         <div className="login-logo">
 
-                {entreprise?.logo ? (
+                                        <div className="login-company-logo-container">
                     <img
-                        src={`${import.meta.env.VITE_API_URL}${entreprise?.logo}`}
-                        alt={`Logo ${entreprise.nom || "entreprise"}`}
+                        src={`${import.meta.env.VITE_API_URL}/entreprise/public/logo`}
+                        alt={`Logo ${entreprise?.nom || "entreprise"}`}
                         className="login-company-logo"
+                        onError={(e) => {
+                            e.currentTarget.style.display = "none";
+                            e.currentTarget.parentElement
+                                .querySelector(".login-company-logo-fallback")
+                                .style.display = "block";
+                        }}
                     />
-                ) : (
-                    <h1>
+
+                    <h1
+                        className="login-company-logo-fallback"
+                        style={{ display: "none" }}
+                    >
                         TMACKEN_SYS
                     </h1>
-                )}
+                </div>
 
                 <div className="login-company-name">
                     {entreprise?.nom || "TMACKEN_SYS"}
